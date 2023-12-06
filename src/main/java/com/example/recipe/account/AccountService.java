@@ -63,4 +63,48 @@ public class AccountService {
         String token = jwtService.newToken(account);
         return new AuthRes(token, account.getId());
     }
+
+    public Boolean delete(int id) {
+        Account account = accountRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("No accounts with the id"));
+        // TODO: delete all account's recipies
+        try {
+            accountRepository.delete(account);
+        } catch(Exception e) {
+            throw new RuntimeException("Failed to delete account");
+        }
+        return true;
+    }
+
+    public Boolean update(Account account, int id) {
+        Account oldAccount = accountRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("Invalid id"));
+
+        if ((accountRepository.findByUsername(account.getUsername()).isPresent()
+                && !oldAccount.getUsername().equals(account.getUsername()))
+                || !account.getUsername().matches("^(.{4,20})")) {
+            throw new BadRequestException("Invalid username");
+        }
+        if (accountRepository.findByEmail(account.getEmail()).isPresent()
+            && !oldAccount.getEmail().equals(account.getEmail())) {
+            throw new BadRequestException("Invalid email");
+        }
+        if (!account.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")
+            && !account.getPassword().equals("null")) {
+            throw new BadRequestException("Invalid password");
+        }
+
+        oldAccount.setName(account.getName());
+        oldAccount.setUsername(account.getUsername());
+        oldAccount.setEmail(account.getEmail());
+        if (!account.getPassword().equals("null")) {
+            oldAccount.setPassword(passwordEncoder.encode(account.getPassword()));
+        }
+        try {
+            accountRepository.save(oldAccount);
+        } catch(Exception e) {
+            throw new RuntimeException("Failed to save changes to database");
+        }
+        return true;
+    }
 }

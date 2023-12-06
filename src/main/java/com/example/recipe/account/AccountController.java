@@ -27,4 +27,14 @@ public class AccountController {
 
     @PostMapping("/create")
     public AuthRes create(@RequestBody Account account) { return accountService.create(account); }
+
+    @PreAuthorize("#id == authentication.principal.id")
+    @DeleteMapping("/delete")
+    public Boolean delete(@RequestParam("accountId") int id) { return accountService.delete(id); }
+
+    @PreAuthorize("#id == authentication.principal.id")
+    @PutMapping("/update")
+    public Boolean update(@RequestBody Account account, @RequestParam("accountId") int id) {
+        return accountService.update(account, id);
+    }
 }
