@@ -1,0 +1,1 @@
+INSERT INTO accounts (account_name, account_username, account_email, account_password) VALUES ('test name', 'test username', 'test email', '$2a$10$0ooeofhWH.dzRKtwBUI6l.mcPaj7TZAoBcNpHUEFmeQhY0SPYecd6');
