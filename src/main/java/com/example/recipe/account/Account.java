@@ -6,6 +6,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * Creates the account entity for the database.
+ */
 @Entity
 @Table(name="accounts")
 public class Account implements UserDetails {

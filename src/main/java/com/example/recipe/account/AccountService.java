@@ -11,6 +11,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * Logic for account calls.
+ */
 @Service
 public class AccountService {
     @Autowired
@@ -26,6 +30,12 @@ public class AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Finds the account with the given id.
+     * @param id
+     *       Id of the account to get
+     * @return An account with the id
+     */
     public Account getAccount(int id) {
         Account account = accountRepository.findById(id).orElseThrow(()->
                 new BadRequestException("Account not found"));
@@ -33,6 +43,12 @@ public class AccountService {
         return account;
     }
 
+    /**
+     * Logs user in.
+     * @param request
+     *       AuthRequest of username and password
+     * @return AuthRes of token and user's id
+     */
     public AuthRes login(AuthRequest request) {
         System.out.println(passwordEncoder.encode(request.getPassword()));
         authenticationManager.authenticate(
@@ -43,6 +59,12 @@ public class AccountService {
         return new AuthRes(token, account.getId());
     }
 
+    /**
+     * Creates a new account.
+     * @param account
+     *       Account with name, username, email and password for new user
+     * @return AuthRes of token and user's id
+     */
     public AuthRes create(Account account) {
         if (accountRepository.findByUsername(account.getUsername()).isPresent()
             || !account.getUsername().matches("^(.{4,20})")) {
@@ -65,6 +87,12 @@ public class AccountService {
         return new AuthRes(token, account.getId());
     }
 
+    /**
+     * Deletes an account.
+     * @param id
+     *       Id of the account to be deleted
+     * @return true if account was deleted, false if not
+     */
     public Boolean delete(int id) {
         Account account = accountRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("No accounts with the id"));
@@ -77,6 +105,14 @@ public class AccountService {
         return true;
     }
 
+    /**
+     * Updates user's account information.
+     * @param account
+     *      Contains user's new name, username, email and password
+     * @param id
+     *      Id of the account being updated
+     * @return true if account was updated, false if not
+     */
     public Boolean update(Account account, int id) {
         Account oldAccount = accountRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("Invalid id"));
