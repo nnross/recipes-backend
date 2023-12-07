@@ -1,10 +1,13 @@
 package com.example.recipe.account;
 
 
+import com.example.recipe.response.AuthRes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,8 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //TODO: annotations
 @WebMvcTest(value= AccountController.class)
 @ContextConfiguration(classes = AccountController.class)
+@EnableMethodSecurity
 class AccountControllerTest {
-    //TODO: mocks and autowires
+    @MockBean
+    AccountService accountService;
 
     @Autowired
     MockMvc mockMvc;
@@ -32,8 +37,8 @@ class AccountControllerTest {
                 1,
                 "name",
                 "username",
-                "pass",
-                "email"
+                "email",
+                "pass"
         );
         given(accountService.getAccount(anyInt())).willReturn(account);
 
@@ -66,6 +71,7 @@ class AccountControllerTest {
                 1,
                 "name",
                 "username",
+                "email",
                 "pass"
         );
         mockMvc.perform(get("/api/account/get?accountId=2", 1).with(csrf())
@@ -76,16 +82,16 @@ class AccountControllerTest {
     @Test
     void addAccountWorks() throws Exception {
 
-        given(accountService.saveAccount(any())).willReturn(new AuthRes("token", 1));
+        given(accountService.create(any())).willReturn(new AuthRes("token", 1));
 
-        mockMvc.perform(post("/api/account/add").with(csrf())
+        mockMvc.perform(post("/api/account/create").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                            "name": "seller",
-                            "username": "sellerUsername",
-                            "password": "SellerPass123",
-                            "email": "sellerEmail"
+                            "name": "test name",
+                            "username": "testusername",
+                            "email": "test email",
+                            "password": "TestPass123!"
                         }
                         """)
                         .with(user(new Account())))
@@ -97,7 +103,7 @@ class AccountControllerTest {
 
     @Test
     void addAccountThrowsWithNoItemGiven() throws Exception {
-        mockMvc.perform(post("/api/account/add").with(csrf())
+        mockMvc.perform(post("/api/account/create").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("")
                         .with(user(new Account())))
@@ -111,8 +117,8 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                            "username": "sellerUsername",
-                            "password": "SellerPass123"
+                            "username": "testusername",
+                            "password": "TestPass123!"
                         }
                         """)
                         .with(user(new Account())))
@@ -137,11 +143,11 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
 
-        given(accountService.updateAccount(anyInt(), any())).willReturn(true);
+        given(accountService.update(any(), anyInt())).willReturn(true);
 
         mockMvc.perform(put("/api/account/update?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,8 +155,8 @@ class AccountControllerTest {
                         {
                             "name": "updatedName",
                             "username": "updatedUsername",
-                            "password": "updatedPass",
-                            "email": "updatedEmail"
+                            "email": "updatedEmail",
+                            "pass": "updatedPass"
                         }
                         """)
                         .with(user(account)))
@@ -163,8 +169,8 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
 
         mockMvc.perform(put("/api/account/update").with(csrf())
@@ -173,8 +179,8 @@ class AccountControllerTest {
                         {
                             "name": "updatedName",
                             "username": "updatedUsername",
-                            "password": "updatedPass",
-                            "email": "updatedEmail"
+                            "email": "updatedEmail",
+                            "pass": "updatedPass"
                         }
                         """)
                         .with(user(account)))
@@ -188,8 +194,8 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
 
         mockMvc.perform(put("/api/account/update?accountId=1", 1).with(csrf())
@@ -230,11 +236,11 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
-        given(accountService.deleteAccount(anyInt())).willReturn(true);
-        mockMvc.perform(delete("/api/account/del?accountId=1", 1).with(csrf())
+        given(accountService.delete(anyInt())).willReturn(true);
+        mockMvc.perform(delete("/api/account/delete?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user(account)))
                 .andExpect(status().isOk())
@@ -247,11 +253,11 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
-        given(accountService.deleteAccount(anyInt())).willReturn(false);
-        mockMvc.perform(delete("/api/account/del?accountId=1", 1).with(csrf())
+        given(accountService.delete(anyInt())).willReturn(false);
+        mockMvc.perform(delete("/api/account/delete?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user(account)))
                 .andExpect(status().isOk())
@@ -264,11 +270,11 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
-        given(accountService.deleteAccount(anyInt())).willReturn(true);
-        mockMvc.perform(delete("/api/account/del").with(csrf())
+        given(accountService.delete(anyInt())).willReturn(true);
+        mockMvc.perform(delete("/api/account/delete").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -279,11 +285,11 @@ class AccountControllerTest {
                 1,
                 "updatedName",
                 "updatedUsername",
-                "updatedPass",
-                "updatedEmail"
+                "updatedEmail",
+                "updatedPass"
         );
-        given(accountService.deleteAccount(anyInt())).willReturn(true);
-        mockMvc.perform(delete("/api/account/del?accountId=2").with(csrf())
+        given(accountService.delete(anyInt())).willReturn(true);
+        mockMvc.perform(delete("/api/account/delete?accountId=2").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }

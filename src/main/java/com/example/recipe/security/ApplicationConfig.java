@@ -29,7 +29,7 @@ public class ApplicationConfig {
      * @return found user.
      */
     @Bean
-    public UserDetailsService userDetailService ()  {
+    public UserDetailsService userDetailsService ()  {
         return username -> accountRepository.findByUsername(username).orElseThrow(
                 () -> new ForbiddenException(
                         "Access Denied"
@@ -48,24 +48,24 @@ public class ApplicationConfig {
     }
 
     /**
-     * creates spring security authenticationProvider setUserDetailsService and setPasswordEncoder as our custom.
-     * @return created authenticationProvider.
-     */
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    /**
      * Creates a new BcryptPasswordEncoder.
      * @return created passwordEncoder.
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * creates spring security authenticationProvider setUserDetailsService and setPasswordEncoder as our custom.
+     * @return created authenticationProvider.
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
 }

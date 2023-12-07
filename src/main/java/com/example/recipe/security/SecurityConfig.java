@@ -59,10 +59,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // endpoints without security and with security
         http.authorizeHttpRequests(auth -> auth
-                // .requestMatchers("/api/account/add", "/api/account/login", "/error")
-                // .permitAll()
-                .anyRequest().permitAll());
-                // .authenticated());
+                .requestMatchers("/api/account/create", "/api/account/login", "/error")
+                .permitAll()
+                .anyRequest()
+                .authenticated());
 
 
         http.sessionManagement(session -> session
