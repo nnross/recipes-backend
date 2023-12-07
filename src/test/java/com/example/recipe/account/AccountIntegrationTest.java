@@ -1,7 +1,9 @@
 package com.example.recipe.account;
 
+import com.example.recipe.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -10,12 +12,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// TODO: annotations
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class AccountIntegrationTest {
-    //TODO: mocks
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Autowired
     private WebTestClient webClient;
@@ -24,10 +28,10 @@ class AccountIntegrationTest {
     void getAccountWorks() {
         Account account = new Account(
                 1,
-                "test",
-                "initSeller",
-                "initSeller pass",
-                "email"
+                "test username",
+                "test name",
+                "test email",
+                "test"
         );
         String token = jwtService.newToken(account);
         webClient.get().uri("/api/account/get?accountId=1")
@@ -35,23 +39,23 @@ class AccountIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("initSeller name")
-                .jsonPath("$.username").isEqualTo("initSeller")
+                .jsonPath("$.name").isEqualTo("test name")
+                .jsonPath("$.username").isEqualTo("test username")
                 .jsonPath("$.password").isEqualTo(null)
-                .jsonPath("$.email").isEqualTo("initSeller email");
+                .jsonPath("$.email").isEqualTo("test email");
     }
     @Test
     void addAccountWorks() {
         int items = accountRepository.findAll().size();
-        webClient.post().uri("/api/account/add")
+        webClient.post().uri("/api/account/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(
                         """
                         {
-                            "name": "test",
+                            "name": "test name",
                             "username": "testUsername",
-                            "password": "testPass123!",
-                            "email": "testEmail"
+                            "email": "testEmail",
+                            "password": "testPass123!"
                         }
                         """
                 )
@@ -68,20 +72,20 @@ class AccountIntegrationTest {
     void deleteAccountWorks() {
         Account account = new Account(
                 1,
-                "test",
-                "initSeller",
-                "initSeller pass",
-                "email"
+                "test username",
+                "test name",
+                "test email",
+                "testPass123!"
         );
         String token = jwtService.newToken(account);
 
-        webClient.delete().uri("/api/account/del?accountId=1")
+        webClient.delete().uri("/api/account/delete?accountId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().toString().equals("true");
 
-        assertEquals(1, accountRepository.findAll().size());
+        assertEquals(0, accountRepository.findAll().size());
 
     }
 
@@ -92,8 +96,8 @@ class AccountIntegrationTest {
                 .bodyValue(
                         """
                         {
-                            "username": "initSeller",
-                            "password": "adminPass123!"
+                            "username": "test username",
+                            "password": "test"
                         }
                         """
                 )
@@ -107,10 +111,10 @@ class AccountIntegrationTest {
     void updateAccountWorks() {
         Account account = new Account(
                 1,
-                "test",
-                "initSeller",
-                "initSeller pass",
-                "email"
+                "test username",
+                "test name",
+                "test email",
+                "test"
         );
         String token = jwtService.newToken(account);
         webClient.put().uri("/api/account/update?accountId=1")
@@ -121,8 +125,8 @@ class AccountIntegrationTest {
                         {
                             "name": "newName",
                             "username": "newUser",
-                            "password": "newPass1!",
-                            "email": "newEmail"
+                            "email": "test email",
+                            "password": "testPass123!"
                         }
                         """
                 )

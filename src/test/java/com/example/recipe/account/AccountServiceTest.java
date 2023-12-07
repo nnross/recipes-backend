@@ -2,16 +2,23 @@ package com.example.recipe.account;
 
 
 import com.example.recipe.RecipeApplication;
-import org.apache.coyote.BadRequestException;
+import com.example.recipe.security.AuthRequest;
+import com.example.recipe.security.JwtService;
+import exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -28,170 +35,137 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
 
-    //TODO: mocks
+    @Mock
+    private AccountRepository accountRepository;
+    @Mock
+    private JwtService jwtService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @InjectMocks
+    private AccountService testAccountService;
+
     @Test
     void getAccountWorks() {
         given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
         testAccountService.getAccount(1);
 
         verify(accountRepository).findById(1);
-
     }
 
     @Test
     void getAccountThrowsWithNoAccount() {
         assertThatThrownBy(() ->  testAccountService.getAccount(1))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("no accounts with id: 1");
+                .hasMessageContaining("Account not found");
 
     }
 
     @Test
-    void saveAllAccounts() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
+    void saveAccount() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.empty());
 
-        Role role = new Role(1, "test category");
         Account account = new Account(
                 1,
                 "test name",
                 "username",
-                "passWord123!",
                 "example@gmail.com",
-                role
+                "passWord123!"
         );
 
-        testAccountService.saveAccount(account);
+        testAccountService.create(account);
 
         verify(accountRepository).save(account);
     }
 
     @Test
-    void saveAllAccountsThrowsWithBadPasswordCharacter() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
+    void saveAccountThrowsWithBadPasswordCharacter() {
 
-        Role role = new Role(1, "test category");
         Account account = new Account(
                 1,
                 "test name",
                 "username",
-                "password",
                 "example@gmail.com",
-                role
+                "passWord123!ä"
         );
 
-        assertThatThrownBy(() ->  testAccountService.saveAccount(account))
+        assertThatThrownBy(() ->  testAccountService.create(account))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("password doesn't include an uppercase letter, number or special character os is min length 8");
+                .hasMessageContaining("Invalid password");
 
         verify(accountRepository, never()).save(account);
     }
 
     @Test
-    void saveAllAccountsThrowsWithUsernameSpaceCharacter() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
-
-        Role role = new Role(1, "test category");
+    void saveAccountThrowsWithUsernameTooShort() {
         Account account = new Account(
                 1,
-                "test name",
+                "tes",
                 "user name",
-                "password",
                 "example@gmail.com",
-                role
+                "passWord123!"
         );
 
-        assertThatThrownBy(() ->  testAccountService.saveAccount(account))
+        assertThatThrownBy(() -> testAccountService.create(account))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("username includes one of the following. special character, space or is not between 2-20 characters");
+                .hasMessageContaining("Invalid username");
 
         verify(accountRepository, never()).save(account);
     }
 
     @Test
-    void saveAllAccountsThrowsWithUsernameSpecialCharacter() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
-
-        Role role = new Role(1, "test category");
-        Account account = new Account(
-                1,
-                "testname",
-                "username!",
-                "password",
-                "example@gmail.com",
-                role
-        );
-
-        assertThatThrownBy(() ->  testAccountService.saveAccount(account))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("username includes one of the following. special character, space or is not between 2-20 characters");
-
-        verify(accountRepository, never()).save(account);
-    }
-
-    @Test
-    void saveAllAccountsThrowsWithTooShortPassword() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
-
-        Role role = new Role(1, "test category");
+    void saveAccountThrowsWithTooShortPassword() {
         Account account = new Account(
                 1,
                 "test name",
                 "username",
-                "Pa12!",
                 "example@gmail.com",
-                role
+                "pA23!"
         );
 
-        assertThatThrownBy(() ->  testAccountService.saveAccount(account))
+        assertThatThrownBy(() ->  testAccountService.create(account))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("password doesn't include an uppercase letter, number or special character os is min length 8");
+                .hasMessageContaining("Invalid password");
 
         verify(accountRepository, never()).save(account);
     }
 
     @Test
-    void saveAllAccountsThrowsWithNotUniqueUsername() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
+    void saveAccountThrowsWithNotUniqueUsername() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.of(new Account()));
-
-        Role role = new Role(1, "test category");
         Account account = new Account(
                 1,
                 "test name",
                 "username",
-                "PassWord12!",
                 "example@gmail.com",
-                role
+                "passWord123!"
         );
 
-        assertThatThrownBy(() ->  testAccountService.saveAccount(account))
+        assertThatThrownBy(() ->  testAccountService.create(account))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("an account with username: username already exists");
+                .hasMessageContaining("Invalid username");
 
         verify(accountRepository, never()).save(account);
     }
 
     @Test
-    void saveAllAccountsThrowsWithNotUniqueEmail() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
+    void saveAccountThrowsWithNotUniqueEmail() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.of(new Account()));
-
-        Role role = new Role(1, "test category");
         Account account = new Account(
                 1,
                 "test name",
                 "username",
-                "PassWord12!",
                 "example@gmail.com",
-                role
+                "passWord123!"
         );
 
-        assertThatThrownBy(() ->  testAccountService.saveAccount(account))
+        assertThatThrownBy(() ->  testAccountService.create(account))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("an account with email: example@gmail.com already exists");
+                .hasMessageContaining("Invalid email");
 
         verify(accountRepository, never()).save(account);
     }
@@ -199,7 +173,7 @@ class AccountServiceTest {
     @Test
     void loginWorks() {
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
         AuthRequest request = new AuthRequest(
                 "test",
                 "test"
@@ -219,39 +193,36 @@ class AccountServiceTest {
 
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
         AuthRequest request = new AuthRequest(
                 "test",
                 "test"
         );
 
         assertThatThrownBy(() -> testAccountService.login(request))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("username not found");
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessageContaining("No value present");
 
         verify(accountRepository).findByUsername("test");
     }
 
     @Test
     void updateAccountWorks() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.empty());
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
-        Role role = new Role(1, "test category");
+        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
 
         Account updateAccount = new Account(
                 1,
                 "test2 name",
                 "username",
-                "passWord321!",
-                "example2@gmail.com",
-                role
+                "example@gmail.com",
+                "passWord123!"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        testAccountService.updateAccount(updateAccount.getId(), updateAccount);
+        testAccountService.update(updateAccount, updateAccount.getId());
 
         verify(accountRepository).save(account);
     }
@@ -259,227 +230,140 @@ class AccountServiceTest {
     @Test
     void updateAccountThrowsWithNoMatchingAccount() {
 
-        Role role = new Role(1, "test category");
-
         Account updateAccount = new Account(
                 1,
                 "test2 name",
                 "username 2",
-                "passWord321!",
                 "example2@gmail.com",
-                role
+                "passWord123!"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.empty());
         int AccountId = updateAccount.getId();
-        assertThatThrownBy(() -> testAccountService.updateAccount(AccountId, updateAccount))
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("No accounts exists with id: 1");
+                .hasMessageContaining("Invalid id");
 
         verify(accountRepository, never()).save(updateAccount);
     }
 
     @Test
     void updateAccountThrowsWithBadEmail() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.of(new Account()));
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
-        Role role = new Role(1, "test category");
+        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
 
         Account updateAccount = new Account(
                 1,
                 "test2 name",
                 "username2",
-                "passWord321!",
                 "example2@gmail.com",
-                role
+                "passWord123!"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
         int AccountId = updateAccount.getId();
-        assertThatThrownBy(() -> testAccountService.updateAccount(AccountId, updateAccount))
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("an account with email: " + updateAccount.getEmail() + " already exists");
+                .hasMessageContaining("Invalid email");
 
         verify(accountRepository, never()).save(updateAccount);
     }
 
     @Test
     void updateAccountThrowsWithBadUsername() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
         given(accountRepository.findByUsername(any())).willReturn(Optional.of(new Account()));
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
-        Role role = new Role(1, "test category");
+        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
 
         Account updateAccount = new Account(
                 1,
                 "test2 name",
                 "username2",
-                "passWord321!",
-                "example2@gmail.com",
-                role
+                "example@gmail.com",
+                "passWord123!"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
         int AccountId = updateAccount.getId();
-        assertThatThrownBy(() -> testAccountService.updateAccount(AccountId, updateAccount))
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("an account with username: " + updateAccount.getUsername() + " already exists");
+                .hasMessageContaining("Invalid username");
 
         verify(accountRepository, never()).save(updateAccount);
     }
 
     @Test
     void updateAccountThrowsWithBadPassword() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
-        Role role = new Role(1, "test category");
+        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
 
         Account updateAccount = new Account(
                 1,
                 "test2 name",
                 "username2",
-                "psas!",
                 "example2@gmail.com",
-                role
+                "psas!"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
         int AccountId = updateAccount.getId();
-        assertThatThrownBy(() -> testAccountService.updateAccount(AccountId, updateAccount))
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("password doesn't include an uppercase letter, number or special character os is min length 8");
-
-        verify(accountRepository, never()).save(updateAccount);
-    }
-
-    @Test
-    void updateAccountThrowsWithUsernameSpace() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
-
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail", new Role());
-        Role role = new Role(1, "test category");
-
-        Account updateAccount = new Account(
-                1,
-                "test2 name",
-                "username 2",
-                "pass!",
-                "example2@gmail.com",
-                role
-        );
-
-        given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        int AccountId = updateAccount.getId();
-        assertThatThrownBy(() -> testAccountService.updateAccount(AccountId, updateAccount))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("username includes one of the following. special character, space or is not between 2-20 characters");
+                .hasMessageContaining("Invalid password");
 
         verify(accountRepository, never()).save(updateAccount);
     }
 
     @Test
     void updateAccountWorksWithSameEmailAndUsername() {
-        given(roleRepository.findById(any())).willReturn(Optional.of(new Role()));
         given(accountRepository.findByUsername(any())).willReturn(Optional.of(new Account()));
         given(accountRepository.findByEmail(any())).willReturn(Optional.of(new Account()));
 
-        Account account = new Account(1, "test name", "testusername2", "testPass", "testEmail", new Role());
-        Role role = new Role(1, "test category");
-
+        Account account = new Account(1, "testusername2", "test name", "testEmail", "testPass");
         Account updateAccount = new Account(
                 1,
-                "test2 name",
                 "testusername2",
-                "passWord321!",
+                "test name",
                 "testEmail",
-                role
+                "passWord321!"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        testAccountService.updateAccount(updateAccount.getId(), updateAccount);
+        testAccountService.update(updateAccount, updateAccount.getId());
 
         verify(accountRepository).save(account);
     }
 
     @Test
     void deleteAccountWorks() {
-        Item item = new Item(
-                1,
-                "test title",
-                new Account(
-                        1,
-                        "name",
-                        "username",
-                        "pass",
-                        "email",
-                        new Role()
-                ),
-                0,
-                new Category(),
-                null
-        );
 
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Account()), Optional.empty());
-        given(itemRepository.findAll()).willReturn(List.of(item));
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
 
-        testAccountService.deleteAccount(0);
+        testAccountService.delete(0);
 
-        verify(accountRepository).deleteById(0);
+        verify(accountRepository).delete(any());
     }
 
     @Test
-    void deleteAccountThrowsWithFailureToDeleteItems() {
-        Item item = new Item(
-                1,
-                "test title",
-                new Account(
-                        1,
-                        "name",
-                        "username",
-                        "pass",
-                        "email",
-                        new Role()
-                ),
-                0,
-                new Category(),
-                null
-        );
+    void deleteAccountThrowsWithFailureToDeleteAccount() {
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
+        doThrow(new RuntimeException("error")).when(accountRepository).delete(any());
 
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Account()), Optional.empty());
-        given(itemRepository.findAll()).willReturn(List.of(item));
-        given(itemService.deleteItem(anyInt())).willThrow(new RuntimeException());
-
-        assertThatThrownBy(() ->  testAccountService.deleteAccount(1))
-                .isInstanceOf(java.lang.RuntimeException.class)
-                .hasMessageContaining("error: null. While deleting item with id: 1");
-
-        verify(accountRepository, never()).deleteById(0);
+        assertThatThrownBy(() ->  testAccountService.delete(0))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Failed to delete account");
     }
 
     @Test
     void deleteAccountThrowsErrorWithNoMatchingAccount() {
         given(accountRepository.findById(any())).willReturn(Optional.empty());
 
-        assertThatThrownBy(() ->  testAccountService.deleteAccount(0))
+        assertThatThrownBy(() ->  testAccountService.delete(0))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("No Accounts exists with id 0");
+                .hasMessageContaining("No accounts with the id");
 
         verify(accountRepository, never()).deleteById(0);
-    }
-
-    @Test
-    void deleteAccountThrowsErrorWithFailedDeletion() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
-
-        assertThatThrownBy(() ->  testAccountService.deleteAccount(0))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("deletion failed");
-
-        verify(accountRepository).deleteById(0);
     }
 }

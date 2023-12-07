@@ -3,6 +3,7 @@ package com.example.recipe.account;
 import com.example.recipe.RecipeApplication;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -11,16 +12,16 @@ import org.springframework.test.context.ContextConfiguration;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-// TODO: annotations
 @ActiveProfiles("test")
 @DataJpaTest()
 @ContextConfiguration(classes = RecipeApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class AccountRepositoryTest {
-    // TODO: mocks and autowires
+    @Autowired
+    private AccountRepository testAccountRepository;
     @AfterEach
     void deleteAll() {
-        testaccountRepository.deleteAll();
+        testAccountRepository.deleteAll();
     }
 
     @Test
@@ -29,33 +30,32 @@ class AccountRepositoryTest {
                 1,
                 "test name",
                 "username",
-                "passWord123!",
-                "example@gmail.com"
+                "example@gmail.com",
+                "passWord123!"
         );
 
-        testaccountRepository.save(account);
+        testAccountRepository.save(account);
 
-        Account foundEntity = testaccountRepository.findByEmail(account.getEmail()).orElse(null);
-        Account foundNoneEntity = testaccountRepository.findByEmail("empty").orElse(null);
+        Account foundEntity = testAccountRepository.findByEmail(account.getEmail()).orElse(null);
+        Account foundNoneEntity = testAccountRepository.findByEmail("empty").orElse(null);
         assertNotNull(foundEntity);
         assertNull(foundNoneEntity);
     }
 
     @Test
     void AccountFindByUsernameWorks() {
-        Role role = testRoleRepository.findById(1).orElseThrow();
         Account account = new Account(
                 1,
                 "test name",
                 "username",
-                "passWord123!",
-                "example@gmail.com"
+                "example@gmail.com",
+                "passWord123!"
         );
 
-        testaccountRepository.save(account);
+        testAccountRepository.save(account);
 
-        Account foundEntity = testaccountRepository.findByUsername(account.getUsername()).orElse(null);
-        Account foundNoneEntity = testaccountRepository.findByUsername("empty").orElse(null);
+        Account foundEntity = testAccountRepository.findByUsername(account.getUsername()).orElse(null);
+        Account foundNoneEntity = testAccountRepository.findByUsername("empty").orElse(null);
         assertNotNull(foundEntity);
         assertNull(foundNoneEntity);
     }

@@ -34,6 +34,7 @@ public class AccountService {
     }
 
     public AuthRes login(AuthRequest request) {
+        System.out.println(passwordEncoder.encode(request.getPassword()));
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
