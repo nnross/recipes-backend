@@ -50,11 +50,12 @@ public class AccountService {
      * @return AuthRes of token and user's id
      */
     public AuthRes login(AuthRequest request) {
-        System.out.println(passwordEncoder.encode(request.getPassword()));
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        Account account = accountRepository.findByUsername(request.getUsername()).orElseThrow();
+        Account account = accountRepository.findByUsername(request.getUsername()).orElseThrow(() ->
+                new BadRequestException("Invalid username")
+        );
         String token = jwtService.newToken(account);
         return new AuthRes(token, account.getId());
     }

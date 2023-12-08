@@ -19,7 +19,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//TODO: annotations
 @WebMvcTest(value= AccountController.class)
 @ContextConfiguration(classes = AccountController.class)
 @EnableMethodSecurity
