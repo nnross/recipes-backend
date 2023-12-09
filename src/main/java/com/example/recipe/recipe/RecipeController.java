@@ -14,9 +14,21 @@ public class RecipeController {
     @Autowired
     private RecipeService recipeService;
 
-    @PreAuthorize("#id == authentication.principal.id")
-    @PostMapping("/add/favourite")
-    public Boolean favourite(@RequestBody Recipe recipe, @RequestParam("accountId") int id) {
-        return recipeService.favourite(recipe, id);
+    @PreAuthorize("@authorization.addRecipeIsOwn(authentication, #recipe)")
+    @PostMapping("/add")
+    public Boolean add(@RequestBody Recipe recipe) {
+        return recipeService.add(recipe);
+    }
+
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
+    @PutMapping("/favourite")
+    public Boolean favourite(@RequestParam("recipeId") int recipeId) {
+        return recipeService.favourite(recipeId);
+    }
+
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
+    @PutMapping("/doLater")
+    public Boolean doLater(@RequestParam("recipeId") int recipeId) {
+        return recipeService.doLater(recipeId);
     }
 }

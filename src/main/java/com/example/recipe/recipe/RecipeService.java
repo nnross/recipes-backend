@@ -6,7 +6,15 @@ import org.springframework.stereotype.Service;
 public class RecipeService {
 
 
-    public Boolean favourite(Recipe recipe, int id) {
+    public Boolean add(Recipe recipe) {
+        return true;
+    }
+
+    public Boolean favourite(int recipeId) {
+        return true;
+    }
+
+    public Boolean doLater(int recipeId) {
         return true;
     }
 }
