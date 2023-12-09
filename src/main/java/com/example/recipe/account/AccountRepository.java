@@ -16,9 +16,9 @@ public interface AccountRepository extends PagingAndSortingRepository<Account, I
      *        username to search an account for
      * @return the account that matched the query
      */
-    @Query(value = "SELECT * FROM accounts a WHERE a.account_username = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM account a WHERE a.account_username = ?1", nativeQuery = true)
     Optional<Account> findByUsername(String username);
 
-    @Query(value = "SELECT * FROM accounts a WHERE a.account_email = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM account a WHERE a.account_email = ?1", nativeQuery = true)
     Optional<Account> findByEmail(String email);
 }
