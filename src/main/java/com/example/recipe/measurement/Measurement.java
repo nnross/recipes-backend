@@ -1,6 +1,7 @@
 package com.example.recipe.measurement;
 
 import com.example.recipe.ingredient.Ingredient;
+import com.example.recipe.recipe.Recipe;
 import com.example.recipe.unit.Unit;
 import jakarta.persistence.*;
 
@@ -15,6 +16,10 @@ public class Measurement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "measurement_id", nullable = false, updatable = false, unique = true)
     private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "measurement_recipe", referencedColumnName = "recipe_id", nullable = false)
+    private Recipe recipe;
 
     @ManyToOne
     @JoinColumn(name = "measurement_unit", referencedColumnName = "unit_id", nullable = false)

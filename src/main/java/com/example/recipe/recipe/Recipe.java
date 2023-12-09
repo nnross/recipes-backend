@@ -8,6 +8,8 @@ import com.example.recipe.type.Type;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Creates the recipe entity for the database.
@@ -45,7 +47,7 @@ public class Recipe {
     @Column(name = "recipe_finished", nullable = false)
     private Boolean finished;
 
-    @Column(name = "recipe_toDoDate", nullable = false)
+    @Column(name = "recipe_toDoDate")
     private Date toDoDate;
 
     @Column(name = "recipe_instructions", nullable = false)
@@ -67,11 +69,11 @@ public class Recipe {
     @JoinColumn(name = "recipe_country", referencedColumnName = "country_id", nullable = false)
     private Country country;
 
-    @ManyToOne
-    @JoinColumn(name = "recipe_measurements", referencedColumnName = "measurement_id", nullable = false)
-    private Measurement measurements;
+    @OneToMany(mappedBy = "recipe")
+    @Column(name = "recipe_measurements", nullable = false)
+    private Set<Measurement> measurements;
 
-    public Recipe(int id, String title, String description, int time, int servings, String image, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, Category category, Type type, Account account, Country country, Measurement measurements) {
+    public Recipe(int id, String title, String description, int time, int servings, String image, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, Category category, Type type, Account account, Country country, Set<Measurement> measurements) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -213,11 +215,11 @@ public class Recipe {
         this.country = country;
     }
 
-    public Measurement getMeasurements() {
+    public Set<Measurement> getMeasurements() {
         return measurements;
     }
 
-    public void setMeasurements(Measurement measurements) {
+    public void setMeasurements(Set<Measurement> measurements) {
         this.measurements = measurements;
     }
 }
