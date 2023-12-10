@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -158,35 +159,35 @@ class RecipeServiceTest {
 
     @Test
     void favouriteRecipeWorks() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()))
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()));
         testRecipeService.favourite(true, 1);
         verify(recipeRepository).save(1);
     }
 
     @Test
     void doLaterRecipeWorks() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()))
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()));
         testRecipeService.doLater(true, 1);
         verify(recipeRepository).save(1);
     }
 
     @Test
     void unFavouriteRecipeWorks() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()))
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()));
         testRecipeService.favourite(false, 1);
         verify(recipeRepository).save(1);
     }
 
     @Test
     void unDoLaterRecipeWorks() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()))
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()));
         testRecipeService.doLater(false, 1);
         verify(recipeRepository).save(1);
     }
 
     @Test
     void finishRecipeWorks() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()))
+        given(accountRepository.findById(any())).willReturn(Optional.of(new Recipe()));
         testRecipeService.favourite(1);
         verify(recipeRepository).save(1);
     }
