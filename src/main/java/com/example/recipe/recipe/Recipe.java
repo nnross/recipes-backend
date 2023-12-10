@@ -6,6 +6,8 @@ import com.example.recipe.country.Country;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.type.Type;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Date;
 import java.util.List;
@@ -63,17 +65,18 @@ public class Recipe {
 
     @ManyToOne
     @JoinColumn(name = "recipe_account", referencedColumnName = "account_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Account account;
 
     @ManyToOne
     @JoinColumn(name = "recipe_country", referencedColumnName = "country_id", nullable = false)
     private Country country;
 
-    @OneToMany(mappedBy = "recipe")
-    @Column(name = "recipe_measurements", nullable = false)
-    private Set<Measurement> measurements;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "recipe_id")
+    private List<Measurement> measurements;
 
-    public Recipe(int id, String title, String description, int time, int servings, String image, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, Category category, Type type, Account account, Country country, Set<Measurement> measurements) {
+    public Recipe(int id, String title, String description, int time, int servings, String image, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, Category category, Type type, Account account, Country country, List<Measurement> measurements) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -215,11 +218,11 @@ public class Recipe {
         this.country = country;
     }
 
-    public Set<Measurement> getMeasurements() {
+    public List<Measurement> getMeasurements() {
         return measurements;
     }
 
-    public void setMeasurements(Set<Measurement> measurements) {
+    public void setMeasurements(List<Measurement> measurements) {
         this.measurements = measurements;
     }
 }

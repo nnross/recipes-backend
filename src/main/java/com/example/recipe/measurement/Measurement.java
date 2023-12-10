@@ -18,10 +18,6 @@ public class Measurement {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "measurement_recipe", referencedColumnName = "recipe_id", nullable = false)
-    private Recipe recipe;
-
-    @ManyToOne
     @JoinColumn(name = "measurement_unit", referencedColumnName = "unit_id", nullable = false)
     private Unit unit;
 
@@ -37,6 +33,9 @@ public class Measurement {
         this.unit = unit;
         this.ingredient = ingredient;
         this.amount = amount;
+    }
+
+    public Measurement() {
     }
 
     public int getId() {
@@ -70,4 +69,5 @@ public class Measurement {
     public void setAmount(float amount) {
         this.amount = amount;
     }
+
 }

@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -208,6 +209,17 @@ public class RecipeControllerTest {
 
         mockMvc.perform(post("/api/recipe/favourite?recipeId=1", 1).with(csrf())
                         .with(user(account)))
+                .andExpect(status().isOk());
+    }
+    @Test
+    void addRecipeWorks() throws Exception {
+        Account account = new Account(1, "test", "test", "test", "test");
+
+        given(recipeService.add(any())).willReturn(true);
+
+        mockMvc.perform(post("/api/recipe/add").with(csrf())
+                        .with(user(account)))
+                //TODO: REST
                 .andExpect(status().isOk());
     }
     @Test
