@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Logic for recipe calls.
+ */
 @Service
 public class RecipeService {
 
@@ -39,7 +42,12 @@ public class RecipeService {
     @Autowired
     private MeasurementRepository measurementRepository;
 
-
+    /**
+     * Adds a recipe to the database.
+     * @param recipe
+     *        Recipe to be added
+     * @return true if successful.
+     */
     public Boolean add(Recipe recipe) {
         for (Measurement measurement : recipe.getMeasurements()) {
             unitRepository.findById(measurement.getUnit().getId()).orElseThrow(() ->
@@ -62,11 +70,43 @@ public class RecipeService {
         return true;
     }
 
-    public Boolean favourite(int recipeId) {
+    /**
+     * Toggles the favourite on the selected recipe
+     * @param recipeId
+     *        Recipe to be toggled.
+     * @return true if successful
+     */
+    public Boolean toggleFavourite(int recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        recipe.setFavourite(!recipe.getFavourite());
+
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("error while saving to database");
+        }
         return true;
     }
 
-    public Boolean doLater(int recipeId) {
+    /**
+     * Toggles the doLater on the selected recipe
+     * @param recipeId
+     *        Recipe to be toggled.
+     * @return true if successful
+     */
+    public Boolean toggleDoLater(int recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        recipe.setDoLater(!recipe.getDoLater());
+
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("error while saving to database");
+        }
         return true;
     }
 }
