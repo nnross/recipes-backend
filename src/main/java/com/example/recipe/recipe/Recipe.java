@@ -72,8 +72,10 @@ public class Recipe {
     @JoinColumn(name = "recipe_country", referencedColumnName = "country_id", nullable = false)
     private Country country;
 
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "recipe_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Measurement> measurements;
 
     public Recipe(int id, String title, String description, int time, int servings, String image, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, Category category, Type type, Account account, Country country, List<Measurement> measurements) {
