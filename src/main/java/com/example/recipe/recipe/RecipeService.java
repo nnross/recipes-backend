@@ -42,6 +42,9 @@ public class RecipeService {
     @Autowired
     private MeasurementRepository measurementRepository;
 
+    @Autowired
+    private RecipeUtils recipeUtils;
+
     /**
      * Adds a recipe to the database.
      * @param recipe
@@ -109,4 +112,8 @@ public class RecipeService {
         }
         return true;
     }
+
+    public Object getSearch() {
+        return recipeUtils.searchResults().getResults();
+    };
 }

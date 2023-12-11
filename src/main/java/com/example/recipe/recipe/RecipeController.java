@@ -55,4 +55,10 @@ public class RecipeController {
     public Boolean doLater(@RequestParam("recipeId") int recipeId) {
         return recipeService.toggleDoLater(recipeId);
     }
+
+
+    @GetMapping("/get/search")
+    public Object search() {
+        return recipeService.getSearch();
+    }
 }
