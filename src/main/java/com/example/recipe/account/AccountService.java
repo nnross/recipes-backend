@@ -97,12 +97,8 @@ public class AccountService {
     public Boolean delete(int id) {
         Account account = accountRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("No accounts with the id"));
-        // TODO: delete all account's recipies
-        try {
-            accountRepository.delete(account);
-        } catch(Exception e) {
-            throw new RuntimeException("Failed to delete account");
-        }
+
+        accountRepository.delete(account);
         return true;
     }
 
