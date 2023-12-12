@@ -1,6 +1,6 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.response.ResStat;
+import com.example.recipe.response.StatRes;
 
 import java.util.List;
 
@@ -9,12 +9,12 @@ import java.util.List;
  */
 public class RecipeStats {
 
-    private List<ResStat> chart;
+    private List<StatRes> chart;
     private int done;
     private int favourite;
     private int doLater;
 
-    public RecipeStats(List<ResStat> chart, int done, int favourite, int doLater) {
+    public RecipeStats(List<StatRes> chart, int done, int favourite, int doLater) {
         this.chart = chart;
         this.done = done;
         this.favourite = favourite;
@@ -24,11 +24,11 @@ public class RecipeStats {
     public RecipeStats() {
     }
 
-    public List<ResStat> getChart() {
+    public List<StatRes> getChart() {
         return chart;
     }
 
-    public void setChart(List<ResStat> chart) {
+    public void setChart(List<StatRes> chart) {
         this.chart = chart;
     }
 
