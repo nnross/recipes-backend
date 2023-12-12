@@ -6,6 +6,7 @@ import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
+import com.example.recipe.response.ResStat;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
@@ -108,5 +109,27 @@ public class RecipeService {
             throw new RuntimeException("error while saving to database");
         }
         return true;
+    }
+
+    /**
+     * Gets the statistics of recipes for specified account.
+     * @param accountId
+     *        id of the account we want stats for.
+     * @return The stats in RecipeStats foramat
+     */
+    public RecipeStats getStats(int accountId) {
+        RecipeStats res = new RecipeStats();
+        res.setChart(recipeRepository.getStats(accountId));
+
+        res.setDone(recipeRepository.getDoneCount(accountId).orElseThrow(() ->
+                new BadRequestException("error while getting done count from database")));
+
+        res.setFavourite(recipeRepository.getFavouriteCount(accountId).orElseThrow(() ->
+                new BadRequestException("error while getting favourite count from database")));
+
+        res.setDoLater(recipeRepository.getDoLaterCount(accountId).orElseThrow(() ->
+                new BadRequestException("error while getting doLater count from database")));
+
+        return res;
     }
 }
