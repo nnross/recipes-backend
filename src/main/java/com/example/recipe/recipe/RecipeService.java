@@ -113,7 +113,7 @@ public class RecipeService {
         return true;
     }
 
-    public Object getSearch() {
-        return recipeUtils.searchResults().getResults();
+    public Object getSearch(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection) {
+        return recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection).getResults();
     };
 }

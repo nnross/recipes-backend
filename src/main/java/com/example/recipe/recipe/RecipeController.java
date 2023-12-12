@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Controller for recipe calls
  */
@@ -58,7 +60,14 @@ public class RecipeController {
 
 
     @GetMapping("/get/search")
-    public Object search() {
-        return recipeService.getSearch();
+    public Object search(@RequestParam("search") String search,
+                         @RequestParam("ingredients") String ingredients,
+                         @RequestParam("cuisine") String cuisine,
+                         @RequestParam("diet") String diet,
+                         @RequestParam("intolerances") String intolerances,
+                         @RequestParam("type") String type,
+                         @RequestParam("sort") String sort,
+                         @RequestParam("sortDirection") String sortDirection) {
+        return recipeService.getSearch(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection);
     }
 }
