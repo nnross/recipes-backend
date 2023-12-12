@@ -1,14 +1,9 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.account.Account;
-import com.example.recipe.account.AccountService;
-import com.example.recipe.response.ResStat;
-import com.example.recipe.security.AuthRequest;
+import com.example.recipe.response.ListRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Controller for recipe calls
@@ -57,5 +52,35 @@ public class RecipeController {
     @PutMapping("/doLater")
     public Boolean doLater(@RequestParam("recipeId") int recipeId) {
         return recipeService.toggleDoLater(recipeId);
+    }
+
+    /**
+     * GET API call to /api/recipe/get/favourite
+     * Gets favourite recipes for account with selected page.
+     * @param accountId
+     *        id of account to be searched for
+     * @param page
+     *        page that we want results for
+     * @return ListRes object with favourite recipes and if there is a next page.
+     */
+    @PreAuthorize("#accountId == authentication.principal.id")
+    @GetMapping("/get/favourite")
+    public ListRes getFavourite(@RequestParam("accountId") int accountId, @RequestParam("page") int page) {
+        return recipeService.getFavourite(accountId, page);
+    }
+
+    /**
+     * GET API call to /api/recipe/get/doLater
+     * Gets doLater recipes for account with selected page.
+     * @param accountId
+     *        id of account to be searched for
+     * @param page
+     *        page that we want results for
+     * @return ListRes object with doLater recipes and if there is a next page.
+     */
+    @PreAuthorize("#accountId == authentication.principal.id")
+    @GetMapping("/get/doLater")
+    public ListRes getDoLater(@RequestParam("accountId") int accountId, @RequestParam("page") int page) {
+        return recipeService.getDoLater(accountId, page);
     }
 }

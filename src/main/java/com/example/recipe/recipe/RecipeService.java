@@ -1,20 +1,17 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.account.AccountRepository;
 import com.example.recipe.category.CategoryRepository;
 import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
-import com.example.recipe.response.ResStat;
+import com.example.recipe.response.ListRes;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Logic for recipe calls.
@@ -132,4 +129,44 @@ public class RecipeService {
 
         return res;
     }
+
+    /**
+     * Gets favourite recipes with page from database.
+     * Also checks if there is a next page and converts into a ListRes.
+     * @param accountId
+     *        id of account we want favourites for.
+     * @param page
+     *        Page of recipes we want.
+     * @return ListRes with favourite recipes and if there is a nextPage
+     */
+    public ListRes getFavourite(int accountId, int page) {
+        if (page < 0) {
+            throw new BadRequestException("Invalid page");
+        }
+        PageRequest pageRequest = PageRequest.of(page, 6);
+        PageRequest nextPageRequest = PageRequest.of(page + 1, 6);
+        return new ListRes(recipeRepository.getFavourite(
+                accountId, pageRequest),
+                !recipeRepository.getFavourite(accountId, nextPageRequest).isEmpty());
+    };
+
+    /**
+     * Gets doLater recipes with page from database.
+     * Also checks if there is a next page and converts into a ListRes.
+     * @param accountId
+     *        id of account we want doLater for.
+     * @param page
+     *        Page of recipes we want.
+     * @return ListRes with doLater recipes and if there is a nextPage
+     */
+    public ListRes getDoLater(int accountId, int page) {
+        if (page < 0) {
+            throw new BadRequestException("Invalid page");
+        }
+        PageRequest pageRequest = PageRequest.of(page, 6);
+        PageRequest nextPageRequest = PageRequest.of(page + 1, 6);
+        return new ListRes(
+                recipeRepository.getDoLater(accountId, pageRequest),
+                !recipeRepository.getDoLater(accountId, nextPageRequest).isEmpty());
+    };
 }

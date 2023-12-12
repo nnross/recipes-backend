@@ -1,8 +1,7 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.account.Account;
-import com.example.recipe.country.Country;
-import com.example.recipe.response.ResStat;
+import com.example.recipe.response.StatRes;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -21,7 +20,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      * @return List of ResStats with the count of recipes and name of country.
      */
     @Query(value = "SELECT COUNT(recipe_country) AS count, c.country_name AS name FROM recipe r LEFT JOIN country c ON r.recipe_country = c.country_id WHERE r.recipe_account = ?1 GROUP BY recipe_country", nativeQuery = true)
-    List<ResStat> getStats(int accountId);
+    List<StatRes> getStats(int accountId);
 
     /**
      * Query to get count of all done recipes
@@ -49,4 +48,26 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      */
     @Query(value = "SELECT COUNT(*) FROM recipe r WHERE r.recipe_account = ?1 AND recipe_do_later = 1", nativeQuery = true)
     Optional<Integer> getDoLaterCount(int accountId);
+
+    /**
+     * Query to get favourite recipes for account
+     * @param accountId
+     *        id for account
+     * @param pageable
+     *        PageRequest for page.
+     * @return favourite recipes for account with page.
+     */
+    @Query(value = "SELECT recipe_title AS title, recipe_id AS id FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_favourite = 1", nativeQuery = true)
+    List<ListRecipeRes> getFavourite(int accountId, Pageable pageable);
+
+    /**
+     * Query to get doLater recipes for account
+     * @param accountId
+     *        id for account
+     * @param pageable
+     *        PageRequest for page.
+     * @return doLater recipes for account with page.
+     */
+    @Query(value = "SELECT recipe_title AS title, recipe_id AS id FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_do_later = 1", nativeQuery = true)
+    List<ListRecipeRes> getDoLater(int accountId, Pageable pageable);
 }
