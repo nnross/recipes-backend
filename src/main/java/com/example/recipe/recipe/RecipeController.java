@@ -2,6 +2,7 @@ package com.example.recipe.recipe;
 
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountService;
+import com.example.recipe.response.ListRes;
 import com.example.recipe.security.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,14 +61,15 @@ public class RecipeController {
 
 
     @GetMapping("/get/search")
-    public Object search(@RequestParam("search") String search,
-                         @RequestParam("ingredients") String ingredients,
-                         @RequestParam("cuisine") String cuisine,
-                         @RequestParam("diet") String diet,
-                         @RequestParam("intolerances") String intolerances,
-                         @RequestParam("type") String type,
-                         @RequestParam("sort") String sort,
-                         @RequestParam("sortDirection") String sortDirection) {
-        return recipeService.getSearch(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection);
+    public ListRes search(@RequestParam("search") String search,
+                          @RequestParam("ingredients") String ingredients,
+                          @RequestParam("cuisine") String cuisine,
+                          @RequestParam("diet") String diet,
+                          @RequestParam("intolerances") String intolerances,
+                          @RequestParam("type") String type,
+                          @RequestParam("sort") String sort,
+                          @RequestParam("sortDirection") String sortDirection,
+                          @RequestParam("page") int page){
+        return recipeService.getSearch(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, page);
     }
 }

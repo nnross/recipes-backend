@@ -6,6 +6,7 @@ import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
+import com.example.recipe.response.ListRes;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -113,7 +115,58 @@ public class RecipeService {
         return true;
     }
 
-    public Object getSearch(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection) {
-        return recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection).getResults();
+    public ListRes getSearch(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection, int page) {
+        if(!ingredients.isEmpty()){
+            try {
+                Ingredient ingredient = Ingredient.valueOf(ingredients.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid ingredient filter");
+            }
+        }
+        if(!cuisine.isEmpty()){
+            try {
+                Cuisine cuisines = Cuisine.valueOf(cuisine.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid cuisine filter");
+            }
+        }
+        if(!diet.isEmpty()){
+            try {
+                Diet diets = Diet.valueOf(diet.toUpperCase().replaceAll(" ", "_"));
+            } catch (Exception e) {
+                throw new BadRequestException("invalid diet filter");
+            }
+        }
+        if(!intolerances.isEmpty()){
+            try {
+                Intolerance intolerance = Intolerance.valueOf(intolerances.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid intolerance filter");
+            }
+        }
+        if(!type.isEmpty()){
+            try {
+                Type types = Type.valueOf(type.toUpperCase().replaceAll(" ", "_"));
+            } catch (Exception e) {
+                throw new BadRequestException("invalid type filter");
+            }
+        }
+        if(!sort.isEmpty()){
+            try {
+                Sort sorts = Sort.valueOf(sort.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid sort");
+            }
+        }
+        if(!sortDirection.isEmpty()){
+            try {
+                SortDirection sortDirections = SortDirection.valueOf(sortDirection.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid sort direction");
+            }
+        }
+        int offset = page*12;
+        List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, offset).getResults();
+        return new ListRes(recipes, true);
     };
 }
