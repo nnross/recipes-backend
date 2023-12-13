@@ -60,6 +60,28 @@ public class RecipeController {
     }
 
 
+    /**
+     * Gets the parameters from the url
+     * @param search
+     *        Recipes to get from the API
+     * @param ingredients
+     *        Ingredients included in the recipe
+     * @param cuisine
+     *        From which origin the recipe can be
+     * @param diet
+     *        Dietary restrictions of the recipe
+     * @param intolerances
+     *        Food intolerances
+     * @param type
+     *        The type of food the recipe is, e.g. breakfast
+     * @param sort
+     *        Ways to sort the results
+     * @param sortDirection
+     *        Ascending or descending
+     * @param page
+     *        Keeps track of the page showing the results
+     * @return RecipeService with all parameters from url
+     */
     @GetMapping("/get/search")
     public ListRes search(@RequestParam("search") String search,
                           @RequestParam("ingredients") String ingredients,

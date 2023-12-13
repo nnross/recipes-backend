@@ -2,6 +2,9 @@ package com.example.recipe.recipe;
 
 import java.util.List;
 
+/**
+ * Formats the response for API get call
+ */
 public class RecipeResponse {
     private List<ShortRecipe> results;
 

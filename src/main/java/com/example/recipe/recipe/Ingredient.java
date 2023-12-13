@@ -1,5 +1,8 @@
 package com.example.recipe.recipe;
 
+/**
+ * Enum for ingredients included filter
+ */
 public enum Ingredient {
     PORK,
     CHICKEN,

@@ -115,6 +115,29 @@ public class RecipeService {
         return true;
     }
 
+    /**
+     * Checks that filters and sort are correct
+     * and keeps track of page
+     * @param search
+     *        Recipes to get from the API
+     * @param ingredients
+     *        Ingredients included in the recipe
+     * @param cuisine
+     *        From which origin the recipe can be
+     * @param diet
+     *        Dietary restrictions of the recipe
+     * @param intolerances
+     *        Food intolerances
+     * @param type
+     *        The type of food the recipe is, e.g. breakfast
+     * @param sort
+     *        Ways to sort the results
+     * @param sortDirection
+     *        Ascending or descending
+     * @param page
+     *        Keeps track of the page showing the results
+     * @return ListRes of recipe
+     */
     public ListRes getSearch(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection, int page) {
         if(!ingredients.isEmpty()){
             try {
