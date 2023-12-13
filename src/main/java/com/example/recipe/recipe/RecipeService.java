@@ -169,4 +169,18 @@ public class RecipeService {
                 recipeRepository.getDoLater(accountId, pageRequest),
                 !recipeRepository.getDoLater(accountId, nextPageRequest).isEmpty());
     };
+
+
+    /**
+     * Gets recipe from the database.
+     * @param recipeId
+     *        id of the recipe we want to search.
+     * @return found recipe.
+     */
+    public Object getRecipe(int recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        // TODO: convert into returnable recipe
+        return recipe;
+    }
 }
