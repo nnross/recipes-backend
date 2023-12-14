@@ -1,5 +1,8 @@
-package com.example.recipe.recipe;
+package com.example.recipe.apiClasses;
 
+/**
+ * Formats recipe from API for search
+ */
 public class ShortRecipe {
 
     private int id;

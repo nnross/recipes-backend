@@ -1,12 +1,9 @@
 package com.example.recipe.recipe;
 
+import com.example.recipe.apiClasses.RecipeFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Utils for recipes
@@ -46,6 +43,23 @@ public class RecipeUtils {
                 .uri("/complexSearch?apiKey="+apiKey+"&query="+search+"&includeIngredients="+ingredients+"&cuisine="+cuisine+"&diet="+diet+"&intolerances="+intolerances+"&type="+type+"&sort="+sort+"&sortDirection="+sortDirection+"&offset="+offset+"&number=12")
                 .retrieve()
                 .bodyToMono(RecipeResponse.class)
+                .block();
+    }
+
+    /**
+     * Makes the get call to the API for one recipe by id
+     * @param id
+     *        Id of the recipe wanted
+     * @return Data for recipe by id as RecipeFormat
+     */
+    public RecipeFormat getRecipeById(int id) {
+        String request_url = "https://api.spoonacular.com/recipes";
+        WebClient webClient = WebClient.create(request_url);
+
+        return webClient.get()
+                .uri("/"+id+"/information?apiKey="+apiKey+"&includeNutrition=false")
+                .retrieve()
+                .bodyToMono(RecipeFormat.class)
                 .block();
     }
 }

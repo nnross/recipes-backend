@@ -61,7 +61,7 @@ public class RecipeController {
 
 
     /**
-     * Gets the parameters from the url
+     * Gets the parameters from the url for search
      * @param search
      *        Recipes to get from the API
      * @param ingredients
@@ -80,7 +80,7 @@ public class RecipeController {
      *        Ascending or descending
      * @param page
      *        Keeps track of the page showing the results
-     * @return RecipeService with all parameters from url
+     * @return RecipeService getSearch with all parameters from url
      */
     @GetMapping("/get/search")
     public ListRes search(@RequestParam("search") String search,
@@ -93,5 +93,16 @@ public class RecipeController {
                           @RequestParam("sortDirection") String sortDirection,
                           @RequestParam("page") int page){
         return recipeService.getSearch(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, page);
+    }
+
+    /**
+     * Gets the parameter for search by id
+     * @param id
+     *       Id of the recipe wanted
+     * @return RecipeService getSearchById with id from url
+     */
+    @GetMapping("/get/id")
+    public Object searchById(@RequestParam("id") int id){
+        return recipeService.getSearchById(id);
     }
 }

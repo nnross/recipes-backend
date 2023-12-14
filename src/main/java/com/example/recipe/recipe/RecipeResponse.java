@@ -1,5 +1,7 @@
 package com.example.recipe.recipe;
 
+import com.example.recipe.apiClasses.ShortRecipe;
+
 import java.util.List;
 
 /**

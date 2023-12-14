@@ -1,12 +1,16 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.account.AccountRepository;
+import com.example.recipe.apiClasses.RecipeFormat;
+import com.example.recipe.apiClasses.RecipeIngredients;
+import com.example.recipe.apiClasses.ShortRecipe;
 import com.example.recipe.category.CategoryRepository;
 import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
 import com.example.recipe.response.ListRes;
+import com.example.recipe.response.MeasurementRes;
+import com.example.recipe.response.RecipeRes;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
@@ -14,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -192,4 +195,39 @@ public class RecipeService {
         List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, offset).getResults();
         return new ListRes(recipes, true);
     };
+
+    /**
+     * Formats ingredients correctly
+     * @param id
+     *       Id of the recipe wanted
+     * @return Recipe as RecipeRes
+     */
+    public RecipeRes getSearchById(int id) {
+        RecipeFormat res = recipeUtils.getRecipeById(id);
+        List<MeasurementRes> measurements = new ArrayList<>();
+        for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
+            measurements.add(new MeasurementRes(
+                    ingredient.getName(),
+                    ingredient.getMeasures().getMetric().getAmount(),
+                    ingredient.getMeasures().getMetric().getUnitShort()));
+        }
+        return new RecipeRes(
+                res.getId(),
+                res.getTitle(),
+                res.getImage(),
+                res.getServings(),
+                res.getReadyInMinutes(),
+                res.getSourceUrl(),
+                res.getInstructions(),
+                res.getSummary(),
+                res.getHealthScore(),
+                res.isDairyFree(),
+                res.isGlutenFree(),
+                res.isVegan(),
+                res.isVegetarian(),
+                res.getCuisines(),
+                res.getDiets(),
+                measurements
+        );
+    }
 }
