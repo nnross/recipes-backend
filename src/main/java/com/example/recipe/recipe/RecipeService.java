@@ -1,11 +1,16 @@
 package com.example.recipe.recipe;
 
+import com.example.recipe.apiClasses.RecipeFormat;
+import com.example.recipe.apiClasses.RecipeIngredients;
+import com.example.recipe.apiClasses.ShortRecipe;
 import com.example.recipe.category.CategoryRepository;
 import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
 import com.example.recipe.response.ListRes;
+import com.example.recipe.response.MeasurementRes;
+import com.example.recipe.response.RecipeRes;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
@@ -39,6 +44,9 @@ public class RecipeService {
 
     @Autowired
     private MeasurementRepository measurementRepository;
+
+    @Autowired
+    private RecipeUtils recipeUtils;
 
     /**
      * Adds a recipe to the database.
@@ -109,6 +117,118 @@ public class RecipeService {
     }
 
     /**
+     * Checks that filters and sort are correct
+     * and keeps track of page
+     * @param search
+     *        Recipes to get from the API
+     * @param ingredients
+     *        Ingredients included in the recipe
+     * @param cuisine
+     *        From which origin the recipe can be
+     * @param diet
+     *        Dietary restrictions of the recipe
+     * @param intolerances
+     *        Food intolerances
+     * @param type
+     *        The type of food the recipe is, e.g. breakfast
+     * @param sort
+     *        Ways to sort the results
+     * @param sortDirection
+     *        Ascending or descending
+     * @param page
+     *        Keeps track of the page showing the results
+     * @return ListRes of recipe
+     */
+    public ListRes getSearch(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection, int page) {
+        if(!ingredients.isEmpty()){
+            try {
+                Ingredient ingredient = Ingredient.valueOf(ingredients.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid ingredient filter");
+            }
+        }
+        if(!cuisine.isEmpty()){
+            try {
+                Cuisine cuisines = Cuisine.valueOf(cuisine.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid cuisine filter");
+            }
+        }
+        if(!diet.isEmpty()){
+            try {
+                Diet diets = Diet.valueOf(diet.toUpperCase().replaceAll(" ", "_"));
+            } catch (Exception e) {
+                throw new BadRequestException("invalid diet filter");
+            }
+        }
+        if(!intolerances.isEmpty()){
+            try {
+                Intolerance intolerance = Intolerance.valueOf(intolerances.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid intolerance filter");
+            }
+        }
+        if(!type.isEmpty()){
+            try {
+                Type types = Type.valueOf(type.toUpperCase().replaceAll(" ", "_"));
+            } catch (Exception e) {
+                throw new BadRequestException("invalid type filter");
+            }
+        }
+        if(!sort.isEmpty()){
+            try {
+                Sort sorts = Sort.valueOf(sort.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid sort");
+            }
+        }
+        if(!sortDirection.isEmpty()){
+            try {
+                SortDirection sortDirections = SortDirection.valueOf(sortDirection.toUpperCase());
+            } catch (Exception e) {
+                throw new BadRequestException("invalid sort direction");
+            }
+        }
+        int offset = page*12;
+        List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, offset).getResults();
+        return new ListRes(recipes, true);
+    };
+
+    /**
+     * Formats ingredients correctly
+     * @param id
+     *       Id of the recipe wanted
+     * @return Recipe as RecipeRes
+     */
+    public RecipeRes getSearchById(int id) {
+        RecipeFormat res = recipeUtils.getRecipeById(id);
+        List<MeasurementRes> measurements = new ArrayList<>();
+        for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
+            measurements.add(new MeasurementRes(
+                    ingredient.getName(),
+                    ingredient.getMeasures().getMetric().getAmount(),
+                    ingredient.getMeasures().getMetric().getUnitShort()));
+        }
+        return new RecipeRes(
+                res.getId(),
+                res.getTitle(),
+                res.getImage(),
+                res.getServings(),
+                res.getReadyInMinutes(),
+                res.getSourceUrl(),
+                res.getInstructions(),
+                res.getSummary(),
+                res.getHealthScore(),
+                res.isDairyFree(),
+                res.isGlutenFree(),
+                res.isVegan(),
+                res.isVegetarian(),
+                res.getCuisines(),
+                res.getDiets(),
+                measurements
+        );
+    }
+
      * Gets the statistics of recipes for specified account.
      * @param accountId
      *        id of the account we want stats for.

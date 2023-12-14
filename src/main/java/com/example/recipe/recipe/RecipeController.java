@@ -1,9 +1,14 @@
 package com.example.recipe.recipe;
 
+import com.example.recipe.account.Account;
+import com.example.recipe.account.AccountService;
 import com.example.recipe.response.ListRes;
+import com.example.recipe.security.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Controller for recipe calls
@@ -53,6 +58,51 @@ public class RecipeController {
     public Boolean doLater(@RequestParam("recipeId") int recipeId) {
         return recipeService.toggleDoLater(recipeId);
     }
+
+    /**
+     * Gets the parameters from the url for search
+     * @param search
+     *        Recipes to get from the API
+     * @param ingredients
+     *        Ingredients included in the recipe
+     * @param cuisine
+     *        From which origin the recipe can be
+     * @param diet
+     *        Dietary restrictions of the recipe
+     * @param intolerances
+     *        Food intolerances
+     * @param type
+     *        The type of food the recipe is, e.g. breakfast
+     * @param sort
+     *        Ways to sort the results
+     * @param sortDirection
+     *        Ascending or descending
+     * @param page
+     *        Keeps track of the page showing the results
+     * @return RecipeService getSearch with all parameters from url
+     */
+    @GetMapping("/get/search")
+    public ListRes search(@RequestParam("search") String search,
+                          @RequestParam("ingredients") String ingredients,
+                          @RequestParam("cuisine") String cuisine,
+                          @RequestParam("diet") String diet,
+                          @RequestParam("intolerances") String intolerances,
+                          @RequestParam("type") String type,
+                          @RequestParam("sort") String sort,
+                          @RequestParam("sortDirection") String sortDirection,
+                          @RequestParam("page") int page){
+        return recipeService.getSearch(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, page);
+    }
+
+    /**
+     * Gets the parameter for search by id
+     * @param id
+     *       Id of the recipe wanted
+     * @return RecipeService getSearchById with id from url
+     */
+    @GetMapping("/get/id")
+    public Object searchById(@RequestParam("id") int id){
+        return recipeService.getSearchById(id);
 
     /**
      * GET API call to /api/recipe/get/favourite
