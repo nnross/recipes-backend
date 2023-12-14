@@ -1,6 +1,7 @@
 package com.example.recipe.response;
 
 import com.example.recipe.recipe.ListRecipeRes;
+import org.hibernate.mapping.Any;
 
 import java.util.List;
 
@@ -8,19 +9,19 @@ import java.util.List;
  * Class to return list of recipes with data of a new page.
  */
 public class ListRes {
-    private List<ListRecipeRes> recipes;
+    private List<?> recipes;
     private Boolean nextPage;
 
-    public ListRes(List<ListRecipeRes> recipes, Boolean nextPage) {
+    public ListRes(List<?> recipes, Boolean nextPage) {
         this.recipes = recipes;
         this.nextPage = nextPage;
     }
 
-    public List<ListRecipeRes> getRecipes() {
+    public List<?> getRecipes() {
         return recipes;
     }
 
-    public void setRecipes(List<ListRecipeRes> recipes) {
+    public void setRecipes(List<?> recipes) {
         this.recipes = recipes;
     }
 
