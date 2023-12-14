@@ -1,5 +1,6 @@
 package com.example.recipe.response;
 
+import com.example.recipe.recipe.ListRecipeRes;
 import org.hibernate.mapping.Any;
 
 import java.util.List;

@@ -59,7 +59,6 @@ public class RecipeController {
         return recipeService.toggleDoLater(recipeId);
     }
 
-
     /**
      * Gets the parameters from the url for search
      * @param search
@@ -104,5 +103,34 @@ public class RecipeController {
     @GetMapping("/get/id")
     public Object searchById(@RequestParam("id") int id){
         return recipeService.getSearchById(id);
+
+    /**
+     * GET API call to /api/recipe/get/favourite
+     * Gets favourite recipes for account with selected page.
+     * @param accountId
+     *        id of account to be searched for
+     * @param page
+     *        page that we want results for
+     * @return ListRes object with favourite recipes and if there is a next page.
+     */
+    @PreAuthorize("#accountId == authentication.principal.id")
+    @GetMapping("/get/favourite")
+    public ListRes getFavourite(@RequestParam("accountId") int accountId, @RequestParam("page") int page) {
+        return recipeService.getFavourite(accountId, page);
+    }
+
+    /**
+     * GET API call to /api/recipe/get/doLater
+     * Gets doLater recipes for account with selected page.
+     * @param accountId
+     *        id of account to be searched for
+     * @param page
+     *        page that we want results for
+     * @return ListRes object with doLater recipes and if there is a next page.
+     */
+    @PreAuthorize("#accountId == authentication.principal.id")
+    @GetMapping("/get/doLater")
+    public ListRes getDoLater(@RequestParam("accountId") int accountId, @RequestParam("page") int page) {
+        return recipeService.getDoLater(accountId, page);
     }
 }
