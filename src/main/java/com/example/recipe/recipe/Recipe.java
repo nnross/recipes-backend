@@ -11,7 +11,6 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Creates the recipe entity for the database.
@@ -31,6 +30,9 @@ public class Recipe {
     @Column(name = "recipe_description", nullable = false)
     private String description;
 
+    @Column(name = "recipe_original")
+    private String original;
+
     @Column(name = "recipe_time", nullable = false)
     private int time;
 
@@ -39,6 +41,9 @@ public class Recipe {
 
     @Column(name = "recipe_image", nullable = false)
     private String image;
+
+    @Column(name = "recipe_healthScore")
+    private double healthScore;
 
     @Column(name = "recipe_favourite", nullable = false)
     private Boolean favourite;
@@ -55,36 +60,50 @@ public class Recipe {
     @Column(name = "recipe_instructions", nullable = false)
     private String instructions;
 
-    @ManyToOne
-    @JoinColumn(name = "recipe_category", referencedColumnName = "category_id", nullable = false)
-    private Category category;
+    @ManyToMany(cascade=CascadeType.REMOVE)
+    @JoinTable(
+            name = "recipe_category_mapping",
+            joinColumns = @JoinColumn(name = "recipe_category"),
+            inverseJoinColumns = @JoinColumn(name = "type_id")
+    )
+    private List<Category> category;
 
-    @ManyToOne
-    @JoinColumn(name = "recipe_type", referencedColumnName = "type_id", nullable = false)
-    private Type type;
+    @ManyToMany(cascade=CascadeType.REMOVE)
+    @JoinTable(
+            name = "recipe_type_mapping",
+            joinColumns = @JoinColumn(name = "recipe_type"),
+            inverseJoinColumns = @JoinColumn(name = "type_id")
+    )
+    private List<Type> type;
 
     @ManyToOne
     @JoinColumn(name = "recipe_account", referencedColumnName = "account_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Account account;
 
-    @ManyToOne
-    @JoinColumn(name = "recipe_country", referencedColumnName = "country_id", nullable = false)
-    private Country country;
-
+    @ManyToMany(cascade=CascadeType.REMOVE)
+    @JoinTable(
+            name = "recipe_country_mapping",
+            joinColumns = @JoinColumn(name = "recipe_country"),
+            inverseJoinColumns = @JoinColumn(name = "country_id")
+    )
+    private List<Country> country;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "recipe_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Measurement> measurements;
 
-    public Recipe(int id, String title, String description, int time, int servings, String image, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, Category category, Type type, Account account, Country country, List<Measurement> measurements) {
+
+    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.original = original;
         this.time = time;
         this.servings = servings;
         this.image = image;
+        this.healthScore = healthScore;
         this.favourite = favourite;
         this.doLater = doLater;
         this.finished = finished;
@@ -95,6 +114,22 @@ public class Recipe {
         this.account = account;
         this.country = country;
         this.measurements = measurements;
+    }
+
+    public double getHealthScore() {
+        return healthScore;
+    }
+
+    public void setHealthScore(double healthScore) {
+        this.healthScore = healthScore;
+    }
+
+    public String getOriginal() {
+        return original;
+    }
+
+    public void setOriginal(String original) {
+        this.original = original;
     }
 
     public Recipe() {
@@ -188,19 +223,19 @@ public class Recipe {
         this.instructions = instructions;
     }
 
-    public Category getCategory() {
+    public List<Category> getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(List<Category> category) {
         this.category = category;
     }
 
-    public Type getType() {
+    public List<Type> getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(List<Type> type) {
         this.type = type;
     }
 
@@ -212,11 +247,11 @@ public class Recipe {
         this.account = account;
     }
 
-    public Country getCountry() {
+    public List<Country> getCountry() {
         return country;
     }
 
-    public void setCountry(Country country) {
+    public void setCountry(List<Country> country) {
         this.country = country;
     }
 
