@@ -15,15 +15,13 @@ public class RecipeRes {
     private String instructions;
     private String summary;
     private double healthScore;
-    private boolean dairyFree;
-    private boolean glutenFree;
-    private boolean vegan;
-    private boolean vegetarian;
+
+    private List<String> dishTypes;
     private List<String> cuisines;
     private List<String> diets;
     private List<MeasurementRes> measurements;
 
-    public RecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, boolean dairyFree, boolean glutenFree, boolean vegan, boolean vegetarian, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
+    public RecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -33,13 +31,18 @@ public class RecipeRes {
         this.instructions = instructions;
         this.summary = summary;
         this.healthScore = healthScore;
-        this.dairyFree = dairyFree;
-        this.glutenFree = glutenFree;
-        this.vegan = vegan;
-        this.vegetarian = vegetarian;
+        this.dishTypes = dishTypes;
         this.cuisines = cuisines;
         this.diets = diets;
         this.measurements = measurements;
+    }
+
+    public List<String> getDishTypes() {
+        return dishTypes;
+    }
+
+    public void setDishTypes(List<String> dishTypes) {
+        this.dishTypes = dishTypes;
     }
 
     public int getId() {
@@ -112,38 +115,6 @@ public class RecipeRes {
 
     public void setHealthScore(double healthScore) {
         this.healthScore = healthScore;
-    }
-
-    public boolean isDairyFree() {
-        return dairyFree;
-    }
-
-    public void setDairyFree(boolean dairyFree) {
-        this.dairyFree = dairyFree;
-    }
-
-    public boolean isGlutenFree() {
-        return glutenFree;
-    }
-
-    public void setGlutenFree(boolean glutenFree) {
-        this.glutenFree = glutenFree;
-    }
-
-    public boolean isVegan() {
-        return vegan;
-    }
-
-    public void setVegan(boolean vegan) {
-        this.vegan = vegan;
-    }
-
-    public boolean isVegetarian() {
-        return vegetarian;
-    }
-
-    public void setVegetarian(boolean vegetarian) {
-        this.vegetarian = vegetarian;
     }
 
     public List<String> getCuisines() {

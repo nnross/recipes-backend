@@ -22,6 +22,7 @@ public class RecipeController {
 
     /**
      * POST API call to /api/recipe/add
+     * with recipe in body
      * Adds a recipe to the database
      * @param recipe
      *       New recipe as a Recipe object
@@ -34,7 +35,7 @@ public class RecipeController {
     }
 
     /**
-     * PUT API call to /api/recipe/favourite
+     * PUT API call to /api/recipe/favourite?recipeId=(id)
      * Toggles the favourite on the selected recipe
      * @param recipeId
      *        id of recipe to be changed
@@ -47,7 +48,7 @@ public class RecipeController {
     }
 
     /**
-     * PUT API call to /api/recipe/doLater
+     * PUT API call to /api/recipe/doLater?recipeId=(id)
      * Toggles the doLater on the selected recipe
      * @param recipeId
      *        id of recipe to be changed
@@ -60,6 +61,7 @@ public class RecipeController {
     }
 
     /**
+     * GET API call to /api/recipe/get/favourite?accountId=(id)&page=(page)
      * Gets the parameters from the url for search
      * @param search
      *        Recipes to get from the API
@@ -97,15 +99,16 @@ public class RecipeController {
     /**
      * Gets the parameter for search by id
      * @param id
-     *       Id of the recipe wanted
+     *       id of the recipe wanted
      * @return RecipeService getSearchById with id from url
      */
     @GetMapping("/get/id")
-    public Object searchById(@RequestParam("id") int id){
+    public Object searchById(@RequestParam("id") int id) {
         return recipeService.getSearchById(id);
+    }
 
     /**
-     * GET API call to /api/recipe/get/favourite
+     * GET API call to /api/recipe/get/favourite?accountId=(id)&page=(page)
      * Gets favourite recipes for account with selected page.
      * @param accountId
      *        id of account to be searched for
@@ -120,7 +123,7 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/doLater
+     * GET API call to /api/recipe/get/doLater?accountId=(id)&page=(page)
      * Gets doLater recipes for account with selected page.
      * @param accountId
      *        id of account to be searched for
@@ -132,5 +135,25 @@ public class RecipeController {
     @GetMapping("/get/doLater")
     public ListRes getDoLater(@RequestParam("accountId") int accountId, @RequestParam("page") int page) {
         return recipeService.getDoLater(accountId, page);
+    }
+
+    /**
+     * GET API call to /api/recipe/get/recipe?recipeId=(id)
+     * Gets recipe with specified ID.
+     * @param recipeId
+     *        id of recipe to be searched for.
+     * @return Found recipe.
+     */
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
+    @GetMapping("/get/db")
+    public Object getDoLater(@RequestParam("recipeId") int recipeId) {
+        return recipeService.getRecipe(recipeId);
+    }
+
+
+    // TEMP TO DELETE TODO:
+    @DeleteMapping("/del")
+    public Boolean delete(@RequestParam("id") int id) {
+        return recipeService.delete(id);
     }
 }

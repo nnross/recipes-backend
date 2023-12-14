@@ -19,11 +19,12 @@ public class RecipeFormat {
     private boolean glutenFree;
     private boolean vegan;
     private boolean vegetarian;
+    private List<String> dishTypes;
     private List<String> cuisines;
     private List<String> diets;
     private List<RecipeIngredients> extendedIngredients;
 
-    public RecipeFormat(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, boolean dairyFree, boolean glutenFree, boolean vegan, boolean vegetarian, List<String> cuisines, List<String> diets, List<RecipeIngredients> extendedIngredients) {
+    public RecipeFormat(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, boolean dairyFree, boolean glutenFree, boolean vegan, boolean vegetarian, List<String> dishTypes, List<String> cuisines, List<String> diets, List<RecipeIngredients> extendedIngredients) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -37,9 +38,18 @@ public class RecipeFormat {
         this.glutenFree = glutenFree;
         this.vegan = vegan;
         this.vegetarian = vegetarian;
+        this.dishTypes = dishTypes;
         this.cuisines = cuisines;
         this.diets = diets;
         this.extendedIngredients = extendedIngredients;
+    }
+
+    public List<String> getDishTypes() {
+        return dishTypes;
+    }
+
+    public void setDishTypes(List<String> dishTypes) {
+        this.dishTypes = dishTypes;
     }
 
     public int getId() {

@@ -17,7 +17,7 @@ public class AccountController {
     private AccountService accountService;
 
     /**
-     * API GET call to /api/account/get
+     * API GET call to /api/account/get?accountId=(id)
      * Takes an id and returns an account with that id.
      * @param id
      *        Id of the account wanted
@@ -31,6 +31,7 @@ public class AccountController {
 
     /**
      * API POST call to /api/account/login
+     * with account in body
      * Calls the AccountService to log in the user.
      * @param request
      *        AuthRequest with username and password
@@ -43,6 +44,7 @@ public class AccountController {
 
     /**
      * POST API call to /api/account/create
+     * with account in body
      * Creates a new account
      * @param account
      *       New account's name, username, email and password
@@ -52,7 +54,7 @@ public class AccountController {
     public AuthRes create(@RequestBody Account account) { return accountService.create(account); }
 
     /**
-     * API DELETE call to /api/account/delete
+     * API DELETE call to /api/account/delete?accountId=(id)
      * @param id
      *       Id of the account to be deleted
      * @return true if deleted, false if failed
@@ -63,6 +65,7 @@ public class AccountController {
 
     /**
      * API PUT call to /api/account/update
+     * with account in body
      * @param account
      *       Updated account name, username, email, password
      * @param id

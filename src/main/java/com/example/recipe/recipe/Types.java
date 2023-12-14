@@ -3,7 +3,7 @@ package com.example.recipe.recipe;
 /**
  * Enum for food type filter
  */
-public enum Type {
+public enum Types {
     DESSERT,
     FINGERFOOD,
     SNACK,

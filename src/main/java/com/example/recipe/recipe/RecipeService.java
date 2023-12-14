@@ -3,7 +3,9 @@ package com.example.recipe.recipe;
 import com.example.recipe.apiClasses.RecipeFormat;
 import com.example.recipe.apiClasses.RecipeIngredients;
 import com.example.recipe.apiClasses.ShortRecipe;
+import com.example.recipe.category.Category;
 import com.example.recipe.category.CategoryRepository;
+import com.example.recipe.country.Country;
 import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
@@ -13,10 +15,14 @@ import com.example.recipe.response.MeasurementRes;
 import com.example.recipe.response.RecipeRes;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
+import com.example.recipe.type.Type;
 import exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Logic for recipe calls.
@@ -61,18 +67,23 @@ public class RecipeService {
             ingredientRepository.findById(measurement.getIngredient().getId()).orElseThrow(() ->
                     new BadRequestException("ingredient not in database"));
             }
-        typeRepository.findById(recipe.getType().getId()).orElseThrow(() ->
-                new BadRequestException("type not in database"));
-        countryRepository.findById(recipe.getCountry().getId()).orElseThrow(() ->
-                new BadRequestException("country not in database"));
-        categoryRepository.findById(recipe.getCategory().getId()).orElseThrow(() ->
-                new BadRequestException("category not in database"));
-        try {
-            recipeRepository.save(recipe);
+
+        for (Type type : recipe.getType()) {
+            typeRepository.findById(type.getId()).orElseThrow(() ->
+                    new BadRequestException("type not in database"));
         }
-        catch (Exception e) {
-            throw new BadRequestException("error while saving to database");
+
+        for (Country country : recipe.getCountry()) {
+            countryRepository.findById(country.getId()).orElseThrow(() ->
+                    new BadRequestException("country not in database"));
         }
+
+        for (Category category : recipe.getCategory()) {
+            categoryRepository.findById(category.getId()).orElseThrow(() ->
+                    new BadRequestException("category not in database"));
+        }
+
+        recipeRepository.save(recipe);
         return true;
     }
 
@@ -170,7 +181,7 @@ public class RecipeService {
         }
         if(!type.isEmpty()){
             try {
-                Type types = Type.valueOf(type.toUpperCase().replaceAll(" ", "_"));
+                Types types = Types.valueOf(type.toUpperCase().replaceAll(" ", "_"));
             } catch (Exception e) {
                 throw new BadRequestException("invalid type filter");
             }
@@ -209,6 +220,22 @@ public class RecipeService {
                     ingredient.getMeasures().getMetric().getAmount(),
                     ingredient.getMeasures().getMetric().getUnitShort()));
         }
+        List<String> diets = new ArrayList<>();
+        if (res.isDairyFree()) {
+            diets.add("dairy free");
+        }
+        if (res.isVegan()) {
+            diets.add("vegan");
+        }
+        if (res.isVegetarian()) {
+            diets.add("vegetarian");
+        }
+        if (res.isGlutenFree()) {
+            diets.add("gluten free");
+        }
+
+        diets.addAll(res.getDiets());
+
         return new RecipeRes(
                 res.getId(),
                 res.getTitle(),
@@ -219,16 +246,16 @@ public class RecipeService {
                 res.getInstructions(),
                 res.getSummary(),
                 res.getHealthScore(),
-                res.isDairyFree(),
-                res.isGlutenFree(),
-                res.isVegan(),
-                res.isVegetarian(),
                 res.getCuisines(),
-                res.getDiets(),
+                diets,
+                res.getDishTypes(),
                 measurements
+
         );
     }
 
+
+    /**
      * Gets the statistics of recipes for specified account.
      * @param accountId
      *        id of the account we want stats for.
@@ -289,4 +316,67 @@ public class RecipeService {
                 recipeRepository.getDoLater(accountId, pageRequest),
                 !recipeRepository.getDoLater(accountId, nextPageRequest).isEmpty());
     };
+
+
+    /**
+     * Gets recipe from the database.
+     * @param recipeId
+     *        id of the recipe we want to search.
+     * @return found recipe.
+     */
+    public Object getRecipe(int recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        List<String> types = new ArrayList<>();
+        List<MeasurementRes> measurements = new ArrayList<>();
+        List<String> categories = new ArrayList<>();
+        List<String> countries = new ArrayList<>();
+
+        for (Type type : recipe.getType()) {
+            types.add(type.getName());
+        }
+
+        for (Country country : recipe.getCountry()) {
+            countries.add(country.getName());
+        }
+
+        for (Measurement measurement : recipe.getMeasurements()) {
+            measurements.add(new MeasurementRes(measurement.getIngredient().getName(), measurement.getAmount(), measurement.getUnit().getName()));
+        }
+
+        for (Category category : recipe.getCategory()) {
+            categories.add(category.getName());
+        }
+
+        return new RecipeRes(
+                recipe.getId(),
+                recipe.getTitle(),
+                recipe.getImage(),
+                recipe.getServings(),
+                recipe.getServings(),
+                recipe.getOriginal(),
+                recipe.getInstructions(),
+                recipe.getDescription(),
+                recipe.getHealthScore(),
+                categories,
+                countries,
+                types,
+                measurements
+
+        );
+
+
+    }
+
+
+    // TEMP TO DELET TODO:
+    public Boolean delete(int id) {
+        Recipe recipe = recipeRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("error"));
+        recipe.getCountry().clear();
+        recipe.getType().clear();
+        recipe.getCategory().clear();
+        recipeRepository.deleteById(id);
+        return true;
+    }
 }

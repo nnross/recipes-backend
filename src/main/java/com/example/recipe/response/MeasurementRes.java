@@ -5,10 +5,10 @@ package com.example.recipe.response;
  */
 public class MeasurementRes {
     private String name;
-    private int amount;
+    private float amount;
     private String unit;
 
-    public MeasurementRes(String name, int amount, String unit) {
+    public MeasurementRes(String name, float amount, String unit) {
         this.name = name;
         this.amount = amount;
         this.unit = unit;
@@ -22,11 +22,11 @@ public class MeasurementRes {
         this.name = name;
     }
 
-    public int getAmount() {
+    public float getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(float amount) {
         this.amount = amount;
     }
 
