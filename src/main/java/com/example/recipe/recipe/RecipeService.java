@@ -128,6 +128,26 @@ public class RecipeService {
     }
 
     /**
+     * Marks the selected recipe as finished
+     * @param recipeId
+     *        Recipe to be marked as finished
+     * @return true if successful
+     */
+    public Boolean finishRecipe(int recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        recipe.setFinished(true);
+
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("error while saving to database");
+        }
+        return true;
+    }
+
+    /**
      * Checks that filters and sort are correct
      * and keeps track of page
      * @param search
@@ -368,15 +388,24 @@ public class RecipeService {
 
     }
 
-
-    // TEMP TO DELET TODO:
+    /**
+     * Deletes the wanted recipe from the database
+     * @param id
+     *       The recipe to be deleted
+     * @return true if successful
+     */
     public Boolean delete(int id) {
         Recipe recipe = recipeRepository.findById(id).orElseThrow(() ->
-                new BadRequestException("error"));
+                new BadRequestException("no recipe with id"));
         recipe.getCountry().clear();
         recipe.getType().clear();
         recipe.getCategory().clear();
-        recipeRepository.deleteById(id);
+        try {
+            recipeRepository.deleteById(id);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("error while deleting from database");
+        }
         return true;
     }
 }
