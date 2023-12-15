@@ -61,6 +61,18 @@ public class RecipeController {
     }
 
     /**
+     * PUT API call to /api/recipe/finished?recipeId=(id)
+     * @param recipeId
+     *        id of the recipe to be marked as finished
+     * @return true if successful
+     */
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
+    @PutMapping("/finished")
+    public Boolean finished(@RequestParam("recipeId") int recipeId) {
+        return recipeService.finishRecipe(recipeId);
+    }
+
+    /**
      * GET API call to /api/recipe/get/favourite?accountId=(id)&page=(page)
      * Gets the parameters from the url for search
      * @param search
@@ -97,7 +109,7 @@ public class RecipeController {
     }
 
     /**
-     * Gets the parameter for search by id
+     * GET API call to /api/recipe/get/id?id=(id)
      * @param id
      *       id of the recipe wanted
      * @return RecipeService getSearchById with id from url
@@ -150,10 +162,15 @@ public class RecipeController {
         return recipeService.getRecipe(recipeId);
     }
 
-
-    // TEMP TO DELETE TODO:
+    /**
+     * DELETE API call to /api/recipe/del?recipeId=(id)
+     * @param recipeId
+     *        Recipe of the recipe to be deleted
+     * @return true if successful
+     */
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
     @DeleteMapping("/del")
-    public Boolean delete(@RequestParam("id") int id) {
-        return recipeService.delete(id);
+    public Boolean delete(@RequestParam("recipeId") int recipeId) {
+        return recipeService.delete(recipeId);
     }
 }
