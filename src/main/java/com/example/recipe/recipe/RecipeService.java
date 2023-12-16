@@ -63,7 +63,7 @@ public class RecipeService {
     public Boolean add(Recipe recipe) {
         for (Measurement measurement : recipe.getMeasurements()) {
             unitRepository.findById(measurement.getUnit().getId()).orElseThrow(() ->
-                new BadRequestException("measurement not in database"));
+                new BadRequestException("unit not in database"));
             ingredientRepository.findById(measurement.getIngredient().getId()).orElseThrow(() ->
                     new BadRequestException("ingredient not in database"));
             }
@@ -83,7 +83,12 @@ public class RecipeService {
                     new BadRequestException("category not in database"));
         }
 
-        recipeRepository.save(recipe);
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("error while saving to database");
+        }
         return true;
     }
 
@@ -233,6 +238,7 @@ public class RecipeService {
      */
     public RecipeRes getSearchById(int id) {
         RecipeFormat res = recipeUtils.getRecipeById(id);
+
         List<MeasurementRes> measurements = new ArrayList<>();
         for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
             measurements.add(new MeasurementRes(
@@ -270,7 +276,6 @@ public class RecipeService {
                 diets,
                 res.getDishTypes(),
                 measurements
-
         );
     }
 
@@ -380,8 +385,8 @@ public class RecipeService {
      * @return recipe that matches the date.
      */
     public FullRecipeRes getRecipeForDate(int accountId, Date date) {
-        Recipe recipe = recipeRepository.getByDate(accountId, date).orElseThrow(() ->
-                new BadRequestException("no recipe with id"));
+        Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
+        if (recipe == null) return null;
         return converter.fullRecipeConverter(recipe);
     }
 }

@@ -44,6 +44,9 @@ public class RecipeFormat {
         this.extendedIngredients = extendedIngredients;
     }
 
+    public RecipeFormat() {
+    }
+
     public List<String> getDishTypes() {
         return dishTypes;
     }
