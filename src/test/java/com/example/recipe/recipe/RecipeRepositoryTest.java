@@ -9,6 +9,7 @@ import com.example.recipe.measurement.Measurement;
 import com.example.recipe.response.StatRes;
 import com.example.recipe.type.Type;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

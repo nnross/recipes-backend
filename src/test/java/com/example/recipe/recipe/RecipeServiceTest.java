@@ -22,6 +22,7 @@ import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.Unit;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

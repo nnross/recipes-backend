@@ -76,7 +76,7 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/api/favourite?accountId=(id)&page=(page) TODO: ?
+     * GET API call to /a@@pi/recipe/get/api/favourite?accountId=(id)&page=(page) TODO: ?
      * Gets the parameters from the url for search
      * @param search
      *        Recipes to get from the API

@@ -13,6 +13,9 @@ public class RecipeUtils {
     @Value("${apiKey}")
     String apiKey;
 
+    @Value("${requestUrl}")
+    String request_url;
+
     /**
      * Makes the get call to the API
      * @param search
@@ -36,7 +39,6 @@ public class RecipeUtils {
      * @return Results from call to API as RecipeResponse
      */
     public RecipeResponse searchResults(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection, int offset) {
-        String request_url = "https://api.spoonacular.com/recipes";
         WebClient webClient = WebClient.create(request_url);
 
         return webClient.get()
@@ -53,7 +55,6 @@ public class RecipeUtils {
      * @return Data for recipe by id as RecipeFormat
      */
     public RecipeFormat getRecipeById(int id) {
-        String request_url = "https://api.spoonacular.com/recipes";
         WebClient webClient = WebClient.create(request_url);
 
         return webClient.get()
