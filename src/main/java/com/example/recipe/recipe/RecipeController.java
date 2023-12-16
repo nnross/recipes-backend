@@ -2,6 +2,7 @@ package com.example.recipe.recipe;
 
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountService;
+import com.example.recipe.response.FullRecipeRes;
 import com.example.recipe.response.ListRes;
 import com.example.recipe.response.RecipeRes;
 import com.example.recipe.security.AuthRequest;
@@ -75,7 +76,7 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/favourite?accountId=(id)&page=(page)
+     * GET API call to /api/recipe/get/api/favourite?accountId=(id)&page=(page) TODO: ?
      * Gets the parameters from the url for search
      * @param search
      *        Recipes to get from the API
@@ -97,7 +98,7 @@ public class RecipeController {
      *        Keeps track of the page showing the results
      * @return RecipeService getSearch with all parameters from url
      */
-    @GetMapping("/get/search")
+    @GetMapping("/get/api/search")
     public ListRes search(@RequestParam("search") String search,
                           @RequestParam("ingredients") String ingredients,
                           @RequestParam("cuisine") String cuisine,
@@ -111,13 +112,13 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/id?id=(id)
+     * GET API call to /api/recipe/get/api/id?id=(id)
      * @param id
      *       id of the recipe wanted
      * @return RecipeService getSearchById with id from url
      */
-    @GetMapping("/get/id")
-    public Object searchById(@RequestParam("id") int id) {
+    @GetMapping("/get/api/id")
+    public RecipeRes searchById(@RequestParam("id") int id) {
         return recipeService.getSearchById(id);
     }
 
@@ -160,7 +161,7 @@ public class RecipeController {
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
     @GetMapping("/get/db")
-    public RecipeRes getRecipeFromDB(@RequestParam("recipeId") int recipeId) {
+    public FullRecipeRes getRecipeFromDB(@RequestParam("recipeId") int recipeId) {
         return recipeService.getRecipe(recipeId);
     }
 
@@ -175,7 +176,7 @@ public class RecipeController {
      */
     @PreAuthorize("#accountId == authentication.principal.id")
     @GetMapping("/get/date")
-    public RecipeRes getDoLater(@RequestParam("accountId") int accountId, @RequestParam("date") Date date) {
+    public FullRecipeRes getDate(@RequestParam("accountId") int accountId, @RequestParam("date") Date date) {
         return recipeService.getRecipeForDate(accountId, date);
     }
 

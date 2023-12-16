@@ -10,10 +10,7 @@ import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
-import com.example.recipe.response.Converters;
-import com.example.recipe.response.ListRes;
-import com.example.recipe.response.MeasurementRes;
-import com.example.recipe.response.RecipeRes;
+import com.example.recipe.response.*;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import com.example.recipe.type.Type;
@@ -347,10 +344,10 @@ public class RecipeService {
      *        id of the recipe we want to search.
      * @return found recipe.
      */
-    public RecipeRes getRecipe(int recipeId) {
+    public FullRecipeRes getRecipe(int recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
                 new BadRequestException("no recipe with id"));
-        return converter.recipeConverter(recipe);
+        return converter.fullRecipeConverter(recipe);
     }
 
     /**
@@ -382,9 +379,9 @@ public class RecipeService {
      *        Wanted date of recipe
      * @return recipe that matches the date.
      */
-    public RecipeRes getRecipeForDate(int accountId, Date date) {
+    public FullRecipeRes getRecipeForDate(int accountId, Date date) {
         Recipe recipe = recipeRepository.getByDate(accountId, date).orElseThrow(() ->
                 new BadRequestException("no recipe with id"));
-        return converter.recipeConverter(recipe);
+        return converter.fullRecipeConverter(recipe);
     }
 }
