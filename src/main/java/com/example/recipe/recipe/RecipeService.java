@@ -10,6 +10,7 @@ import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
+import com.example.recipe.response.Converters;
 import com.example.recipe.response.ListRes;
 import com.example.recipe.response.MeasurementRes;
 import com.example.recipe.response.RecipeRes;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,7 @@ import java.util.List;
  */
 @Service
 public class RecipeService {
+    Converters converter = new Converters();
 
     @Autowired
     private RecipeRepository recipeRepository;
@@ -344,48 +347,10 @@ public class RecipeService {
      *        id of the recipe we want to search.
      * @return found recipe.
      */
-    public Object getRecipe(int recipeId) {
+    public RecipeRes getRecipe(int recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
                 new BadRequestException("no recipe with id"));
-        List<String> types = new ArrayList<>();
-        List<MeasurementRes> measurements = new ArrayList<>();
-        List<String> categories = new ArrayList<>();
-        List<String> countries = new ArrayList<>();
-
-        for (Type type : recipe.getType()) {
-            types.add(type.getName());
-        }
-
-        for (Country country : recipe.getCountry()) {
-            countries.add(country.getName());
-        }
-
-        for (Measurement measurement : recipe.getMeasurements()) {
-            measurements.add(new MeasurementRes(measurement.getIngredient().getName(), measurement.getAmount(), measurement.getUnit().getName()));
-        }
-
-        for (Category category : recipe.getCategory()) {
-            categories.add(category.getName());
-        }
-
-        return new RecipeRes(
-                recipe.getId(),
-                recipe.getTitle(),
-                recipe.getImage(),
-                recipe.getServings(),
-                recipe.getServings(),
-                recipe.getOriginal(),
-                recipe.getInstructions(),
-                recipe.getDescription(),
-                recipe.getHealthScore(),
-                categories,
-                countries,
-                types,
-                measurements
-
-        );
-
-
+        return converter.recipeConverter(recipe);
     }
 
     /**
@@ -407,5 +372,19 @@ public class RecipeService {
             throw new RuntimeException("error while deleting from database");
         }
         return true;
+    }
+
+    /**
+     * Gets recipe for date from the backend
+     * @param accountId
+     *        id of account of recipe
+     * @param date
+     *        Wanted date of recipe
+     * @return recipe that matches the date.
+     */
+    public RecipeRes getRecipeForDate(int accountId, Date date) {
+        Recipe recipe = recipeRepository.getByDate(accountId, date).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        return converter.recipeConverter(recipe);
     }
 }

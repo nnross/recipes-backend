@@ -3,11 +3,13 @@ package com.example.recipe.recipe;
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountService;
 import com.example.recipe.response.ListRes;
+import com.example.recipe.response.RecipeRes;
 import com.example.recipe.security.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.List;
 
 /**
@@ -158,8 +160,23 @@ public class RecipeController {
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
     @GetMapping("/get/db")
-    public Object getDoLater(@RequestParam("recipeId") int recipeId) {
+    public RecipeRes getRecipeFromDB(@RequestParam("recipeId") int recipeId) {
         return recipeService.getRecipe(recipeId);
+    }
+
+    /**
+     * GET API call to /api/recipe/get/date?accountId=(id)&data=(date)
+     * Gets recipe for specified date.
+     * @param accountId
+     *        id of account that is searching
+     * @param date
+     *        date of recipe we want
+     * @return Found recipe.
+     */
+    @PreAuthorize("#accountId == authentication.principal.id")
+    @GetMapping("/get/date")
+    public RecipeRes getDoLater(@RequestParam("accountId") int accountId, @RequestParam("date") Date date) {
+        return recipeService.getRecipeForDate(accountId, date);
     }
 
     /**

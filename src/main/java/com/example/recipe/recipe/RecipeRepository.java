@@ -1,5 +1,6 @@
 package com.example.recipe.recipe;
 
+import com.example.recipe.response.RecipeRes;
 import com.example.recipe.response.StatRes;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,4 +72,16 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      */
     @Query(value = "SELECT recipe_title AS title, recipe_id AS id FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_do_later = 1", nativeQuery = true)
     List<ListRecipeRes> getDoLater(int accountId, Pageable pageable);
+
+
+    /**
+     * Query to get recipe for account with date
+     * @param accountId
+     *        id for account
+     * @param date
+     *        wanted date for recipe
+     * @return recipe with selected date.
+     */
+    @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_to_do_date = ?2", nativeQuery = true)
+    Optional<Recipe> getByDate(int accountId, Date date);
 }
