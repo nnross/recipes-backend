@@ -10,7 +10,7 @@ import java.util.Collection;
  * Creates the account entity for the database.
  */
 @Entity
-@Table(name="accounts")
+@Table(name="account")
 public class Account implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

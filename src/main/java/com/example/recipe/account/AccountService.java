@@ -50,11 +50,12 @@ public class AccountService {
      * @return AuthRes of token and user's id
      */
     public AuthRes login(AuthRequest request) {
-        System.out.println(passwordEncoder.encode(request.getPassword()));
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        Account account = accountRepository.findByUsername(request.getUsername()).orElseThrow();
+        Account account = accountRepository.findByUsername(request.getUsername()).orElseThrow(() ->
+                new BadRequestException("Invalid username")
+        );
         String token = jwtService.newToken(account);
         return new AuthRes(token, account.getId());
     }
@@ -96,12 +97,8 @@ public class AccountService {
     public Boolean delete(int id) {
         Account account = accountRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("No accounts with the id"));
-        // TODO: delete all account's recipies
-        try {
-            accountRepository.delete(account);
-        } catch(Exception e) {
-            throw new RuntimeException("Failed to delete account");
-        }
+
+        accountRepository.delete(account);
         return true;
     }
 

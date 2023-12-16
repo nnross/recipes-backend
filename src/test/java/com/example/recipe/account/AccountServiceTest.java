@@ -171,6 +171,25 @@ class AccountServiceTest {
     }
 
     @Test
+    void saveAccountThrowsWithFailureToSaveToDatabase() {
+        given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
+        given(accountRepository.findByEmail(any())).willReturn(Optional.empty());
+        given(accountRepository.save(any())).willThrow(new RuntimeException("error"));
+
+        Account account = new Account(
+                1,
+                "test name",
+                "username",
+                "example@gmail.com",
+                "passWord123!"
+        );
+
+        assertThatThrownBy(() ->  testAccountService.create(account))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Failed to save to database");
+    }
+
+    @Test
     void loginWorks() {
 
         Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
@@ -193,17 +212,11 @@ class AccountServiceTest {
 
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
 
-        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
-        AuthRequest request = new AuthRequest(
-                "test",
-                "test"
-        );
+        AuthRequest request = new AuthRequest("test", "test");
 
         assertThatThrownBy(() -> testAccountService.login(request))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessageContaining("No value present");
-
-        verify(accountRepository).findByUsername("test");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Invalid username");
     }
 
     @Test
@@ -334,6 +347,29 @@ class AccountServiceTest {
         testAccountService.update(updateAccount, updateAccount.getId());
 
         verify(accountRepository).save(account);
+    }
+
+    @Test
+    void updateAccountThrowsWithFailureToSaveToDatabase() {
+        given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
+        given(accountRepository.findByEmail(any())).willReturn(Optional.empty());
+        given(accountRepository.save(any())).willThrow(new RuntimeException("error"));
+
+        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
+
+        Account updateAccount = new Account(
+                1,
+                "test2 name",
+                "username",
+                "example@gmail.com",
+                "passWord123!"
+        );
+
+        given(accountRepository.findById(any())).willReturn(Optional.of(account));
+
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, updateAccount.getId()))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Failed to save changes to database");
     }
 
     @Test
