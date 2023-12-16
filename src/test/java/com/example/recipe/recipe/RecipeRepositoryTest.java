@@ -3,16 +3,23 @@ package com.example.recipe.recipe;
 
 import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
+import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
+import com.example.recipe.measurement.Measurement;
+import com.example.recipe.response.StatRes;
+import com.example.recipe.type.Type;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -36,29 +43,32 @@ public class RecipeRepositoryTest {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
+        PageRequest page = PageRequest.of(0, 4);
 
-        List<Recipe> foundEntity = testRecipeRepository.findByFavourite(account.getId()).orElse(null);
-        List<Recipe> foundNoneEntity = testRecipeRepository.findByFavourite(0).orElse(null);
+        List<ListRecipeRes> foundEntity = testRecipeRepository.getFavourite(account.getId(), page);
+        List<ListRecipeRes> foundNoneEntity = testRecipeRepository.getFavourite(0, page);
         assertNotNull(foundEntity);
-        assertEquals("title", Recipe[0].title);
+        assertEquals("title", foundEntity.get(0).getTitle());
         assertNull(foundNoneEntity);
     }
 
@@ -67,29 +77,32 @@ public class RecipeRepositoryTest {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
+        PageRequest page = PageRequest.of(0, 4);
 
-        List<Recipe> foundEntity = testRecipeRepository.findByDoLater(account.getId()).orElse(null);
-        List<Recipe> foundNoneEntity = testRecipeRepository.findByDoLater(0).orElse(null);
+        List<ListRecipeRes> foundEntity = testRecipeRepository.getDoLater(account.getId(), page);
+        List<ListRecipeRes> foundNoneEntity = testRecipeRepository.getDoLater(0, page);
         assertNotNull(foundEntity);
-        assertEquals("title", Recipe[0].title);
+        assertEquals("title", foundEntity.get(0).getTitle());
         assertNull(foundNoneEntity);
     }
 
@@ -98,137 +111,251 @@ public class RecipeRepositoryTest {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
+        PageRequest page = PageRequest.of(0, 4);
 
-        List<Recipe> foundEntity = testRecipeRepository.findByDate(account.getId(), new Date(2020, 10, 12)).orElse(null);
-        List<Recipe> foundNoneEntity = testRecipeRepository.findByDate(0, new Date(2020, 10, 12)).orElse(null);
-        assertEquals("title", Recipe[0].title);
+        Recipe foundEntity = testRecipeRepository.getByDate(account.getId(), new Date(2022, 12, 12)).orElse(null);
+        Recipe foundNoneEntity = testRecipeRepository.getByDate(0, new Date(2020, 10, 12)).orElse(null);
+        assertEquals("title", foundEntity.getTitle());
         assertNotNull(foundEntity);
         assertNull(foundNoneEntity);
     }
 
     @Test
-    void RecipeFindCountryByFinishedWorks() {
+    void RecipegetStatsWorks() {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
         Recipe recipe2 = new Recipe(
                 2,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
         testRecipeRepository.save(recipe2);
 
-        List<Stats> foundEntity = testRecipeRepository.getCountryForFinished(account.getId()).orElse(null);
-        List<Stats> foundNoneEntity = testRecipeRepository.getCountryForFinished(0).orElse(null);
+        List<StatRes> foundEntity = testRecipeRepository.getStats(account.getId());
+        List<StatRes> foundNoneEntity = testRecipeRepository.getStats(0);
         assertNotNull(foundEntity);
-        assertEquals(1, foundEntity[0].count);
-        assertEquals("asian", foundEntity[0].name);
-        assertEquals(1, foundEntity[1].count);
+        assertEquals(1, foundEntity.get(0).getCount());
+        assertEquals("asian", foundEntity.get(0).getName());
+        assertEquals(1, foundEntity.get(0).getCount());
         assertNull(foundNoneEntity);
         
     }
 
     @Test
-    void RecipeFindStatisticsByIdWorks() {
+    void recipeGetDoneCountWorks() {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
         Recipe recipe2 = new Recipe(
                 2,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
         testRecipeRepository.save(recipe2);
 
-        List<Stats> foundEntity = testRecipeRepository.getStatsForId(account.getId()).orElse(null);
-        List<Stats> foundNoneEntity = testRecipeRepository.getStatsForId(0).orElse(null);
+        int foundEntity = testRecipeRepository.getDoneCount(account.getId()).orElse(null);
+        int foundNoneEntity = testRecipeRepository.getDoneCount(0).orElse(null);
         assertNotNull(foundEntity);
-        assertEquals(1, foundEntity[0].count);
-        assertEquals("favourite", foundEntity[0].name);
-        assertEquals(1, foundEntity[1].count);
-        assertEquals("do later", foundEntity[0].name);
-        assertEquals(0, foundEntity[2].count);
-        assertEquals("finished", foundEntity[0].name);
+        assertEquals(1, foundEntity);
+        assertNull(foundNoneEntity);
+    }
+
+    @Test
+    void recipeGetFavouriteCountWorks() {
+        Account account = new Account(1, "test", "test", "test", "test");
+        Recipe recipe = new Recipe(
+                1,
+                "test title",
+                "test desc",
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
+                false,
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
+        );
+        Recipe recipe2 = new Recipe(
+                2,
+                "test title",
+                "test desc",
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
+                false,
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
+        );
+
+        testRecipeRepository.save(recipe);
+        testRecipeRepository.save(recipe2);
+
+        int foundEntity = testRecipeRepository.getFavouriteCount(account.getId()).orElse(null);
+        int foundNoneEntity = testRecipeRepository.getFavouriteCount(0).orElse(null);
+        assertNotNull(foundEntity);
+        assertEquals(1, foundEntity);
+        assertNull(foundNoneEntity);
+    }
+
+    @Test
+    void recipeGetDoLaterCountWorks() {
+        Account account = new Account(1, "test", "test", "test", "test");
+        Recipe recipe = new Recipe(
+                1,
+                "test title",
+                "test desc",
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
+                false,
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
+        );
+        Recipe recipe2 = new Recipe(
+                2,
+                "test title",
+                "test desc",
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
+                false,
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
+        );
+
+        testRecipeRepository.save(recipe);
+        testRecipeRepository.save(recipe2);
+
+        int foundEntity = testRecipeRepository.getDoLaterCount(account.getId()).orElse(null);
+        int foundNoneEntity = testRecipeRepository.getDoLaterCount(0).orElse(null);
+        assertNotNull(foundEntity);
+        assertEquals(1, foundEntity);
         assertNull(foundNoneEntity);
     }
 
@@ -238,39 +365,43 @@ public class RecipeRepositoryTest {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
         Recipe recipe2 = new Recipe(
-                2,
-                "title",
-                new Category(),
-                new Types(),
-                account,
+                1,
+                "test title",
                 "test desc",
-                1400,
-                5,
-                "test image",
-                true,
-                true,
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
                 false,
-                new Country(),
-                new Date(),
-                new Measurements(),
-                new Instructions()
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
