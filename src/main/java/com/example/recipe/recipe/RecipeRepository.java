@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -84,4 +85,10 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      */
     @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_to_do_date = ?2", nativeQuery = true)
     Optional<Recipe> getByDate(int accountId, Date date);
+
+    /**
+     * for Calendar
+     */
+    @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1", nativeQuery = true)
+    Map<String, Day> getCalendar(int accountId);
 }
