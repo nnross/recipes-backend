@@ -70,6 +70,22 @@ public class RecipeIntegrationTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.title").isEqualTo("test title")
+                .jsonPath("$.image").isEqualTo("test image")
+                .jsonPath("$.servings").isEqualTo(2)
+                .jsonPath("$.readyInMinutes").isEqualTo(12)
+                .jsonPath("$.sourceUrl").isEqualTo("test original")
+                .jsonPath("$.instructions").isEqualTo("test instruction")
+                .jsonPath("$.healthScore").isEqualTo(120)
+                .jsonPath("$.account").isEqualTo(1)
+                .jsonPath("$.favourite").isEqualTo(false)
+                .jsonPath("$.doLater").isEqualTo(false)
+                .jsonPath("$.finished").isEqualTo(false)
+                .jsonPath("$.date").isEqualTo(null)
+                .jsonPath("$.dishTypes[0]").isEqualTo("test category")
+                .jsonPath("$.diets[0]").isEqualTo("test type")
+                .jsonPath("$.cuisines[0]").isEqualTo("test country")
+                .jsonPath("$.measurements[0].unit").isEqualTo("test unit")
+
                 .jsonPath("$.id").isEqualTo("1");
     }
 
@@ -162,9 +178,8 @@ public class RecipeIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$res[0].title").isEqualTo("test")
-                .jsonPath("$res[0].id").isEqualTo("test");
-        //TODO: rest
+                .jsonPath("$.recipes[0].title").isEqualTo("test title 2")
+                .jsonPath("$.recipes[0].id").isEqualTo(2);
     }
     @Test
     void getDoLaterWorks() {
@@ -181,9 +196,8 @@ public class RecipeIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$res[0].title").isEqualTo("test")
-                .jsonPath("$res[0].id").isEqualTo("test");
-        //TODO: rest
+                .jsonPath("$.recipes[0].title").isEqualTo("test title 2")
+                .jsonPath("$.recipes[0].id").isEqualTo(2);
     }
     @Test
     void getRecipeByDateWorks() {
@@ -209,7 +223,7 @@ public class RecipeIntegrationTest {
     @Test
     void favouriteRecipeWorks() {
         Recipe recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(recipe.getFavourite().booleanValue(), false);
+        assertEquals(false, recipe.getFavourite().booleanValue());
         Account account = new Account(
                 1,
                 "test username",
@@ -224,13 +238,13 @@ public class RecipeIntegrationTest {
                 .expectStatus().isOk();
 
         recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(recipe.getFavourite().booleanValue(), true);
+        assertEquals(true, recipe.getFavourite().booleanValue());
 
     }
     @Test
     void doLaterRecipeWorks() {
         Recipe recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(recipe.getDoLater().booleanValue(), false);
+        assertEquals(false, recipe.getDoLater().booleanValue());
         Account account = new Account(
                 1,
                 "test username",
@@ -245,7 +259,7 @@ public class RecipeIntegrationTest {
                 .expectStatus().isOk();
 
         recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(recipe.getDoLater().booleanValue(), true);
+        assertEquals(true, recipe.getDoLater().booleanValue());
     }
     @Test
     void finishRecipeWorks() {
@@ -287,46 +301,50 @@ public class RecipeIntegrationTest {
     }
     @Test
     void addRecipeWorks() {
+        Account account = new Account(
+                1,
+                "test username",
+                "test name",
+                "test email",
+                "test"
+        );
+        String token = jwtService.newToken(account);
         int res = recipeRepository.findAll().size();
-        webClient.post().uri("/api/account/login")
+        webClient.post().uri("/api/recipe/add")
                 .contentType(MediaType.APPLICATION_JSON)
+                .headers(http -> http.setBearerAuth(token))
                 .bodyValue(
-                        """
+                            """
+                            {
+                                "title": "test title 3",
+                                "description": "test desc",
+                                "original": "test original",
+                                "time": 2,
+                                "servings": 4,
+                                "image": "test src",
+                                "favourite": false,
+                                "doLater": false,
+                                "finished": true,
+                                "toDoDate": null,
+                                "instructions": "test instructions",
+                                "healthScore": 2,
+                                "category": [{"id": 1}],
+                                "type": [{"id": 1}],
+                                "country": [{"id":1}],
+                                "account": {"id": 1},
+                                "measurements":
+                                    [
                                         {
-                                            "title": "test title",
-                                            "description": "test desc",
-                                            "original": "test original",
-                                            "time": 2,
-                                            "servings": 4,
-                                            "image": "test src",
-                                            "favourite": false,
-                                            "doLater": false,
-                                            "finished": true,
-                                            "toDoDate": null,
-                                            "instructions": "test instructions",
-                                            "healthScore": 2,
-                                            "category": [{"id": 1}],
-                                            "type": [{"id": 1}],
-                                            "country":
-                                                [
-                                                    {"id":1}
-                                                ],
-                                            "account": {"id": 1},
-                                            "measurements":
-                                                [
-                                                    {
-                                                        "unit": {"id": 1},
-                                                        "ingredient": {"id": 1},
-                                                        "amount": 12
-                                                    }
-                                                ]
+                                            "unit": {"id": 1},
+                                            "ingredient": {"id": 1},
+                                            "amount": 12
                                         }
-                                """
+                                    ]
+                            }
+                            """
                 )
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.token").exists();
+                .expectStatus().isOk();
 
         assertEquals(recipeRepository.findAll().size(), res + 1);
     }

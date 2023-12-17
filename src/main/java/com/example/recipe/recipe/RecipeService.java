@@ -83,12 +83,7 @@ public class RecipeService {
                     new BadRequestException("category not in database"));
         }
 
-        try {
-            recipeRepository.save(recipe);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("error while saving to database");
-        }
+        recipeRepository.save(recipe);
         return true;
     }
 
