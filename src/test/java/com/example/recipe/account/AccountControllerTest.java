@@ -183,7 +183,6 @@ class AccountControllerTest {
                         }
                         """)
                         .with(user(account)))
-
                 .andExpect(status().isBadRequest());
     }
 

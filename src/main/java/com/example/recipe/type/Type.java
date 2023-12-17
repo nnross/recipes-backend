@@ -13,7 +13,7 @@ public class Type {
     @Column(name = "type_id", nullable = false, updatable = false, unique = true)
     private int id;
 
-    @Column(name = "type_name", nullable = false, unique = true)
+    @Column(name = "type_name", unique = true)
     private String name;
 
     public Type(int id, String name) {

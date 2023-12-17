@@ -10,10 +10,7 @@ import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
-import com.example.recipe.response.Converters;
-import com.example.recipe.response.ListRes;
-import com.example.recipe.response.MeasurementRes;
-import com.example.recipe.response.RecipeRes;
+import com.example.recipe.response.*;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import com.example.recipe.type.Type;
@@ -66,7 +63,7 @@ public class RecipeService {
     public Boolean add(Recipe recipe) {
         for (Measurement measurement : recipe.getMeasurements()) {
             unitRepository.findById(measurement.getUnit().getId()).orElseThrow(() ->
-                new BadRequestException("measurement not in database"));
+                new BadRequestException("unit not in database"));
             ingredientRepository.findById(measurement.getIngredient().getId()).orElseThrow(() ->
                     new BadRequestException("ingredient not in database"));
             }
@@ -86,7 +83,12 @@ public class RecipeService {
                     new BadRequestException("category not in database"));
         }
 
-        recipeRepository.save(recipe);
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("error while saving to database");
+        }
         return true;
     }
 
@@ -236,6 +238,7 @@ public class RecipeService {
      */
     public RecipeRes getSearchById(int id) {
         RecipeFormat res = recipeUtils.getRecipeById(id);
+
         List<MeasurementRes> measurements = new ArrayList<>();
         for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
             measurements.add(new MeasurementRes(
@@ -273,7 +276,6 @@ public class RecipeService {
                 diets,
                 res.getDishTypes(),
                 measurements
-
         );
     }
 
@@ -347,10 +349,10 @@ public class RecipeService {
      *        id of the recipe we want to search.
      * @return found recipe.
      */
-    public RecipeRes getRecipe(int recipeId) {
+    public FullRecipeRes getRecipe(int recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
                 new BadRequestException("no recipe with id"));
-        return converter.recipeConverter(recipe);
+        return converter.fullRecipeConverter(recipe);
     }
 
     /**
@@ -382,9 +384,9 @@ public class RecipeService {
      *        Wanted date of recipe
      * @return recipe that matches the date.
      */
-    public RecipeRes getRecipeForDate(int accountId, Date date) {
-        Recipe recipe = recipeRepository.getByDate(accountId, date).orElseThrow(() ->
-                new BadRequestException("no recipe with id"));
-        return converter.recipeConverter(recipe);
+    public FullRecipeRes getRecipeForDate(int accountId, Date date) {
+        Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
+        if (recipe == null) return null;
+        return converter.fullRecipeConverter(recipe);
     }
 }

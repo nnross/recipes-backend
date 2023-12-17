@@ -1,11 +1,9 @@
-package com.example.recipe.apiClasses;
+package com.example.recipe.response;
 
+import java.sql.Date;
 import java.util.List;
 
-/**
- * Formats recipe from API
- */
-public class RecipeFormat {
+public class FullRecipeRes {
     private int id;
     private String title;
     private String image;
@@ -15,16 +13,18 @@ public class RecipeFormat {
     private String instructions;
     private String summary;
     private double healthScore;
-    private boolean dairyFree;
-    private boolean glutenFree;
-    private boolean vegan;
-    private boolean vegetarian;
+    private int account;
+    private boolean favourite;
+    private boolean doLater;
+    private boolean finished;
+    private Date date;
+
     private List<String> dishTypes;
     private List<String> cuisines;
     private List<String> diets;
-    private List<RecipeIngredients> extendedIngredients;
+    private List<MeasurementRes> measurements;
 
-    public RecipeFormat(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, boolean dairyFree, boolean glutenFree, boolean vegan, boolean vegetarian, List<String> dishTypes, List<String> cuisines, List<String> diets, List<RecipeIngredients> extendedIngredients) {
+    public FullRecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, int account, boolean favourite, boolean doLater, boolean finished, Date date, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -34,26 +34,17 @@ public class RecipeFormat {
         this.instructions = instructions;
         this.summary = summary;
         this.healthScore = healthScore;
-        this.dairyFree = dairyFree;
-        this.glutenFree = glutenFree;
-        this.vegan = vegan;
-        this.vegetarian = vegetarian;
+        this.account = account;
+        this.favourite = favourite;
+        this.doLater = doLater;
+        this.finished = finished;
+        this.date = date;
         this.dishTypes = dishTypes;
         this.cuisines = cuisines;
         this.diets = diets;
-        this.extendedIngredients = extendedIngredients;
+        this.measurements = measurements;
     }
 
-    public RecipeFormat() {
-    }
-
-    public List<String> getDishTypes() {
-        return dishTypes;
-    }
-
-    public void setDishTypes(List<String> dishTypes) {
-        this.dishTypes = dishTypes;
-    }
 
     public int getId() {
         return id;
@@ -127,36 +118,52 @@ public class RecipeFormat {
         this.healthScore = healthScore;
     }
 
-    public boolean isDairyFree() {
-        return dairyFree;
+    public int getAccount() {
+        return account;
     }
 
-    public void setDairyFree(boolean dairyFree) {
-        this.dairyFree = dairyFree;
+    public void setAccount(int account) {
+        this.account = account;
     }
 
-    public boolean isGlutenFree() {
-        return glutenFree;
+    public boolean isFavourite() {
+        return favourite;
     }
 
-    public void setGlutenFree(boolean glutenFree) {
-        this.glutenFree = glutenFree;
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
     }
 
-    public boolean isVegan() {
-        return vegan;
+    public boolean isDoLater() {
+        return doLater;
     }
 
-    public void setVegan(boolean vegan) {
-        this.vegan = vegan;
+    public void setDoLater(boolean doLater) {
+        this.doLater = doLater;
     }
 
-    public boolean isVegetarian() {
-        return vegetarian;
+    public boolean isFinished() {
+        return finished;
     }
 
-    public void setVegetarian(boolean vegetarian) {
-        this.vegetarian = vegetarian;
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public List<String> getDishTypes() {
+        return dishTypes;
+    }
+
+    public void setDishTypes(List<String> dishTypes) {
+        this.dishTypes = dishTypes;
     }
 
     public List<String> getCuisines() {
@@ -175,11 +182,11 @@ public class RecipeFormat {
         this.diets = diets;
     }
 
-    public List<RecipeIngredients> getExtendedIngredients() {
-        return extendedIngredients;
+    public List<MeasurementRes> getMeasurements() {
+        return measurements;
     }
 
-    public void setExtendedIngredients(List<RecipeIngredients> extendedIngredients) {
-        this.extendedIngredients = extendedIngredients;
+    public void setMeasurements(List<MeasurementRes> measurements) {
+        this.measurements = measurements;
     }
 }

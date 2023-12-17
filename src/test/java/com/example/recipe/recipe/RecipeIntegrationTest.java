@@ -3,12 +3,25 @@ package com.example.recipe.recipe;
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountRepository;
 import com.example.recipe.security.JwtService;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.io.IOException;
+import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties="secret.key=cHJvcGVydHlzdWJzdGFuY2V3aXRocmlkaW5nZ3JlYXRhcnRpY2xld2l0aGluZGlzYXA")
 @ActiveProfiles("test")
@@ -22,24 +35,22 @@ public class RecipeIntegrationTest {
     @Autowired
     private WebTestClient webClient;
 
-    //TODO: just a template
+    private static MockWebServer mockWebServer;
+
     @BeforeAll
     static void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
     }
 
-    //TODO: just a template
     @AfterAll
     static void tearDown() throws IOException {
         mockWebServer.shutdown();
     }
 
-    //TODO: just a template
-    //TODO: CORRECT URL
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
-        registry.add("RECIPE API URL",
+        registry.add("requestUrl",
                 () -> mockWebServer.url("/").toString());
     }
 
@@ -58,9 +69,8 @@ public class RecipeIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.title").isEqualTo("test")
-                .jsonPath("$.id").isEqualTo("test");
-                //TODO: rest
+                .jsonPath("$.title").isEqualTo("test title")
+                .jsonPath("$.id").isEqualTo("1");
     }
 
     @Test
@@ -90,7 +100,7 @@ public class RecipeIntegrationTest {
                         )
         );
 
-        webClient.get().uri("/api/recipe/get/db?recipeId=1")
+        webClient.get().uri("/api/recipe/get/api/id?id=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -127,7 +137,7 @@ public class RecipeIntegrationTest {
         );
 
         // TODO: Actual URL.
-        webClient.get().uri("/api/recipe/get/search?search=test&sort=dateAsc&filter={country=[italy]}")
+        webClient.get().uri("/api/recipe/get/api/search")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -186,7 +196,7 @@ public class RecipeIntegrationTest {
         );
         String token = jwtService.newToken(account);
         //TODO: actual url
-        webClient.get().uri("/api/recipe/get/date?date=2022/12/12")
+        webClient.get().uri("/api/recipe/get/date?accountId=1&date=2022-12-12")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -198,6 +208,8 @@ public class RecipeIntegrationTest {
 
     @Test
     void favouriteRecipeWorks() {
+        Recipe recipe = recipeRepository.findById(1).orElse(null);
+        assertEquals(recipe.getFavourite().booleanValue(), false);
         Account account = new Account(
                 1,
                 "test username",
@@ -206,13 +218,19 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.post().uri("/api/recipe/favourite?recipeId=1")
+        webClient.put().uri("/api/recipe/favourite?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
+
+        recipe = recipeRepository.findById(1).orElse(null);
+        assertEquals(recipe.getFavourite().booleanValue(), true);
+
     }
     @Test
     void doLaterRecipeWorks() {
+        Recipe recipe = recipeRepository.findById(1).orElse(null);
+        assertEquals(recipe.getDoLater().booleanValue(), false);
         Account account = new Account(
                 1,
                 "test username",
@@ -221,13 +239,37 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.post().uri("/api/recipe/doLater?recipeId=1")
+        webClient.put().uri("/api/recipe/doLater?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
+
+        recipe = recipeRepository.findById(1).orElse(null);
+        assertEquals(recipe.getDoLater().booleanValue(), true);
+    }
+    @Test
+    void finishRecipeWorks() {
+        Recipe recipe = recipeRepository.findById(1).orElse(null);
+        assertEquals(recipe.getFinished().booleanValue(), false);
+        Account account = new Account(
+                1,
+                "test username",
+                "test name",
+                "test email",
+                "test"
+        );
+        String token = jwtService.newToken(account);
+        webClient.put().uri("/api/recipe/finished?recipeId=1")
+                .headers(http -> http.setBearerAuth(token))
+                .exchange()
+                .expectStatus().isOk();
+
+        recipe = recipeRepository.findById(1).orElse(null);
+        assertEquals(recipe.getFinished().booleanValue(), true);
     }
     @Test
     void deleteRecipeWorks() {
+        int res = recipeRepository.findAll().size();
         Account account = new Account(
                 1,
                 "test username",
@@ -236,9 +278,56 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.delete().uri("/api/recipe/delete?recipeId=1")
+        webClient.delete().uri("/api/recipe/del?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
+
+        assertEquals(recipeRepository.findAll().size(), res + 1);
+    }
+    @Test
+    void addRecipeWorks() {
+        int res = recipeRepository.findAll().size();
+        webClient.post().uri("/api/account/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(
+                        """
+                                        {
+                                            "title": "test title",
+                                            "description": "test desc",
+                                            "original": "test original",
+                                            "time": 2,
+                                            "servings": 4,
+                                            "image": "test src",
+                                            "favourite": false,
+                                            "doLater": false,
+                                            "finished": true,
+                                            "toDoDate": null,
+                                            "instructions": "test instructions",
+                                            "healthScore": 2,
+                                            "category": [{"id": 1}],
+                                            "type": [{"id": 1}],
+                                            "country":
+                                                [
+                                                    {"id":1}
+                                                ],
+                                            "account": {"id": 1},
+                                            "measurements":
+                                                [
+                                                    {
+                                                        "unit": {"id": 1},
+                                                        "ingredient": {"id": 1},
+                                                        "amount": 12
+                                                    }
+                                                ]
+                                        }
+                                """
+                )
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.token").exists();
+
+        assertEquals(recipeRepository.findAll().size(), res + 1);
     }
 }
