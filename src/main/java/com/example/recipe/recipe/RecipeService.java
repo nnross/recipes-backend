@@ -7,6 +7,7 @@ import com.example.recipe.category.Category;
 import com.example.recipe.category.CategoryRepository;
 import com.example.recipe.country.Country;
 import com.example.recipe.country.CountryRepository;
+import com.example.recipe.enums.*;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
@@ -20,8 +21,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
 /**
  * Logic for recipe calls.
@@ -388,5 +392,38 @@ public class RecipeService {
         Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
         if (recipe == null) return null;
         return converter.fullRecipeConverter(recipe);
+    }
+
+    /**
+     * Gets weekly calendar for account
+     * @param accountId
+     *        Id of the account
+     * @return Map of weekdays and Day objects
+     */
+    public Map<String, Day> getCalendar(int accountId) {
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        Map<String, Day> weeklyCalendar = new HashMap<String, Day>();
+        boolean isRecipe;
+        boolean isFinished;
+        for (int i = 0; i < 7; i++) {
+            LocalDate currentDate = monday.plusDays(i);
+            java.sql.Date date = java.sql.Date.valueOf(currentDate);
+            try {
+                Optional<Recipe> recipe = recipeRepository.getByDate(accountId, date);
+                isRecipe = true;
+                if (recipe.get().getFinished()) {
+                    isFinished = true;
+                } else {
+                    isFinished = false;
+                }
+            } catch(Exception e) {
+                isRecipe = false;
+                isFinished = false;
+            }
+            Day day = new Day(currentDate, accountId, isRecipe, isFinished);
+            weeklyCalendar.put(currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()), day);
+        }
+        return weeklyCalendar;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for recipe calls
@@ -190,5 +191,11 @@ public class RecipeController {
     @DeleteMapping("/del")
     public Boolean delete(@RequestParam("recipeId") int recipeId) {
         return recipeService.delete(recipeId);
+    }
+
+
+    @GetMapping("/get/calendar")
+    public Map<String, Day> getWeeklyCalendar(@RequestParam("accountId") int accountId) {
+        return recipeService.getCalendar(accountId);
     }
 }
