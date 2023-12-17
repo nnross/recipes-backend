@@ -5,6 +5,7 @@ import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
 import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
+import com.example.recipe.country.CountryRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.response.StatRes;
 import com.example.recipe.type.Type;
@@ -34,6 +35,10 @@ public class RecipeRepositoryTest {
 
     @Autowired
     private RecipeRepository testRecipeRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
+
     @AfterEach
     void deleteAll() {
         testRecipeRepository.deleteAll();
@@ -44,14 +49,14 @@ public class RecipeRepositoryTest {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "test title",
+                "test fav",
                 "test desc",
                 "test original",
                 12,
                 2,
                 "test img",
                 100,
-                false,
+                true,
                 false,
                 false,
                 new Date(2022, 12, 12),
@@ -69,7 +74,8 @@ public class RecipeRepositoryTest {
         List<ListRecipeRes> foundEntity = testRecipeRepository.getFavourite(account.getId(), page);
         List<ListRecipeRes> foundNoneEntity = testRecipeRepository.getFavourite(0, page);
         assertNotNull(foundEntity);
-        assertEquals("test title 2", foundEntity.get(0).getTitle());
+        assertEquals("test fav", foundEntity.get(0).getTitle());
+        assertEquals(1, foundEntity.get(0).getId());
         assertEquals(0, foundNoneEntity.size());
     }
 
@@ -78,7 +84,7 @@ public class RecipeRepositoryTest {
         Account account = new Account(1, "test", "test", "test", "test");
         Recipe recipe = new Recipe(
                 1,
-                "test title",
+                "test doLater",
                 "test desc",
                 "test original",
                 12,
@@ -86,7 +92,7 @@ public class RecipeRepositoryTest {
                 "test img",
                 100,
                 false,
-                false,
+                true,
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
@@ -103,8 +109,9 @@ public class RecipeRepositoryTest {
         List<ListRecipeRes> foundEntity = testRecipeRepository.getDoLater(account.getId(), page);
         List<ListRecipeRes> foundNoneEntity = testRecipeRepository.getDoLater(0, page);
         assertNotNull(foundEntity);
-        assertEquals("title", foundEntity.get(0).getTitle());
-        assertNull(foundNoneEntity);
+        assertEquals("test doLater", foundEntity.get(0).getTitle());
+        assertEquals(1, foundEntity.get(0).getId());
+        assertEquals(0, foundNoneEntity.size());
     }
 
     @Test
@@ -136,14 +143,16 @@ public class RecipeRepositoryTest {
 
         Recipe foundEntity = testRecipeRepository.getByDate(account.getId(), new Date(2022, 12, 12)).orElse(null);
         Recipe foundNoneEntity = testRecipeRepository.getByDate(0, new Date(2020, 10, 12)).orElse(null);
-        assertEquals("title", foundEntity.getTitle());
+        assertEquals("test title", foundEntity.getTitle());
         assertNotNull(foundEntity);
         assertNull(foundNoneEntity);
     }
 
     @Test
-    void RecipegetStatsWorks() {
+    void RecipeGetStatsWorks() {
         Account account = new Account(1, "test", "test", "test", "test");
+        Country country = countryRepository.findById(1).orElse(null);
+        Country country2 = countryRepository.findById(2).orElse(null);
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -161,7 +170,7 @@ public class RecipeRepositoryTest {
                 Arrays.asList(new Category()),
                 Arrays.asList(new Type()),
                 account,
-                Arrays.asList(new Country()),
+                Arrays.asList(country),
                 Arrays.asList(new Measurement())
         );
         Recipe recipe2 = new Recipe(
@@ -173,15 +182,15 @@ public class RecipeRepositoryTest {
                 2,
                 "test img",
                 100,
-                false,
-                false,
-                false,
+                true,
+                true,
+                true,
                 new Date(2022, 12, 12),
                 "test instructions",
                 Arrays.asList(new Category()),
                 Arrays.asList(new Type()),
                 account,
-                Arrays.asList(new Country()),
+                Arrays.asList(country2),
                 Arrays.asList(new Measurement())
         );
 
@@ -192,9 +201,10 @@ public class RecipeRepositoryTest {
         List<StatRes> foundNoneEntity = testRecipeRepository.getStats(0);
         assertNotNull(foundEntity);
         assertEquals(1, foundEntity.get(0).getCount());
-        assertEquals("asian", foundEntity.get(0).getName());
-        assertEquals(1, foundEntity.get(0).getCount());
-        assertNull(foundNoneEntity);
+        assertEquals("test country", foundEntity.get(0).getName());
+        assertEquals(1, foundEntity.get(1).getCount());
+        assertEquals("test country2", foundEntity.get(1).getName());
+        assertEquals(0, foundNoneEntity.size());
         
     }
 
@@ -212,7 +222,7 @@ public class RecipeRepositoryTest {
                 100,
                 false,
                 false,
-                false,
+                true,
                 new Date(2022, 12, 12),
                 "test instructions",
                 Arrays.asList(new Category()),
@@ -249,7 +259,7 @@ public class RecipeRepositoryTest {
         int foundNoneEntity = testRecipeRepository.getDoneCount(0).orElse(null);
         assertNotNull(foundEntity);
         assertEquals(1, foundEntity);
-        assertNull(foundNoneEntity);
+        assertEquals(0, foundNoneEntity);
     }
 
     @Test
@@ -284,7 +294,7 @@ public class RecipeRepositoryTest {
                 2,
                 "test img",
                 100,
-                false,
+                true,
                 false,
                 false,
                 new Date(2022, 12, 12),
@@ -303,7 +313,7 @@ public class RecipeRepositoryTest {
         int foundNoneEntity = testRecipeRepository.getFavouriteCount(0).orElse(null);
         assertNotNull(foundEntity);
         assertEquals(1, foundEntity);
-        assertNull(foundNoneEntity);
+        assertEquals(0, foundNoneEntity);
     }
 
     @Test
@@ -319,7 +329,7 @@ public class RecipeRepositoryTest {
                 "test img",
                 100,
                 false,
-                false,
+                true,
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
@@ -357,7 +367,7 @@ public class RecipeRepositoryTest {
         int foundNoneEntity = testRecipeRepository.getDoLaterCount(0).orElse(null);
         assertNotNull(foundEntity);
         assertEquals(1, foundEntity);
-        assertNull(foundNoneEntity);
+        assertEquals(0, foundNoneEntity);
     }
 
     // TODO: not sure if this correct

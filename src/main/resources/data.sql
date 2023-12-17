@@ -2,6 +2,7 @@ INSERT INTO account (account_name, account_username, account_email, account_pass
 
 INSERT INTO type (type_name) VALUES ('test type');
 INSERT INTO country (country_name) VALUES ('test country');
+INSERT INTO country (country_name) VALUES ('test country2');
 INSERT INTO category (category_name) VALUES ('test category');
 INSERT INTO ingredient (ingredient_name) VALUES ('test ingredient');
 INSERT INTO unit (unit_name) VALUES ('test unit');
