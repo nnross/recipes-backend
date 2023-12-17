@@ -13,7 +13,7 @@ public class Unit {
     @Column(name = "unit_id", nullable = false, updatable = false, unique = true)
     private int id;
 
-    @Column(name = "unit_name", nullable = false, unique = true)
+    @Column(name = "unit_name", unique = true)
     private String name;
 
     public Unit(int id, String name) {
