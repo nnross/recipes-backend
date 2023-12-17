@@ -192,9 +192,4 @@ public class RecipeController {
     public Boolean delete(@RequestParam("recipeId") int recipeId) {
         return recipeService.delete(recipeId);
     }
-
-    @GetMapping("/test")
-    public RecipeStats test(@RequestParam("id") int id) {
-        return recipeService.getStats(id);
-    }
 }
