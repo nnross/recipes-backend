@@ -5,6 +5,7 @@ import com.example.recipe.account.AccountService;
 import com.example.recipe.response.FullRecipeRes;
 import com.example.recipe.response.ListRes;
 import com.example.recipe.response.RecipeRes;
+import com.example.recipe.response.StatRes;
 import com.example.recipe.security.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -191,11 +192,5 @@ public class RecipeController {
     @DeleteMapping("/del")
     public Boolean delete(@RequestParam("recipeId") int recipeId) {
         return recipeService.delete(recipeId);
-    }
-
-
-    @GetMapping("/get/calendar")
-    public Map<String, Day> getWeeklyCalendar(@RequestParam("accountId") int accountId) {
-        return recipeService.getCalendar(accountId);
     }
 }

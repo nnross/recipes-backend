@@ -60,7 +60,7 @@ public class Recipe {
     @Column(name = "recipe_instructions", nullable = false)
     private String instructions;
 
-    @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.MERGE})
     @JoinTable(
             name = "recipe_category_mapping",
             joinColumns = @JoinColumn(name = "recipe_category"),
@@ -68,7 +68,7 @@ public class Recipe {
     )
     private List<Category> category;
 
-    @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.MERGE})
     @JoinTable(
             name = "recipe_type_mapping",
             joinColumns = @JoinColumn(name = "recipe_type"),
@@ -81,7 +81,7 @@ public class Recipe {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Account account;
 
-    @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.PERSIST})
+    @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.MERGE})
     @JoinTable(
             name = "recipe_country_mapping",
             joinColumns = @JoinColumn(name = "recipe_country"),

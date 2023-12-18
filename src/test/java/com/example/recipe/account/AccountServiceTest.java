@@ -43,7 +43,6 @@ class AccountServiceTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private AuthenticationManager authenticationManager;
-
     @InjectMocks
     private AccountService testAccountService;
 

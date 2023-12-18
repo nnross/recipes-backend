@@ -22,7 +22,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      *        id for account
      * @return List of ResStats with the count of recipes and name of country.
      */
-    @Query(value = "SELECT COUNT(recipe_country) AS count, c.country_name AS name FROM recipe r LEFT JOIN country c ON r.recipe_country = c.country_id WHERE r.recipe_account = ?1 GROUP BY recipe_country", nativeQuery = true)
+    @Query(value = "SELECT COUNT(recipe_country) AS count, c.country_name AS name FROM recipe_country_mapping m LEFT JOIN country c ON m.country_id = c.country_id LEFT JOIN recipe r ON r.recipe_id = m.recipe_country WHERE r.recipe_account = ?1 GROUP BY recipe_country", nativeQuery = true)
     List<StatRes> getStats(int accountId);
 
     /**
@@ -85,10 +85,4 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      */
     @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_to_do_date = ?2", nativeQuery = true)
     Optional<Recipe> getByDate(int accountId, Date date);
-
-    /**
-     * for Calendar
-     */
-    @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1", nativeQuery = true)
-    Map<String, Day> getCalendar(int accountId);
 }
