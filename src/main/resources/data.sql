@@ -7,7 +7,7 @@ INSERT INTO category (category_name) VALUES ('test category');
 INSERT INTO ingredient (ingredient_name) VALUES ('test ingredient');
 INSERT INTO unit (unit_name) VALUES ('test unit');
 
-INSERT INTO recipe (recipe_title, recipe_description, recipe_do_later, recipe_favourite, recipe_finished, recipe_health_score, recipe_image, recipe_instructions, recipe_original, recipe_servings, recipe_time, recipe_to_do_date, recipe_account) VALUES ('test title', 'test desc', false, false, false, 120, 'test image', 'test instruction', 'test original', 2, 12, null, 1);
+INSERT INTO recipe (recipe_title, recipe_description, recipe_do_later, recipe_favourite, recipe_finished, recipe_health_score, recipe_image, recipe_instructions, recipe_original, recipe_servings, recipe_time, recipe_to_do_date, recipe_account) VALUES ('test title', 'test desc', false, false, false, 120, 'test image', 'test instruction', 'test original', 2, 12, '2022-12-12', 1);
 INSERT INTO recipe_category_mapping (recipe_category, category_id) VALUES (1, 1);
 INSERT INTO recipe_type_mapping (recipe_type, type_id) VALUES (1, 1);
 INSERT INTO recipe_country_mapping (recipe_country, country_id) VALUES (1, 1);

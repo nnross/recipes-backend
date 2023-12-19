@@ -85,4 +85,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      */
     @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_to_do_date = ?2", nativeQuery = true)
     Optional<Recipe> getByDate(int accountId, Date date);
+
+    @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1", nativeQuery = true)
+    List<Recipe> getAllForAccount(int accountId);
 }

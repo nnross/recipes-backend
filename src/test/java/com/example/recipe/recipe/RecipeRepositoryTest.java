@@ -367,4 +367,38 @@ public class RecipeRepositoryTest {
         assertEquals(1, foundEntity);
         assertEquals(0, foundNoneEntity);
     }
+
+    @Test
+    void getAllForAccountWorks() {
+        Account account = new Account(1, "test", "test", "test", "test");
+        Recipe recipe = new Recipe(
+                1,
+                "test",
+                "test desc",
+                "test original",
+                12,
+                2,
+                "test img",
+                100,
+                true,
+                false,
+                false,
+                new Date(2022, 12, 12),
+                "test instructions",
+                Arrays.asList(new Category()),
+                Arrays.asList(new Type()),
+                account,
+                Arrays.asList(new Country()),
+                Arrays.asList(new Measurement())
+        );
+
+        testRecipeRepository.save(recipe);
+
+        List<Recipe> foundEntity = testRecipeRepository.getAllForAccount(account.getId());
+        List<Recipe> foundNoneEntity = testRecipeRepository.getAllForAccount(0);
+
+        assertEquals("test", foundEntity.get(0).getTitle());
+        assertEquals(1, foundEntity.get(0).getId());
+        assertEquals(0, foundNoneEntity.size());
+    }
 }

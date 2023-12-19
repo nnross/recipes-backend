@@ -2,8 +2,16 @@ package com.example.recipe.account;
 
 
 import com.example.recipe.RecipeApplication;
+import com.example.recipe.category.Category;
+import com.example.recipe.country.Country;
+import com.example.recipe.ingredient.Ingredient;
+import com.example.recipe.measurement.Measurement;
+import com.example.recipe.recipe.Recipe;
+import com.example.recipe.recipe.RecipeRepository;
 import com.example.recipe.security.AuthRequest;
 import com.example.recipe.security.JwtService;
+import com.example.recipe.type.Type;
+import com.example.recipe.unit.Unit;
 import exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.sql.Date;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +44,9 @@ class AccountServiceTest {
 
     @Mock
     private AccountRepository accountRepository;
+
+    @Mock
+    private RecipeRepository recipeRepository;
     @Mock
     private JwtService jwtService;
     @Mock
@@ -373,6 +383,36 @@ class AccountServiceTest {
 
     @Test
     void deleteAccountWorks() {
+        List<Country> countries = new ArrayList<>();
+        countries.add(new Country(1, "test country"));
+        List<Category> categories = new ArrayList<>();
+        categories.add(new Category(1, "test category"));
+        List<Type> types = new ArrayList<>();
+        types.add(new Type(1, "test type"));
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12));
+
+        given(recipeRepository.getAllForAccount(anyInt()))
+                .willReturn(Arrays.asList(new Recipe(
+                        1,
+                        "title",
+                        "recipe desc",
+                        "recipe original",
+                        12,
+                        12,
+                        "recipe img",
+                        200,
+                        true,
+                        true,
+                        true,
+                        new Date(2022, 12, 12),
+                        "test instructions",
+                        categories,
+                        types,
+                        new Account(),
+                        countries,
+                        measurements
+                )));
 
         given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
 
