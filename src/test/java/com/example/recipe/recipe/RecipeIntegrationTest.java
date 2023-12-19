@@ -1,5 +1,6 @@
 package com.example.recipe.recipe;
 
+import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountRepository;
 import com.example.recipe.security.JwtService;
@@ -23,7 +24,7 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties="secret.key=cHJvcGVydHlzdWJzdGFuY2V3aXRocmlkaW5nZ3JlYXRhcnRpY2xld2l0aGluZGlzYXA")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties="secret.key=cHJvcGVydHlzdWJzdGFuY2V3aXRocmlkaW5nZ3JlYXRhcnRpY2xld2l0aGluZGlzYXA", classes = RecipeApplication.class)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RecipeIntegrationTest {
