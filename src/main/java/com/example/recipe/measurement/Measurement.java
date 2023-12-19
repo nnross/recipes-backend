@@ -18,11 +18,11 @@ public class Measurement {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "measurement_unit", referencedColumnName = "unit_id", nullable = false)
+    @JoinColumn(name = "measurement_unit", referencedColumnName = "unit_id")
     private Unit unit;
 
     @ManyToOne
-    @JoinColumn(name = "measurement_ingredient", referencedColumnName = "ingredient_id", nullable = false)
+    @JoinColumn(name = "measurement_ingredient", referencedColumnName = "ingredient_id")
     private Ingredient ingredient;
 
     @Column(name = "measurement_amount", nullable = false)

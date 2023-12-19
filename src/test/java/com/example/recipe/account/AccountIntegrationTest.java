@@ -1,5 +1,6 @@
 package com.example.recipe.account;
 
+import com.example.recipe.RecipeApplication;
 import com.example.recipe.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
