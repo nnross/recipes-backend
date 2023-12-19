@@ -889,6 +889,16 @@ class RecipeServiceTest {
 
         verify(recipeRepository).deleteById(0);
     }
+
+    @Test
+    void searchRecipeWorks() {
+        given(recipeUtils.getRandom())
+                .willReturn(new RecipeResponse());
+
+        testRecipeService.getRandom();
+
+        verify(recipeUtils).getRandom();
+    }
 }
 
 

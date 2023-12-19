@@ -661,4 +661,18 @@ public class RecipeControllerTest {
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void getRandomRecipesWork() throws Exception {
+        ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
+
+        given(recipeService.getSearch(any(), any(), any(), any(), any(), any(), any(), any(), anyInt())).willReturn(response);
+
+        mockMvc.perform(get("/api/recipe/get/api/random").with(csrf())
+                        .with(user("test")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.recipes[0]").value(response.getRecipes().get(0)))
+                .andExpect(jsonPath("$.recipes[1]").value(response.getRecipes().get(1)))
+                .andExpect(jsonPath("$.nextPage").value(response.getNextPage()));
+    }
 }

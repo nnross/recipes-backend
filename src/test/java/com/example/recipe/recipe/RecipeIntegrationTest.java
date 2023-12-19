@@ -866,4 +866,59 @@ public class RecipeIntegrationTest {
 
         assertEquals(recipeRepository.findAll().size(), res + 1);
     }
+
+    @Test
+    void getRandomRecipesWorks() {
+        Account account = new Account(
+                1,
+                "test username",
+                "test name",
+                "test email",
+                "test"
+        );
+        String token = jwtService.newToken(account);
+
+        mockWebServer.enqueue(
+                new MockResponse().setResponseCode(200)
+                        .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                        .setBody(
+                                """
+                                {
+                                    "results": [
+                                        {
+                                            "id": 654959,
+                                            "title": "Pasta With Tuna",
+                                            "image": "https://spoonacular.com/recipeImages/654959-312x231.jpg",
+                                            "imageType": "jpg"
+                                        },
+                                        {
+                                            "id": 511728,
+                                            "title": "Pasta Margherita",
+                                            "image": "https://spoonacular.com/recipeImages/511728-312x231.jpg",
+                                            "imageType": "jpg"
+                                        },
+                                        {
+                                            "id": 654857,
+                                            "title": "Pasta On The Border",
+                                            "image": "https://spoonacular.com/recipeImages/654857-312x231.jpg",
+                                            "imageType": "jpg"
+                                        }
+                                    ]
+                                }
+                                """
+                        )
+        );
+
+        webClient.get().uri("/api/recipe/get/api/random")
+                .headers(http -> http.setBearerAuth(token))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.recipes[0].title").isEqualTo("Pasta With Tuna")
+                .jsonPath("$.recipes[0].id").isEqualTo(654959)
+                .jsonPath("$.recipes[1].title").isEqualTo("Pasta Margherita")
+                .jsonPath("$.recipes[1].id").isEqualTo(511728)
+                .jsonPath("$.recipes[2].title").isEqualTo("Pasta On The Border")
+                .jsonPath("$.recipes[2].id").isEqualTo(654857);
+    }
 }
