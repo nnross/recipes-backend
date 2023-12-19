@@ -91,7 +91,7 @@ public class RecipeService {
             recipeRepository.save(recipe);
         }
         catch (Exception e) {
-            throw new RuntimeException("error while saving to database");
+            throw new BadRequestException("error while saving to database");
         }
         return true;
     }
@@ -276,9 +276,9 @@ public class RecipeService {
                 res.getInstructions(),
                 res.getSummary(),
                 res.getHealthScore(),
+                res.getDishTypes(),
                 res.getCuisines(),
                 diets,
-                res.getDishTypes(),
                 measurements
         );
     }
@@ -408,7 +408,7 @@ public class RecipeService {
         boolean isFinished;
         for (int i = 0; i < 7; i++) {
             LocalDate currentDate = monday.plusDays(i);
-            java.sql.Date date = java.sql.Date.valueOf(currentDate);
+            Date date = Date.valueOf(currentDate);
             try {
                 Optional<Recipe> recipe = recipeRepository.getByDate(accountId, date);
                 isRecipe = true;

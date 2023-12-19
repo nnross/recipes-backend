@@ -1,5 +1,7 @@
 package com.example.recipe.account;
 
+import com.example.recipe.recipe.Recipe;
+import com.example.recipe.recipe.RecipeRepository;
 import com.example.recipe.response.AuthRes;
 import com.example.recipe.security.AuthRequest;
 import com.example.recipe.security.JwtService;
@@ -11,6 +13,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 /**
  * Logic for account calls.
@@ -19,6 +23,9 @@ import org.springframework.stereotype.Service;
 public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private RecipeRepository recipeRepository;
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -98,7 +105,20 @@ public class AccountService {
         Account account = accountRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("No accounts with the id"));
 
-        accountRepository.delete(account);
+        List<Recipe> recipes = recipeRepository.getAllForAccount(id);
+        for (Recipe recipe : recipes) {
+            recipe.getCountry().clear();
+            recipe.getType().clear();
+            recipe.getCategory().clear();
+        }
+
+        try {
+            accountRepository.delete(account);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Failed to delete account");
+        }
+
         return true;
     }
 

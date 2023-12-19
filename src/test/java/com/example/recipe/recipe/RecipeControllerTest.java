@@ -49,8 +49,9 @@ public class RecipeControllerTest {
     @Test
     void addRecipeWorks() throws Exception {
         Account account = new Account(1, "test", "test", "test", "test");
-
         given(recipeService.add(any())).willReturn(true);
+        given(authorization.addRecipeIsOwn(any(), any())).willReturn(true);
+
         mockMvc.perform(post("/api/recipe/add").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -78,12 +79,12 @@ public class RecipeControllerTest {
                                         [
                                             {
                                                 "unit": {"id": 1},
-                                                "ingredient": {"id": 4},
+                                                "ingredient": {"id": 1},
                                                 "amount": 12
                                             },
                                             {
                                                 "unit": {"id": 1},
-                                                "ingredient": {"id": 4},
+                                                "ingredient": {"id": 1},
                                                 "amount": 11
                                             }
                                         ]
@@ -96,7 +97,7 @@ public class RecipeControllerTest {
     @Test
     void addRecipeThrowsWithNoItem() throws Exception {
         Account account = new Account(1, "test", "test", "test", "test");
-
+        given(authorization.addRecipeIsOwn(any(), any())).willReturn(true);
         given(recipeService.add(any())).willReturn(true);
         mockMvc.perform(post("/api/recipe/add").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +109,7 @@ public class RecipeControllerTest {
     @Test
     void addRecipeThrowsWithNotOwnRecipe() throws Exception {
         Account account = new Account(1, "test", "test", "test", "test");
-
+        given(authorization.addRecipeIsOwn(any(), any())).willReturn(false);
         given(recipeService.add(any())).willReturn(true);
         mockMvc.perform(post("/api/recipe/add").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,7 +150,7 @@ public class RecipeControllerTest {
                                 }
                                 """)
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -158,7 +159,7 @@ public class RecipeControllerTest {
         given(recipeService.toggleFavourite(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(post("/api/recipe/favourite?recipeId=1", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/favourite?recipeId=1", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk());
     }
@@ -169,7 +170,7 @@ public class RecipeControllerTest {
         given(recipeService.toggleFavourite(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(post("/api/recipe/favourite", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/favourite", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -180,9 +181,9 @@ public class RecipeControllerTest {
         given(recipeService.toggleFavourite(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
 
-        mockMvc.perform(post("/api/recipe/favourite?recipeId=2", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/favourite?recipeId=2", 1).with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -192,7 +193,7 @@ public class RecipeControllerTest {
         given(recipeService.toggleDoLater(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(post("/api/recipe/doLater?recipeId=1", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/doLater?recipeId=1", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk());
     }
@@ -204,7 +205,7 @@ public class RecipeControllerTest {
         given(recipeService.toggleDoLater(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(post("/api/recipe/doLater", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/doLater", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -215,7 +216,7 @@ public class RecipeControllerTest {
         given(recipeService.toggleDoLater(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
 
-        mockMvc.perform(post("/api/recipe/doLater", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/doLater", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -227,7 +228,7 @@ public class RecipeControllerTest {
         given(recipeService.finishRecipe(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(post("/api/recipe/finished?recipeId=1", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/finished?recipeId=1", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk());
     }
@@ -239,7 +240,7 @@ public class RecipeControllerTest {
         given(recipeService.finishRecipe(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(post("/api/recipe/finished", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/finished", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -250,30 +251,33 @@ public class RecipeControllerTest {
         given(recipeService.toggleDoLater(anyInt())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
 
-        mockMvc.perform(post("/api/recipe/finished?recipeId=2", 1).with(csrf())
+        mockMvc.perform(put("/api/recipe/finished?recipeId=2", 1).with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void getRecipeSearchWorks() throws Exception {
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getSearch(any(), any(), any(), any(), any(), any(), any(), any(), any())).willReturn(response);
+        given(recipeService.getSearch(any(), any(), any(), any(), any(), any(), any(), any(), anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/recipe/get/api/search?search=tes&ingredients=&cuisine=&diet=&intolerances=&type=&sort=&sortDirection=&page=", 1).with(csrf()))
+        mockMvc.perform(get("/api/recipe/get/api/search?search=tes&ingredients=&cuisine=&diet=&intolerances=&type=&sort=&sortDirection=&page=0").with(csrf())
+                        .with(user("test")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$res[0]").value(response.getRecipes().get(0)))
-                .andExpect(jsonPath("$res[1]").value(response.getRecipes().get(1)));
+                .andExpect(jsonPath("$.recipes[0]").value(response.getRecipes().get(0)))
+                .andExpect(jsonPath("$.recipes[1]").value(response.getRecipes().get(1)))
+                .andExpect(jsonPath("$.nextPage").value(response.getNextPage()));
     }
 
     @Test
     void getRecipeSearchThrowsWithNoParams() throws Exception {
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getSearch(any(), any(), any(), any(), any(), any(), any(), any(), any())).willReturn(response);
+        given(recipeService.getSearch(any(), any(), any(), any(), any(), any(), any(), any(), anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/recipe/get/api/search", 1).with(csrf()))
+        mockMvc.perform(get("/api/recipe/get/api/search").with(csrf())
+                        .with(user("test")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -296,26 +300,28 @@ public class RecipeControllerTest {
         );
         given(recipeService.getSearchById(anyInt())).willReturn(recipe);
 
-        mockMvc.perform(get("/api/recipe/get/api/id?id=1", 1).with(csrf()))
+        mockMvc.perform(get("/api/recipe/get/api/id?id=1",1).with(csrf())
+                .with(user("test")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$res.title").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.image").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.servings").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.readyInMinutes").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.sourceUrl").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.instructions").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.summary").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.healthScore").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.dishTypes").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.cuisines").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.diets").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.measurements").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res.id").value(recipe.getId()));
+                .andExpect(jsonPath("$.title").value(recipe.getTitle()))
+                .andExpect(jsonPath("$.image").value(recipe.getImage()))
+                .andExpect(jsonPath("$.servings").value(recipe.getServings()))
+                .andExpect(jsonPath("$.readyInMinutes").value(recipe.getReadyInMinutes()))
+                .andExpect(jsonPath("$.sourceUrl").value(recipe.getSourceUrl()))
+                .andExpect(jsonPath("$.instructions").value(recipe.getInstructions()))
+                .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
+                .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
+                .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))
+                .andExpect(jsonPath("$.cuisines.[0]").value(recipe.getCuisines().get(0)))
+                .andExpect(jsonPath("$.diets[0]").value(recipe.getDiets().get(0)))
+                .andExpect(jsonPath("$.measurements[0].unit").value(recipe.getMeasurements().get(0).getUnit()))
+                .andExpect(jsonPath("$.id").value(recipe.getId()));
     }
 
     @Test
     void getRecipeFromAPIThrowsWithNoParams() throws Exception {
-        mockMvc.perform(get("/api/recipe/get/api/id", 1).with(csrf()))
+        mockMvc.perform(get("/api/recipe/get/api/id", 1).with(csrf())
+                        .with(user("test")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -324,13 +330,14 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getFavourite(any(), any())).willReturn(response);
+        given(recipeService.getFavourite(anyInt(), anyInt())).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/favourite?accountId=1&page=0", 1, 0).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$res[0]").value(response.getRecipes().get(0)))
-                .andExpect(jsonPath("$res[0]").value(response.getRecipes().get(1)));
+                .andExpect(jsonPath("$.recipes[0]").value(response.getRecipes().get(0)))
+                .andExpect(jsonPath("$.recipes[1]").value(response.getRecipes().get(1)))
+                .andExpect(jsonPath("$.nextPage").value(response.getNextPage()));
     }
 
     @Test
@@ -338,11 +345,11 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getFavourite(any(), any())).willReturn(response);
+        given(recipeService.getFavourite(anyInt(), anyInt())).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/favourite?accountId=2&page=0", 1, 0).with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -350,7 +357,7 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getFavourite(any(), any())).willReturn(response);
+        given(recipeService.getFavourite(anyInt(), anyInt())).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/favourite", 1, 0).with(csrf())
                         .with(user(account)))
@@ -362,13 +369,14 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getDoLater(any(), any())).willReturn(response);
+        given(recipeService.getDoLater(anyInt(), anyInt())).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/doLater?accountId=1&page=0", 1, 0).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$res[0]").value(response.getRecipes().get(0)))
-                .andExpect(jsonPath("$res[0]").value(response.getRecipes().get(1)));
+                .andExpect(jsonPath("$.recipes[0]").value(response.getRecipes().get(0)))
+                .andExpect(jsonPath("$.recipes[1]").value(response.getRecipes().get(1)))
+                .andExpect(jsonPath("$.nextPage").value(response.getNextPage()));
     }
 
     @Test
@@ -376,11 +384,11 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getDoLater(any(), any())).willReturn(response);
+        given(recipeService.getDoLater(anyInt(), anyInt())).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/doLater?accountId=2&page=0", 1, 0).with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -388,7 +396,7 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getDoLater(any(), any())).willReturn(response);
+        given(recipeService.getDoLater(anyInt(), anyInt())).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/doLater", 1, 0).with(csrf())
                         .with(user(account)))
@@ -418,30 +426,32 @@ public class RecipeControllerTest {
                 Arrays.asList("vegan"),
                 Arrays.asList(new MeasurementRes("name", 12, "unit"))
         );
-        given(recipeService.getRecipe(any())).willReturn(recipe);
-        given(authorization.isOwnRecipe(any(), any())).willReturn(true);
+        given(recipeService.getRecipe(anyInt())).willReturn(recipe);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
         mockMvc.perform(get("/api/recipe/get/db?recipeId=2", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$res[0].title").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res[0].image").value(recipe.getImage()))
-                .andExpect(jsonPath("$res[0].servings").value(recipe.getServings()))
-                .andExpect(jsonPath("$res[0].readyInMinutes").value(recipe.getReadyInMinutes()))
-                .andExpect(jsonPath("$res[0].sourceUrl").value(recipe.getSourceUrl()))
-                .andExpect(jsonPath("$res[0].instructions").value(recipe.getInstructions()))
-                .andExpect(jsonPath("$res[0].summary").value(recipe.getSummary()))
-                .andExpect(jsonPath("$res[0].healthScore").value(recipe.getHealthScore()))
-                .andExpect(jsonPath("$res[0].account").value(recipe.getAccount()))
-                .andExpect(jsonPath("$res[0].favourite").value(recipe.isFavourite()))
-                .andExpect(jsonPath("$res[0].doLater").value(recipe.isDoLater()))
-                .andExpect(jsonPath("$res[0].finished").value(recipe.isFinished()))
-                .andExpect(jsonPath("$res[0].date").value(recipe.getDate()))
-                .andExpect(jsonPath("$res[0].dishTypes").value(recipe.getDishTypes()))
-                .andExpect(jsonPath("$res[0].cuisines").value(recipe.getCuisines()))
-                .andExpect(jsonPath("$res[0].diets").value(recipe.getDiets()))
-                .andExpect(jsonPath("$res[0].measurements").value(recipe.getMeasurements()))
-                .andExpect(jsonPath("$res[0].id").value(recipe.getId()));
+                .andExpect(jsonPath("$.title").value(recipe.getTitle()))
+                .andExpect(jsonPath("$.image").value(recipe.getImage()))
+                .andExpect(jsonPath("$.servings").value(recipe.getServings()))
+                .andExpect(jsonPath("$.readyInMinutes").value(recipe.getReadyInMinutes()))
+                .andExpect(jsonPath("$.sourceUrl").value(recipe.getSourceUrl()))
+                .andExpect(jsonPath("$.instructions").value(recipe.getInstructions()))
+                .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
+                .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
+                .andExpect(jsonPath("$.account").value(recipe.getAccount()))
+                .andExpect(jsonPath("$.favourite").value(recipe.isFavourite()))
+                .andExpect(jsonPath("$.doLater").value(recipe.isDoLater()))
+                .andExpect(jsonPath("$.finished").value(recipe.isFinished()))
+                .andExpect(jsonPath("$.date").value(recipe.getDate().toString()))
+                .andExpect(jsonPath("$.cuisines[0]").value(recipe.getCuisines().get(0)))
+                .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))
+                .andExpect(jsonPath("$.diets[0]").value(recipe.getDiets().get(0)))
+                .andExpect(jsonPath("$.measurements[0].name").value(recipe.getMeasurements().get(0).getName()))
+                .andExpect(jsonPath("$.measurements[0].amount").value(recipe.getMeasurements().get(0).getAmount()))
+                .andExpect(jsonPath("$.measurements[0].unit").value(recipe.getMeasurements().get(0).getUnit()))
+                .andExpect(jsonPath("$.id").value(recipe.getId()));
     }
 
     @Test
@@ -467,12 +477,12 @@ public class RecipeControllerTest {
                 Arrays.asList("vegan"),
                 Arrays.asList(new MeasurementRes("name", 12, "unit"))
         );
-        given(recipeService.getRecipe(any())).willReturn(recipe);
-        given(authorization.isOwnRecipe(any(), any())).willReturn(false);
+        given(recipeService.getRecipe(anyInt())).willReturn(recipe);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
 
         mockMvc.perform(get("/api/recipe/get/db?recipeId=2", 1).with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -498,8 +508,8 @@ public class RecipeControllerTest {
                 Arrays.asList("vegan"),
                 Arrays.asList(new MeasurementRes("name", 12, "unit"))
         );
-        given(recipeService.getRecipe(any())).willReturn(recipe);
-        given(authorization.isOwnRecipe(any(), any())).willReturn(true);
+        given(recipeService.getRecipe(anyInt())).willReturn(recipe);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
         mockMvc.perform(get("/api/recipe/get/db", 1).with(csrf())
                         .with(user(account)))
@@ -530,29 +540,32 @@ public class RecipeControllerTest {
                 Arrays.asList("vegan"),
                 Arrays.asList(new MeasurementRes("name", 12, "unit"))
         );
-        given(recipeService.getRecipeForDate(any(), any())).willReturn(recipe);
 
-        mockMvc.perform(get("/api/recipe/get/date?accountId=1&date=2022/12/12", 1).with(csrf())
+        given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(recipe);
+
+        mockMvc.perform(get("/api/recipe/get/date?accountId=1&date=2022-12-12", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$res[0].title").value(recipe.getTitle()))
-                .andExpect(jsonPath("$res[0].image").value(recipe.getImage()))
-                .andExpect(jsonPath("$res[0].servings").value(recipe.getServings()))
-                .andExpect(jsonPath("$res[0].readyInMinutes").value(recipe.getReadyInMinutes()))
-                .andExpect(jsonPath("$res[0].sourceUrl").value(recipe.getSourceUrl()))
-                .andExpect(jsonPath("$res[0].instructions").value(recipe.getInstructions()))
-                .andExpect(jsonPath("$res[0].summary").value(recipe.getSummary()))
-                .andExpect(jsonPath("$res[0].healthScore").value(recipe.getHealthScore()))
-                .andExpect(jsonPath("$res[0].account").value(recipe.getAccount()))
-                .andExpect(jsonPath("$res[0].favourite").value(recipe.isFavourite()))
-                .andExpect(jsonPath("$res[0].doLater").value(recipe.isDoLater()))
-                .andExpect(jsonPath("$res[0].finished").value(recipe.isFinished()))
-                .andExpect(jsonPath("$res[0].date").value(recipe.getDate()))
-                .andExpect(jsonPath("$res[0].dishTypes").value(recipe.getDishTypes()))
-                .andExpect(jsonPath("$res[0].cuisines").value(recipe.getCuisines()))
-                .andExpect(jsonPath("$res[0].diets").value(recipe.getDiets()))
-                .andExpect(jsonPath("$res[0].measurements").value(recipe.getMeasurements()))
-                .andExpect(jsonPath("$res[0].id").value(recipe.getId()));
+                .andExpect(jsonPath("$.title").value(recipe.getTitle()))
+                .andExpect(jsonPath("$.image").value(recipe.getImage()))
+                .andExpect(jsonPath("$.servings").value(recipe.getServings()))
+                .andExpect(jsonPath("$.readyInMinutes").value(recipe.getReadyInMinutes()))
+                .andExpect(jsonPath("$.sourceUrl").value(recipe.getSourceUrl()))
+                .andExpect(jsonPath("$.instructions").value(recipe.getInstructions()))
+                .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
+                .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
+                .andExpect(jsonPath("$.account").value(recipe.getAccount()))
+                .andExpect(jsonPath("$.favourite").value(recipe.isFavourite()))
+                .andExpect(jsonPath("$.doLater").value(recipe.isDoLater()))
+                .andExpect(jsonPath("$.finished").value(recipe.isFinished()))
+                .andExpect(jsonPath("$.date").value(recipe.getDate().toString()))
+                .andExpect(jsonPath("$.cuisines[0]").value(recipe.getCuisines().get(0)))
+                .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))
+                .andExpect(jsonPath("$.diets[0]").value(recipe.getDiets().get(0)))
+                .andExpect(jsonPath("$.measurements[0].name").value(recipe.getMeasurements().get(0).getName()))
+                .andExpect(jsonPath("$.measurements[0].amount").value(recipe.getMeasurements().get(0).getAmount()))
+                .andExpect(jsonPath("$.measurements[0].unit").value(recipe.getMeasurements().get(0).getUnit()))
+                .andExpect(jsonPath("$.id").value(recipe.getId()));
     }
 
     @Test
@@ -578,11 +591,11 @@ public class RecipeControllerTest {
                 Arrays.asList("vegan"),
                 Arrays.asList(new MeasurementRes("name", 12, "unit"))
         );
-        given(recipeService.getRecipeForDate(any(), any())).willReturn(recipe);
+        given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(recipe);
 
-        mockMvc.perform(get("/api/recipe/get/date?accountId=2&date=2022/12/12", 1).with(csrf())
+        mockMvc.perform(get("/api/recipe/get/date?accountId=2&date=2022-12-12", 1).with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -608,7 +621,7 @@ public class RecipeControllerTest {
                 Arrays.asList("vegan"),
                 Arrays.asList(new MeasurementRes("name", 12, "unit"))
         );
-        given(recipeService.getRecipeForDate(any(), any())).willReturn(recipe);
+        given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(recipe);
 
         mockMvc.perform(get("/api/recipe/get/date", 1).with(csrf())
                         .with(user(account)))
@@ -620,7 +633,7 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
 
         given(recipeService.delete(anyInt())).willReturn(true);
-        given(authorization.isOwnRecipe(any(), any())).willReturn(true);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
         mockMvc.perform(delete("/api/recipe/del?recipeId=1", 1).with(csrf())
                         .with(user(account)))
@@ -631,7 +644,7 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
 
         given(recipeService.delete(anyInt())).willReturn(true);
-        given(authorization.isOwnRecipe(any(), any())).willReturn(true);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
         mockMvc.perform(delete("/api/recipe/del", 1).with(csrf())
                         .with(user(account)))
@@ -642,7 +655,7 @@ public class RecipeControllerTest {
         Account account = new Account(1, "test", "test", "test", "test");
 
         given(recipeService.delete(anyInt())).willReturn(true);
-        given(authorization.isOwnRecipe(any(), any())).willReturn(false);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
 
         mockMvc.perform(delete("/api/recipe/del", 1).with(csrf())
                         .with(user(account)))

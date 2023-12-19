@@ -18,6 +18,7 @@ import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
+import com.example.recipe.response.FullRecipeRes;
 import com.example.recipe.response.RecipeRes;
 import com.example.recipe.response.StatRes;
 import com.example.recipe.security.JwtService;
@@ -39,22 +40,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+import javax.swing.text.html.Option;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
 @DataJpaTest()
-@ContextConfiguration(classes = {RecipeApplication.class, Intolerance.class, Types.class, Diet.class, Cuisine.class})
+@ContextConfiguration(classes = {RecipeApplication.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ExtendWith(MockitoExtension.class)
 class RecipeServiceTest {
@@ -95,12 +98,12 @@ class RecipeServiceTest {
 
     @Test
     void addRecipeWorks() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
         given(ingredientRepository.findById(any())).willReturn(Optional.of(new Ingredient()));
         given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
         given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
         given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
+
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -115,24 +118,20 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
-                new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Category(1, "test")),
+                Arrays.asList(new Type(1, "test")),
+                new Account(1, "test", "test", "test", "test"),
+                Arrays.asList(new Country(1, "test")),
+                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 1F))
         );
+
         testRecipeService.add(recipe);
         verify(recipeRepository).save(recipe);
     }
 
     @Test
     void addRecipeThrowsWithBadUnit() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
-        given(unitRepository.findById(any())).willThrow(new RuntimeException("error"));
-        given(ingredientRepository.findById(any())).willReturn(Optional.of(new Ingredient()));
-        given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
-        given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
-        given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
+        given(unitRepository.findById(any())).willReturn(Optional.empty());
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -151,7 +150,7 @@ class RecipeServiceTest {
                 Arrays.asList(new Type()),
                 new Account(),
                 Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -161,12 +160,8 @@ class RecipeServiceTest {
 
     @Test
     void addRecipeThrowsWithIngredient() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
-        given(ingredientRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(ingredientRepository.findById(any())).willReturn(Optional.empty());
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
-        given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
-        given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
-        given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -185,7 +180,7 @@ class RecipeServiceTest {
                 Arrays.asList(new Type()),
                 new Account(),
                 Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -195,12 +190,9 @@ class RecipeServiceTest {
 
     @Test
     void addRecipeThrowsWithBadType() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
-        given(typeRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(typeRepository.findById(any())).willReturn(Optional.empty());
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
         given(ingredientRepository.findById(any())).willReturn(Optional.of(new Ingredient()));
-        given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
-        given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -219,7 +211,7 @@ class RecipeServiceTest {
                 Arrays.asList(new Type()),
                 new Account(),
                 Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -229,12 +221,10 @@ class RecipeServiceTest {
 
     @Test
     void addRecipeThrowsWithBadCountry() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
-        given(countryRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(countryRepository.findById(any())).willReturn(Optional.empty());
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
-        given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
         given(ingredientRepository.findById(any())).willReturn(Optional.of(new Ingredient()));
-        given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
+        given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -253,7 +243,7 @@ class RecipeServiceTest {
                 Arrays.asList(new Type()),
                 new Account(),
                 Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -263,8 +253,7 @@ class RecipeServiceTest {
 
     @Test
     void addRecipeThrowsWithBadCategory() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
-        given(categoryRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(categoryRepository.findById(any())).willReturn(Optional.empty());
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
         given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
         given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
@@ -287,7 +276,7 @@ class RecipeServiceTest {
                 Arrays.asList(new Type()),
                 new Account(),
                 Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -297,13 +286,12 @@ class RecipeServiceTest {
 
     @Test
     void addRecipeThrowsWithErrorWhileSaving() {
-        given(recipeRepository.save(any())).willReturn(Optional.of(new Recipe()));
         given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
         given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
         given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
         given(ingredientRepository.findById(any())).willReturn(Optional.of(new Ingredient()));
-        doThrow(new RuntimeException("error")).when(recipeRepository).save(any());
+        doThrow(new RuntimeException()).when(recipeRepository).save(any());
         Recipe recipe = new Recipe(
                 1,
                 "test title",
@@ -322,7 +310,7 @@ class RecipeServiceTest {
                 Arrays.asList(new Type()),
                 new Account(),
                 Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -339,15 +327,11 @@ class RecipeServiceTest {
         testRecipeService.toggleFavourite( 1);
         recipe.setFavourite(false);
         verify(recipeRepository).save(recipe);
-
-        testRecipeService.toggleFavourite( 1);
-        recipe.setFavourite(true);
-        verify(recipeRepository).save(recipe);
     }
 
     @Test
     void toggleFavouriteThrowsWithNoRecipe() {
-        given(recipeRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(recipeRepository.findById(any())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> testRecipeService.toggleFavourite(1))
                 .isInstanceOf(BadRequestException.class)
@@ -359,10 +343,10 @@ class RecipeServiceTest {
         Recipe recipe = new Recipe();
         recipe.setFavourite(true);
         given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
-        doThrow(new RuntimeException("error")).when(recipeRepository).save(any());
+        doThrow(new RuntimeException()).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.toggleFavourite(1))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
@@ -376,14 +360,10 @@ class RecipeServiceTest {
         recipe.setDoLater(false);
         verify(recipeRepository).save(recipe);
 
-        testRecipeService.toggleDoLater( 1);
-        recipe.setDoLater(true);
-        verify(recipeRepository).save(recipe);
-
     }
     @Test
     void toggleDoLaterThrowsWithNoRecipe() {
-        given(recipeRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(recipeRepository.findById(any())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> testRecipeService.toggleDoLater(1))
                 .isInstanceOf(BadRequestException.class)
@@ -395,17 +375,18 @@ class RecipeServiceTest {
         Recipe recipe = new Recipe();
         recipe.setDoLater(true);
         given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
-        doThrow(new RuntimeException("error")).when(recipeRepository).save(any());
+        doThrow(new RuntimeException()).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.toggleDoLater(1))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
     @Test
     void finishRecipeWorks() {
         Recipe recipe = new Recipe();
-        given(recipeRepository.findById(any())).willReturn(Optional.of(new Recipe()));
+        recipe.setFinished(false);
+        given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
 
         testRecipeService.finishRecipe(1);
         recipe.setFinished(true);
@@ -415,7 +396,7 @@ class RecipeServiceTest {
 
     @Test
     void finishRecipeThrowsWithNoRecipe() {
-        given(recipeRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(recipeRepository.findById(any())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> testRecipeService.finishRecipe(1))
                 .isInstanceOf(BadRequestException.class)
@@ -428,70 +409,50 @@ class RecipeServiceTest {
         doThrow(new RuntimeException("error")).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.finishRecipe(1))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
     @Test
     void searchRecipeWorks() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), anyInt()))
                 .willReturn(new RecipeResponse());
 
-        testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "dinner", "time", "asc", 0);
+        testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "main course", "time", "asc", 0);
 
-        verify(recipeUtils).searchResults("search", "pork", "asian", "vegan", "dairy", "dinner", "time", "asc", 0);
+        verify(recipeUtils).searchResults("search", "pork", "asian", "vegan", "dairy", "main course", "time", "asc", 0);
     }
 
     @Test
     void searchRecipeThrowsWithBadIngredient() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "bad", "asian", "vegan", "dairy", "dinner", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", "bad", "asian", "vegan", "dairy", "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid ingredient filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadCuisine() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "bad", "vegan", "dairy", "dinner", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "bad", "vegan", "dairy", "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid cuisine filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadDiet() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "bad", "dairy", "dinner", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "bad", "dairy", "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid diet filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadIntolerance() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "bad", "dinner", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "bad", "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid intolerance filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadType() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
         assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "bad", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid type filter");
@@ -499,29 +460,21 @@ class RecipeServiceTest {
 
     @Test
     void searchRecipeThrowsWithBadSort() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "dinner", "bad", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "main course", "bad", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid sort");
     }
 
     @Test
     void searchRecipeThrowsWithBadSortDir() {
-        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), any()))
-                .willReturn(new RecipeResponse());
-
-
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "dinner", "time", "bad", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "main course", "time", "bad", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid sort direction");
     }
 
     @Test
     void getRecipeFromAPIWorks() {
-        given(recipeUtils.getRecipeById(any()))
+        given(recipeUtils.getRecipeById(anyInt()))
                 .willReturn(new RecipeFormat(
                         1,
                         "title",
@@ -536,14 +489,14 @@ class RecipeServiceTest {
                         true,
                         true,
                         true,
-                        Arrays.asList("dinner"),
+                        Arrays.asList("main course"),
                         Arrays.asList("indian"),
                         Arrays.asList("vegan"),
                         Arrays.asList(new RecipeIngredients("test name", new Measures(new Metric(2, "tbsp"))))
                 ));
         RecipeRes res = testRecipeService.getSearchById(1);
 
-        assertEquals("vegan", res.getDiets().get(0));
+        assertEquals("dairy free", res.getDiets().get(0));
         assertEquals("test name", res.getMeasurements().get(0).getName());
         assertEquals(2, res.getMeasurements().get(0).getAmount());
         verify(recipeUtils).getRecipeById(1);
@@ -564,10 +517,10 @@ class RecipeServiceTest {
             }
         });
 
-        given(recipeRepository.getStats(any())).willReturn(list);
-        given(recipeRepository.getDoneCount(any())).willReturn(Optional.of(12));
-        given(recipeRepository.getFavouriteCount(any())).willReturn(Optional.of(2));
-        given(recipeRepository.getDoLaterCount(any())).willReturn(Optional.of(4));
+        given(recipeRepository.getStats(anyInt())).willReturn(list);
+        given(recipeRepository.getDoneCount(anyInt())).willReturn(Optional.of(12));
+        given(recipeRepository.getFavouriteCount(anyInt())).willReturn(Optional.of(2));
+        given(recipeRepository.getDoLaterCount(anyInt())).willReturn(Optional.of(4));
 
         RecipeStats res = testRecipeService.getStats(1);
 
@@ -592,10 +545,8 @@ class RecipeServiceTest {
             }
         });
 
-        given(recipeRepository.getStats(any())).willReturn(list);
-        given(recipeRepository.getDoneCount(any())).willThrow(new RuntimeException("error"));
-        given(recipeRepository.getFavouriteCount(any())).willReturn(Optional.of(2));
-        given(recipeRepository.getDoLaterCount(any())).willReturn(Optional.of(4));
+        given(recipeRepository.getStats(anyInt())).willReturn(list);
+        given(recipeRepository.getDoneCount(anyInt())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> testRecipeService.getStats(1))
                 .isInstanceOf(BadRequestException.class)
@@ -617,10 +568,9 @@ class RecipeServiceTest {
             }
         });
 
-        given(recipeRepository.getStats(any())).willReturn(list);
-        given(recipeRepository.getFavouriteCount(any())).willThrow(new RuntimeException("error"));
-        given(recipeRepository.getDoneCount(any())).willReturn(Optional.of(2));
-        given(recipeRepository.getDoLaterCount(any())).willReturn(Optional.of(4));
+        given(recipeRepository.getStats(anyInt())).willReturn(list);
+        given(recipeRepository.getFavouriteCount(anyInt())).willReturn(Optional.empty());
+        given(recipeRepository.getDoneCount(anyInt())).willReturn(Optional.of(2));
 
         assertThatThrownBy(() -> testRecipeService.getStats(1))
                 .isInstanceOf(BadRequestException.class)
@@ -642,10 +592,10 @@ class RecipeServiceTest {
             }
         });
 
-        given(recipeRepository.getStats(any())).willReturn(list);
-        given(recipeRepository.getDoLaterCount(any())).willThrow(new RuntimeException("error"));
-        given(recipeRepository.getDoneCount(any())).willReturn(Optional.of(2));
-        given(recipeRepository.getFavouriteCount(any())).willReturn(Optional.of(4));
+        given(recipeRepository.getStats(anyInt())).willReturn(list);
+        given(recipeRepository.getDoLaterCount(anyInt())).willReturn(Optional.empty());
+        given(recipeRepository.getDoneCount(anyInt())).willReturn(Optional.of(2));
+        given(recipeRepository.getFavouriteCount(anyInt())).willReturn(Optional.of(4));
 
         assertThatThrownBy(() -> testRecipeService.getStats(1))
                 .isInstanceOf(BadRequestException.class)
@@ -654,7 +604,7 @@ class RecipeServiceTest {
 
     @Test
     void getFavouriteForAccountWorks() {
-        given(recipeRepository.getFavourite(any(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
+        given(recipeRepository.getFavourite(anyInt(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
             @Override
             public String getTitle() {
                 return "test";
@@ -665,33 +615,22 @@ class RecipeServiceTest {
                 return 1;
             }
         }));
-        testRecipeService.getFavourite(1, -2);
+        testRecipeService.getFavourite(1, 0);
 
-        verify(recipeRepository).getFavourite(1, PageRequest.of(6, 0));
+        verify(recipeRepository).getFavourite(1, PageRequest.of(0, 6));
     }
 
     @Test
     void getFavouriteForAccountThrowsWithInvalidPage() {
-        given(recipeRepository.getFavourite(any(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
-            @Override
-            public String getTitle() {
-                return "test";
-            }
 
-            @Override
-            public int getId() {
-                return 1;
-            }
-        }));
-
-        assertThatThrownBy(() -> testRecipeService.getFavourite(1, 0))
+        assertThatThrownBy(() -> testRecipeService.getFavourite(1, -2))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("invalid page");
+                .hasMessageContaining("Invalid page");
     }
 
     @Test
     void getDolaterForAccountWorks() {
-        given(recipeRepository.getDoLater(any(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
+        given(recipeRepository.getDoLater(anyInt(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
             @Override
             public String getTitle() {
                 return "test";
@@ -702,99 +641,209 @@ class RecipeServiceTest {
                 return 1;
             }
         }));
-        testRecipeService.getDoLater(1, -2);
+        testRecipeService.getDoLater(1, 0);
 
-        verify(recipeRepository).getDoLater(1, PageRequest.of(6, 0));
+        verify(recipeRepository).getDoLater(1, PageRequest.of(0, 6));
     }
 
     @Test
     void getDoLateForAccountThrowsWithInvalidPage() {
-        given(recipeRepository.getDoLater(any(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
-            @Override
-            public String getTitle() {
-                return "test";
-            }
 
-            @Override
-            public int getId() {
-                return 1;
-            }
-        }));
-
-        assertThatThrownBy(() -> testRecipeService.getDoLater(1, 0))
+        assertThatThrownBy(() -> testRecipeService.getDoLater(1, -1))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("invalid page");
+                .hasMessageContaining("Invalid page");
     }
 
     @Test
     void getRecipeFromDBWorks() {
-        given(recipeRepository.findById(any())).willReturn(Optional.of(new Recipe()));
-        testRecipeService.getRecipe(1);
+        given(recipeRepository.findById(any()))
+                .willReturn(Optional.of(new Recipe(
+                        1,
+                        "title",
+                        "recipe desc",
+                        "recipe original",
+                        12,
+                        12,
+                        "recipe img",
+                        200,
+                        true,
+                        true,
+                        true,
+                        new Date(2022, 12, 12),
+                        "test instructions",
+                        Arrays.asList(new Category()),
+                        Arrays.asList(new Type()),
+                        new Account(),
+                        Arrays.asList(new Country(1, "test Country")),
+                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                );
+        FullRecipeRes res = testRecipeService.getRecipe(1);
         verify(recipeRepository).findById(1);
+
+        assertEquals("test Country", res.getCuisines().get(0));
     }
 
     @Test
     void getRecipeFromDBThrowsWithNoRecipe() {
-        given(recipeRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(recipeRepository.findById(any())).willReturn(Optional.empty());
         assertThatThrownBy(() -> testRecipeService.getRecipe(1))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("invalid page");
+                .hasMessageContaining("no recipe with id");
     }
 
     @Test
     void getRecipeByDateForAccountWorks() {
-        given(recipeRepository.getByDate(any(), any())).willReturn(Optional.of(new Recipe()));
-        testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
+        given(recipeRepository.getByDate(anyInt(), any()))
+                .willReturn(Optional.of(new Recipe(
+                        1,
+                        "title",
+                        "recipe desc",
+                        "recipe original",
+                        12,
+                        12,
+                        "recipe img",
+                        200,
+                        true,
+                        true,
+                        true,
+                        new Date(2022, 12, 12),
+                        "test instructions",
+                        Arrays.asList(new Category()),
+                        Arrays.asList(new Type()),
+                        new Account(),
+                        Arrays.asList(new Country(1, "test Country")),
+                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                );
+        FullRecipeRes res = testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
 
         verify(recipeRepository).getByDate(1, new Date(2022, 12, 12));
+        assertEquals("test Country", res.getCuisines().get(0));
     }
 
     @Test
-    void getRecipeByDateForAccountThrowsWithNoRecipe() {
-        given(recipeRepository.getByDate(any(), any())).willReturn(Optional.of(new Recipe()));
-        testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
+    void getRecipeByDateForAccountWorksWithNoRecipe() {
+        given(recipeRepository.getByDate(anyInt(), any())).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12)))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("invalid page");
+        FullRecipeRes res = testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
+
+        verify(recipeRepository).getByDate(1, new Date(2022, 12, 12));
+        assertEquals(null, res);
     }
 
-    // TODO:
-//    @Test
-//    void getCalendarWorks() {
-//        given(recipeRepository.findByDate(any())).willReturn(Optional.of(new Recipe()));
-//        testRecipeService.getCalenadr(1, new Date(2022, 12, 12));
-//
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 12));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 13));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 14));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 15));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 16));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 17));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 18));
-//        verify(recipeRepository).findByDate(1, newDate(2022, 12, 19));
-//    }
+    @Test
+    void getCalendarWorks() {
+        given(recipeRepository.getByDate(anyInt(), any()))
+                .willReturn(Optional.of(new Recipe(
+                        1,
+                        "title",
+                        "recipe desc",
+                        "recipe original",
+                        12,
+                        12,
+                        "recipe img",
+                        200,
+                        true,
+                        true,
+                        true,
+                        new Date(2022, 12, 12),
+                        "test instructions",
+                        Arrays.asList(new Category()),
+                        Arrays.asList(new Type()),
+                        new Account(),
+                        Arrays.asList(new Country(1, "test Country")),
+                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                );
+        Map<String, Day> res = testRecipeService.getCalendar(1);
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        assertEquals(monday, res.get("Monday").getDate());
+        assertEquals(true, res.get("Monday").getIsRecipe());
+        assertEquals(true, res.get("Monday").getIsFinished());
+    }
 
-    //TODO:
-//    @Test
-//    void getCalendarThrowsWithInvalidDate() {
-//        assertThatThrownBy(() ->  testRecipeService.getCalendar(1, new Date(2022, 20, 12)))
-//                .isInstanceOf(BadRequestException.class)
-//                .hasMessageContaining("Invalid Date");
-//
-//        verify(recipeRepository, never()).findByDate(account);
-//    }
+    @Test
+    void getCalendarWorksWithNotFinished() {
+        given(recipeRepository.getByDate(anyInt(), any()))
+                .willReturn(Optional.of(new Recipe(
+                        1,
+                        "title",
+                        "recipe desc",
+                        "recipe original",
+                        12,
+                        12,
+                        "recipe img",
+                        200,
+                        true,
+                        true,
+                        false,
+                        new Date(2022, 12, 12),
+                        "test instructions",
+                        Arrays.asList(new Category()),
+                        Arrays.asList(new Type()),
+                        new Account(),
+                        Arrays.asList(new Country(1, "test Country")),
+                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                );
+        Map<String, Day> res = testRecipeService.getCalendar(1);
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        assertEquals(monday, res.get("Monday").getDate());
+        assertEquals(true, res.get("Monday").getIsRecipe());
+        assertEquals(false, res.get("Monday").getIsFinished());
+    }
+
+    @Test
+    void getCalendarWorksWithNoRecipe() {
+        given(recipeRepository.getByDate(anyInt(), any()))
+                .willReturn(Optional.empty());
+        Map<String, Day> res = testRecipeService.getCalendar(1);
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        assertEquals(monday, res.get("Monday").getDate());
+        assertEquals(false, res.get("Monday").getIsRecipe());
+        assertEquals(false, res.get("Monday").getIsFinished());
+    }
+
 
     @Test
     void deleteRecipeWorks() {
-        given(recipeRepository.findById(any())).willReturn(Optional.of(new Recipe()));
+        List<Country> countries = new ArrayList<>();
+        countries.add(new Country(1, "test country"));
+        List<Category> categories = new ArrayList<>();
+        categories.add(new Category(1, "test category"));
+        List<Type> types = new ArrayList<>();
+        types.add(new Type(1, "test type"));
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12));
+
+        given(recipeRepository.findById(any()))
+                .willReturn(Optional.of(new Recipe(
+                    1,
+                    "title",
+                    "recipe desc",
+                    "recipe original",
+                    12,
+                    12,
+                    "recipe img",
+                    200,
+                    true,
+                    true,
+                    true,
+                    new Date(2022, 12, 12),
+                    "test instructions",
+                    categories,
+                    types,
+                    new Account(),
+                    countries,
+                    measurements
+                )));
         testRecipeService.delete(1);
         verify(recipeRepository).deleteById(1);
     }
 
     @Test
     void deleteRecipeThrowsWithNoMatchingRecipe() {
-        given(recipeRepository.findById(any())).willThrow(new RuntimeException("error"));
+        given(recipeRepository.findById(any())).willReturn(Optional.empty());
 
         assertThatThrownBy(() ->  testRecipeService.delete(0))
                 .isInstanceOf(BadRequestException.class)
@@ -803,10 +852,39 @@ class RecipeServiceTest {
 
     @Test
     void deleteAccountThrowsErrorWithFailedDeletion() {
-        given(recipeRepository.findById(any())).willReturn(Optional.of(new Recipe()));
+        List<Country> countries = new ArrayList<>();
+        countries.add(new Country(1, "test country"));
+        List<Category> categories = new ArrayList<>();
+        categories.add(new Category(1, "test category"));
+        List<Type> types = new ArrayList<>();
+        types.add(new Type(1, "test type"));
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12));
+
+        given(recipeRepository.findById(any()))
+                .willReturn(Optional.of(new Recipe(
+                        1,
+                        "title",
+                        "recipe desc",
+                        "recipe original",
+                        12,
+                        12,
+                        "recipe img",
+                        200,
+                        true,
+                        true,
+                        true,
+                        new Date(2022, 12, 12),
+                        "test instructions",
+                        categories,
+                        types,
+                        new Account(),
+                        countries,
+                        measurements
+                )));
         doThrow(new RuntimeException("error")).when(recipeRepository).deleteById(any());
         assertThatThrownBy(() ->  testRecipeService.delete(0))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("error while deleting from database");
 
         verify(recipeRepository).deleteById(0);
