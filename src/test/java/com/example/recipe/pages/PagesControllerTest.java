@@ -2,8 +2,7 @@ package com.example.recipe.pages;
 
 import com.example.recipe.account.Account;
 import com.example.recipe.recipe.RecipeController;
-import com.example.recipe.recipe.RecipeService;
-import com.example.recipe.response.CalendarPageRes;
+import com.example.recipe.response.TodaysPageRes;
 import com.example.recipe.response.ListRes;
 import com.example.recipe.response.PersonalPageRes;
 import com.example.recipe.security.Authorization;
@@ -14,8 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -82,7 +79,7 @@ public class PagesControllerTest {
 
     @Test
     void getCalendarPageWorks() throws Exception {
-        ListRes response = new CalendarPageRes();
+        ListRes response = new TodaysPageRes();
         Account account = new Account(1, "test", "test", "test", "test");
 
         given(pagesService.getPersonal(anyInt())).willReturn(response);
@@ -96,7 +93,7 @@ public class PagesControllerTest {
     }
     @Test
     void getCalendarPageThrowsWithNoParams() throws Exception {
-        ListRes response = new CalendarPageRes();
+        ListRes response = new TodaysPageRes();
         Account account = new Account(1, "test", "test", "test", "test");
 
         given(pagesService.getPersonal(anyInt())).willReturn(response);
@@ -108,7 +105,7 @@ public class PagesControllerTest {
     }
     @Test
     void getCalendarPageThrowsWithNotOwnAccount() throws Exception {
-        ListRes response = new CalendarPageRes();
+        ListRes response = new TodaysPageRes();
         Account account = new Account(1, "test", "test", "test", "test");
 
         given(pagesService.getPersonal(anyInt())).willReturn(response);
