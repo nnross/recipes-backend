@@ -1,8 +1,7 @@
 package com.example.recipe.pages;
 
-import com.example.recipe.recipe.Recipe;
-import com.example.recipe.recipe.RecipeService;
 import com.example.recipe.response.PersonalPageRes;
+import com.example.recipe.response.TodaysPageRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,20 @@ public class PagesController {
      */
     @PreAuthorize("#accountId == authentication.principal.id")
     @GetMapping("/get/personal")
-    public PersonalPageRes add(@RequestParam int accountId) {
+    public PersonalPageRes getPersonal(@RequestParam int accountId) {
         return pagesService.getPersonal(accountId);
+    }
+
+    /**
+     * API GET call to /api/pages/get/todays?accountId=(id)
+     * will return the todays page for the selected account.
+     * @param accountId
+     *        id of account we want.
+     * @return todays page data.
+     */
+    @PreAuthorize("#accountId == authentication.principal.id")
+    @GetMapping("/get/todays")
+    public TodaysPageRes getTodays(@RequestParam int accountId) {
+        return pagesService.getTodays(accountId);
     }
 }
