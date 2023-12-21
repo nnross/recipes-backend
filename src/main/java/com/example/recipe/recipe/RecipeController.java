@@ -78,7 +78,7 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /a@@pi/recipe/get/api/favourite?accountId=(id)&page=(page) TODO: ?
+     * GET API call to /api/recipe/get/api/search
      * Gets the parameters from the url for search
      * @param search
      *        Recipes to get from the API
@@ -114,7 +114,7 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/api/id?id=(id)
+     * GET API call to /api/recipe/get/api/id
      * @param id
      *       id of the recipe wanted
      * @return RecipeService getSearchById with id from url
@@ -123,6 +123,13 @@ public class RecipeController {
     public RecipeRes searchById(@RequestParam("id") int id) {
         return recipeService.getSearchById(id);
     }
+
+    /**
+     * GET API call to /api/recipe/get/api/random
+     * @return random 12 recipes
+     */
+    @GetMapping("/get/api/random")
+    public ListRes getRandom() { return recipeService.getRandom(); }
 
     /**
      * GET API call to /api/recipe/get/favourite?accountId=(id)&page=(page)

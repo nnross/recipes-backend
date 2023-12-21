@@ -59,7 +59,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // endpoints without security and with security
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/account/create", "/api/account/login", "/error", "/api/recipe/get/api/search", "/api/recipe/get/api/id")
+                .requestMatchers("/api/account/create", "/api/account/login", "/error", "/api/recipe/get/api/search", "/api/recipe/get/api/id", "api/recipe/get/api/random")
                 .permitAll()
                 .anyRequest()
                 .authenticated());
