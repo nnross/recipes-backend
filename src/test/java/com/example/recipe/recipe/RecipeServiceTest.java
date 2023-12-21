@@ -891,13 +891,13 @@ class RecipeServiceTest {
     }
 
     @Test
-    void searchRecipeWorks() {
-        given(recipeUtils.getRandom())
-                .willReturn(new RecipeResponse());
+    void randomRecipeWorks() {
+        given(recipeUtils.randomResults())
+                .willReturn(new RandomResponse());
 
         testRecipeService.getRandom();
 
-        verify(recipeUtils).getRandom();
+        verify(recipeUtils).randomResults();
     }
 }
 

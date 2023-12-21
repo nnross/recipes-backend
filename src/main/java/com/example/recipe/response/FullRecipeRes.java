@@ -45,6 +45,8 @@ public class FullRecipeRes {
         this.measurements = measurements;
     }
 
+    public FullRecipeRes() {
+    }
 
     public int getId() {
         return id;
