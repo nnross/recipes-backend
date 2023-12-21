@@ -666,7 +666,7 @@ public class RecipeControllerTest {
     void getRandomRecipesWork() throws Exception {
         ListRes response = new ListRes(Arrays.asList("test1", "test2"), false);
 
-        given(recipeService.getSearch(any(), any(), any(), any(), any(), any(), any(), any(), anyInt())).willReturn(response);
+        given(recipeService.getRandom()).willReturn(response);
 
         mockMvc.perform(get("/api/recipe/get/api/random").with(csrf())
                         .with(user("test")))
