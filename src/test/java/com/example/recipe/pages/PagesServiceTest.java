@@ -4,6 +4,8 @@ import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountRepository;
 import com.example.recipe.recipe.*;
+import com.example.recipe.response.FullRecipeRes;
+import com.example.recipe.response.ListRes;
 import com.example.recipe.response.StatRes;
 import com.example.recipe.security.JwtService;
 import com.example.recipe.unit.Unit;
@@ -27,6 +29,7 @@ import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -62,24 +65,16 @@ public class PagesServiceTest {
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
 
-        given(recipeService.getCalendar(any())).willReturn(calendar);
-        given(recipeService.getStats(any())).willReturn(new RecipeStats());
+        given(recipeService.getCalendar(anyInt())).willReturn(calendar);
+        given(recipeService.getStats(anyInt())).willReturn(new RecipeStats());
 
-        given(recipeRepository.getFavourite(any(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
-            @Override
-            public String getTitle() {
-                return "test";
-            }
-
-            @Override
-            public int getId() {
-                return 2;
-            }
-        }));
+        given(recipeService.getFavourite(anyInt(), anyInt())).willReturn(new ListRes(Arrays.asList("test"), false));
 
         testPagesService.getPersonal(1);
 
-        verify(recipeRepository).getFavourite(1, PageRequest.of(0, 6));
+        verify(recipeService).getCalendar(1);
+        verify(recipeService).getStats(1);
+        verify(recipeService).getFavourite(1, 0);
     }
 
     @Test
@@ -92,16 +87,17 @@ public class PagesServiceTest {
 
     @Test
     void getCalendarPageWorks() {
-        given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
-        given(recipeRepository.findById(any())).willReturn(Optional.of(new Recipe()));
+        given(accountRepository.findById(anyInt())).willReturn(Optional.of(new Account()));
+        given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(new FullRecipeRes());
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
 
-        given(recipeService.getCalendar(any())).willReturn(calendar);
+        given(recipeService.getCalendar(anyInt())).willReturn(calendar);
 
         testPagesService.getTodays(1);
 
-        verify(recipeRepository).findById(1);
+        verify(recipeService).getRecipeForDate(1, Date.valueOf(LocalDate.now()));
+        verify(recipeService).getCalendar(1);
     }
 
     @Test
