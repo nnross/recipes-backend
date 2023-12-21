@@ -22,9 +22,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.sql.Date;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,8 +59,12 @@ public class PagesServiceTest {
     @Test
     void getPersonalPageWorks() {
         given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
-        given(recipeService.getCalendar(any())).willReturn(null); // TODO:
+        Map<String, Day> calendar = new HashMap<>();
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+
+        given(recipeService.getCalendar(any())).willReturn(calendar);
         given(recipeService.getStats(any())).willReturn(new RecipeStats());
+
         given(recipeRepository.getFavourite(any(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
             @Override
             public String getTitle() {
@@ -82,7 +85,6 @@ public class PagesServiceTest {
     @Test
     void getPersonalPageThrowsWithNoAccount() {
         given(accountRepository.findById(any())).willReturn(Optional.empty());
-
         assertThatThrownBy(() -> testPagesService.getPersonal(1))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("no account with id");
@@ -92,18 +94,21 @@ public class PagesServiceTest {
     void getCalendarPageWorks() {
         given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
         given(recipeRepository.findById(any())).willReturn(Optional.of(new Recipe()));
-        given(recipeService.getCalendar(any())).willReturn(null);// TODO:
+        Map<String, Day> calendar = new HashMap<>();
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
 
-        testPagesService.getCalendar(1);
+        given(recipeService.getCalendar(any())).willReturn(calendar);
+
+        testPagesService.getTodays(1);
 
         verify(recipeRepository).findById(1);
     }
 
     @Test
-    void getPersonalPageThrowsWithNoAccount() {
+    void getCalendarPageThrowsWithNoAccount() {
         given(accountRepository.findById(any())).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> testPagesService.getCalendar(1))
+        assertThatThrownBy(() -> testPagesService.getTodays(1))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("no account with id");
     }
