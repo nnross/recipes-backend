@@ -3,6 +3,7 @@ package com.example.recipe.pages;
 import com.example.recipe.account.Account;
 import com.example.recipe.recipe.Day;
 import com.example.recipe.recipe.RecipeController;
+import com.example.recipe.recipe.RecipeService;
 import com.example.recipe.recipe.RecipeStats;
 import com.example.recipe.response.*;
 import com.example.recipe.security.Authorization;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,15 +31,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(value= RecipeController.class)
-@ContextConfiguration(classes = {RecipeController.class, Authorization.class})
+@WebMvcTest(value= PagesController.class)
+@ContextConfiguration(classes = PagesController.class)
 @EnableMethodSecurity
 public class PagesControllerTest {
     @MockBean
     PagesService pagesService;
-
-    @MockBean
-    Authorization authorization;
 
     @Autowired
     MockMvc mockMvc;
@@ -57,9 +56,9 @@ public class PagesControllerTest {
         mockMvc.perform(get("/api/pages/get/personal?accountId=1").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.recipes[0]").value(response.getRecipes()))
-                .andExpect(jsonPath("$.stats.doneCount").value(response.getStats().getDone()))
-                .andExpect(jsonPath("$.stats.monday.isRecipe").value(response.getCalendar().get("monday").getIsRecipe()));
+                .andExpect(jsonPath("$.recipes.recipes[0]").value(response.getRecipes().getRecipes().get(0)))
+                .andExpect(jsonPath("$.stats.done").value(response.getStats().getDone()))
+                .andExpect(jsonPath("$.calendar.monday.isRecipe").value(response.getCalendar().get("monday").getIsRecipe()));
     }
 
     @Test
@@ -93,7 +92,7 @@ public class PagesControllerTest {
 
         mockMvc.perform(get("/api/pages/get/personal?accountId=2").with(csrf())
                         .with(user(account)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -126,7 +125,7 @@ public class PagesControllerTest {
 
         given(pagesService.getTodays(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/calendar?accountId=1&date=2022-12-12").with(csrf())
+        mockMvc.perform(get("/api/pages/get/todays?accountId=1").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipe.title").value(response.getRecipe().getTitle()))
@@ -162,7 +161,7 @@ public class PagesControllerTest {
 
         given(pagesService.getTodays(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/calendar").with(csrf())
+        mockMvc.perform(get("/api/pages/get/todays").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -196,7 +195,7 @@ public class PagesControllerTest {
 
         given(pagesService.getTodays(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/calendar?accountId=2&date=2022-12-12").with(csrf())
+        mockMvc.perform(get("/api/pages/get/todays?accountId=2").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }
