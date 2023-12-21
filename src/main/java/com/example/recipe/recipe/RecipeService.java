@@ -283,6 +283,14 @@ public class RecipeService {
         );
     }
 
+    /**
+     * Formats random recipes
+     * @return a ListRes of random recipes
+     */
+    public ListRes getRandom() {
+        List<ShortRecipe> recipes = recipeUtils.randomResults().getRecipes();
+        return new ListRes(recipes, false);
+    }
 
     /**
      * Gets the statistics of recipes for specified account.

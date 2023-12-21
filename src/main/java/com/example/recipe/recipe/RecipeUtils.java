@@ -63,4 +63,14 @@ public class RecipeUtils {
                 .bodyToMono(RecipeFormat.class)
                 .block();
     }
+
+    public RandomResponse randomResults() {
+        WebClient webClient = WebClient.create(request_url);
+
+        return webClient.get()
+                .uri("/random?apiKey="+apiKey+"&number=12")
+                .retrieve()
+                .bodyToMono(RandomResponse.class)
+                .block();
+    }
 }
