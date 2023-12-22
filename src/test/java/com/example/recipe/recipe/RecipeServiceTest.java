@@ -10,10 +10,6 @@ import com.example.recipe.category.Category;
 import com.example.recipe.category.CategoryRepository;
 import com.example.recipe.country.Country;
 import com.example.recipe.country.CountryRepository;
-import com.example.recipe.enums.Cuisine;
-import com.example.recipe.enums.Diet;
-import com.example.recipe.enums.Intolerance;
-import com.example.recipe.enums.Types;
 import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
@@ -27,6 +23,7 @@ import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.Unit;
 import com.example.recipe.unit.UnitRepository;
 import exceptions.BadRequestException;
+import exceptions.DatabaseException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,15 +37,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.swing.text.html.Option;
 import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
@@ -60,6 +60,7 @@ import static org.mockito.Mockito.verify;
 @ContextConfiguration(classes = {RecipeApplication.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 class RecipeServiceTest {
 
     @Mock
@@ -118,11 +119,11 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category(1, "test")),
-                Arrays.asList(new Type(1, "test")),
+                List.of(new Category(1, "test")),
+                List.of(new Type(1, "test")),
                 new Account(1, "test", "test", "test", "test"),
-                Arrays.asList(new Country(1, "test")),
-                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 1F))
+                List.of(new Country(1, "test")),
+                List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 1F))
         );
 
         testRecipeService.add(recipe);
@@ -146,11 +147,11 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -176,11 +177,11 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(), 12))
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -207,11 +208,11 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -239,11 +240,11 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -272,11 +273,11 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
@@ -306,15 +307,15 @@ class RecipeServiceTest {
                 false,
                 null,
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 new Account(),
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement(1, new Unit(), new Ingredient(), 12))
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(), new Ingredient(), 12))
         );
 
         assertThatThrownBy(() -> testRecipeService.add(recipe))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
@@ -346,7 +347,7 @@ class RecipeServiceTest {
         doThrow(new RuntimeException()).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.toggleFavourite(1))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
@@ -378,7 +379,7 @@ class RecipeServiceTest {
         doThrow(new RuntimeException()).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.toggleDoLater(1))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
@@ -409,7 +410,7 @@ class RecipeServiceTest {
         doThrow(new RuntimeException("error")).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.finishRecipe(1))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("error while saving to database");
     }
 
@@ -489,10 +490,10 @@ class RecipeServiceTest {
                         true,
                         true,
                         true,
-                        Arrays.asList("main course"),
-                        Arrays.asList("indian"),
-                        Arrays.asList("vegan"),
-                        Arrays.asList(new RecipeIngredients("test name", new Measures(new Metric(2, "tbsp"))))
+                        List.of("main course"),
+                        List.of("indian"),
+                        List.of("vegan"),
+                        List.of(new RecipeIngredients("test name", new Measures(new Metric(2, "tbsp"))))
                 ));
         RecipeRes res = testRecipeService.getSearchById(1);
 
@@ -604,7 +605,7 @@ class RecipeServiceTest {
 
     @Test
     void getFavouriteForAccountWorks() {
-        given(recipeRepository.getFavourite(anyInt(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
+        given(recipeRepository.getFavourite(anyInt(), any())).willReturn(List.of(new ListRecipeRes() {
             @Override
             public String getTitle() {
                 return "test";
@@ -630,7 +631,7 @@ class RecipeServiceTest {
 
     @Test
     void getDolaterForAccountWorks() {
-        given(recipeRepository.getDoLater(anyInt(), any())).willReturn(Arrays.asList(new ListRecipeRes() {
+        given(recipeRepository.getDoLater(anyInt(), any())).willReturn(List.of(new ListRecipeRes() {
             @Override
             public String getTitle() {
                 return "test";
@@ -671,11 +672,11 @@ class RecipeServiceTest {
                         true,
                         new Date(2022, 12, 12),
                         "test instructions",
-                        Arrays.asList(new Category()),
-                        Arrays.asList(new Type()),
+                        List.of(new Category()),
+                        List.of(new Type()),
                         new Account(),
-                        Arrays.asList(new Country(1, "test Country")),
-                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                        List.of(new Country(1, "test Country")),
+                        List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
                 );
         FullRecipeRes res = testRecipeService.getRecipe(1);
         verify(recipeRepository).findById(1);
@@ -708,11 +709,11 @@ class RecipeServiceTest {
                         true,
                         new Date(2022, 12, 12),
                         "test instructions",
-                        Arrays.asList(new Category()),
-                        Arrays.asList(new Type()),
+                        List.of(new Category()),
+                        List.of(new Type()),
                         new Account(),
-                        Arrays.asList(new Country(1, "test Country")),
-                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                        List.of(new Country(1, "test Country")),
+                        List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
                 );
         FullRecipeRes res = testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
 
@@ -727,7 +728,7 @@ class RecipeServiceTest {
         FullRecipeRes res = testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
 
         verify(recipeRepository).getByDate(1, new Date(2022, 12, 12));
-        assertEquals(null, res);
+        assertNull(res);
     }
 
     @Test
@@ -747,11 +748,11 @@ class RecipeServiceTest {
                         true,
                         new Date(2022, 12, 12),
                         "test instructions",
-                        Arrays.asList(new Category()),
-                        Arrays.asList(new Type()),
+                        List.of(new Category()),
+                        List.of(new Type()),
                         new Account(),
-                        Arrays.asList(new Country(1, "test Country")),
-                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                        List.of(new Country(1, "test Country")),
+                        List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
                 );
         Map<String, Day> res = testRecipeService.getCalendar(1);
         LocalDate today = LocalDate.now();
@@ -778,11 +779,11 @@ class RecipeServiceTest {
                         false,
                         new Date(2022, 12, 12),
                         "test instructions",
-                        Arrays.asList(new Category()),
-                        Arrays.asList(new Type()),
+                        List.of(new Category()),
+                        List.of(new Type()),
                         new Account(),
-                        Arrays.asList(new Country(1, "test Country")),
-                        Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
+                        List.of(new Country(1, "test Country")),
+                        List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
                 );
         Map<String, Day> res = testRecipeService.getCalendar(1);
         LocalDate today = LocalDate.now();
@@ -884,7 +885,7 @@ class RecipeServiceTest {
                 )));
         doThrow(new RuntimeException("error")).when(recipeRepository).deleteById(any());
         assertThatThrownBy(() ->  testRecipeService.delete(0))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("error while deleting from database");
 
         verify(recipeRepository).deleteById(0);

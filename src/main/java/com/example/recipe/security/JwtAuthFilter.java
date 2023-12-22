@@ -1,6 +1,5 @@
 package com.example.recipe.security;
 
-import com.example.recipe.security.JwtService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

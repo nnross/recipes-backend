@@ -41,7 +41,7 @@ class AccountControllerTest {
         );
         given(accountService.getAccount(anyInt())).willReturn(account);
 
-        mockMvc.perform(get("/api/account/get?accountId=1", 1).with(csrf())
+        mockMvc.perform(get("/account/get?accountId=1", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(account.getName()))
@@ -59,7 +59,7 @@ class AccountControllerTest {
                 "updatedPass",
                 "updatedEmail"
         );
-        mockMvc.perform(get("/api/account/get").with(csrf())
+        mockMvc.perform(get("/account/get").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -73,7 +73,7 @@ class AccountControllerTest {
                 "email",
                 "pass"
         );
-        mockMvc.perform(get("/api/account/get?accountId=2", 1).with(csrf())
+        mockMvc.perform(get("/account/get?accountId=2", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }
@@ -83,7 +83,7 @@ class AccountControllerTest {
 
         given(accountService.create(any())).willReturn(new AuthRes("token", 1));
 
-        mockMvc.perform(post("/api/account/create").with(csrf())
+        mockMvc.perform(post("/account/create").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -102,7 +102,7 @@ class AccountControllerTest {
 
     @Test
     void addAccountThrowsWithNoItemGiven() throws Exception {
-        mockMvc.perform(post("/api/account/create").with(csrf())
+        mockMvc.perform(post("/account/create").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("")
                         .with(user(new Account())))
@@ -112,7 +112,7 @@ class AccountControllerTest {
     @Test
     void loginWorks() throws Exception {
         given(accountService.login(any())).willReturn(new AuthRes("token", 1));
-        mockMvc.perform(post("/api/account/login").with(csrf())
+        mockMvc.perform(post("/account/login").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -129,7 +129,7 @@ class AccountControllerTest {
     @Test
     void loginThrowsWithNoItem() throws Exception {
         given(accountService.login(any())).willReturn(new AuthRes("token", 1));
-        mockMvc.perform(post("/api/account/login").with(csrf())
+        mockMvc.perform(post("/account/login").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("")
                         .with(user(new Account())))
@@ -148,7 +148,7 @@ class AccountControllerTest {
 
         given(accountService.update(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(put("/api/account/update?accountId=1", 1).with(csrf())
+        mockMvc.perform(put("/account/update?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -172,7 +172,7 @@ class AccountControllerTest {
                 "updatedPass"
         );
 
-        mockMvc.perform(put("/api/account/update").with(csrf())
+        mockMvc.perform(put("/account/update").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -196,7 +196,7 @@ class AccountControllerTest {
                 "updatedPass"
         );
 
-        mockMvc.perform(put("/api/account/update?accountId=1", 1).with(csrf())
+        mockMvc.perform(put("/account/update?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("")
                         .with(user(account)))
@@ -213,7 +213,7 @@ class AccountControllerTest {
                 "updatedEmail"
         );
 
-        mockMvc.perform(put("/api/account/update?accountId=2").with(csrf())
+        mockMvc.perform(put("/account/update?accountId=2").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -238,7 +238,7 @@ class AccountControllerTest {
                 "updatedPass"
         );
         given(accountService.delete(anyInt())).willReturn(true);
-        mockMvc.perform(delete("/api/account/delete?accountId=1", 1).with(csrf())
+        mockMvc.perform(delete("/account/delete?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user(account)))
                 .andExpect(status().isOk())
@@ -255,7 +255,7 @@ class AccountControllerTest {
                 "updatedPass"
         );
         given(accountService.delete(anyInt())).willReturn(false);
-        mockMvc.perform(delete("/api/account/delete?accountId=1", 1).with(csrf())
+        mockMvc.perform(delete("/account/delete?accountId=1", 1).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user(account)))
                 .andExpect(status().isOk())
@@ -272,7 +272,7 @@ class AccountControllerTest {
                 "updatedPass"
         );
         given(accountService.delete(anyInt())).willReturn(true);
-        mockMvc.perform(delete("/api/account/delete").with(csrf())
+        mockMvc.perform(delete("/account/delete").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -287,7 +287,7 @@ class AccountControllerTest {
                 "updatedPass"
         );
         given(accountService.delete(anyInt())).willReturn(true);
-        mockMvc.perform(delete("/api/account/delete?accountId=2").with(csrf())
+        mockMvc.perform(delete("/account/delete?accountId=2").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }

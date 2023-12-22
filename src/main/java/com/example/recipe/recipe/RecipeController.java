@@ -1,37 +1,32 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.account.Account;
-import com.example.recipe.account.AccountService;
 import com.example.recipe.response.FullRecipeRes;
 import com.example.recipe.response.ListRes;
 import com.example.recipe.response.RecipeRes;
-import com.example.recipe.response.StatRes;
-import com.example.recipe.security.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Controller for recipe calls
  */
 @RestController
-@RequestMapping("/api/recipe")
+@RequestMapping("/recipe")
 public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
 
     /**
-     * POST API call to /api/recipe/add
+     * POST API call to /recipe/add
      * with recipe in body
      * Adds a recipe to the database
+     * Authorization with addRecipeIsOwn().
      * @param recipe
-     *       New recipe as a Recipe object
-     * @return true if successful.
+     *        New recipe as a Recipe object
+     * @return true if successful, error otherwise.
      */
     @PreAuthorize("@authorization.addRecipeIsOwn(authentication, #recipe)")
     @PostMapping("/add")
@@ -40,46 +35,53 @@ public class RecipeController {
     }
 
     /**
-     * PUT API call to /api/recipe/favourite?recipeId=(id)
-     * Toggles the favourite on the selected recipe
+     * PUT API call to /recipe/favourite?recipeId=(id)
+     * Toggles favourite on the selected recipe
+     * Authorization with isOwnRecipe()
      * @param recipeId
      *        id of recipe to be changed
-     * @return true if successful.
+     * @return true if successful, error otherwise.
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
-    @PutMapping("/favourite")
+    @PutMapping("/set/favourite")
     public Boolean favourite(@RequestParam("recipeId") int recipeId) {
         return recipeService.toggleFavourite(recipeId);
     }
 
     /**
-     * PUT API call to /api/recipe/doLater?recipeId=(id)
-     * Toggles the doLater on the selected recipe
+     * PUT API call to /recipe/doLater?recipeId=(id)
+     * Toggles doLater on the selected recipe
+     * Authorization with isOwnRecipe()
      * @param recipeId
      *        id of recipe to be changed
-     * @return true if successful.
+     * @return true if successful, error otherwise.
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
-    @PutMapping("/doLater")
+    @PutMapping("/set/doLater")
     public Boolean doLater(@RequestParam("recipeId") int recipeId) {
         return recipeService.toggleDoLater(recipeId);
     }
 
     /**
-     * PUT API call to /api/recipe/finished?recipeId=(id)
+     * PUT API call to /recipe/finished?recipeId=(id)
+     * Sets recipe as finished.
+     * Authorization with isOwnRecipe()
      * @param recipeId
      *        id of the recipe to be marked as finished
-     * @return true if successful
+     * @return true if successful, error otherwise.
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
-    @PutMapping("/finished")
+    @PutMapping("/set/finished")
     public Boolean finished(@RequestParam("recipeId") int recipeId) {
         return recipeService.finishRecipe(recipeId);
     }
 
     /**
-     * GET API call to /api/recipe/get/api/search
-     * Gets the parameters from the url for search
+     * GET API call to /recipe/get/api/search
+     *         ?search=(search)?ingredients=(ingredients)?cuisine=(cuisine)?diet=(diet)?intolerances=(intolerances)
+     *         ?type=(type)?sort=(sort)?sortDirection=(sortDirection)?page=(page)
+     * If multiple filters then divide with comma for example diets=vegan,vegetarian.
+     * Searches with the API for the recipe and returns list of results.
      * @param search
      *        Recipes to get from the API
      * @param ingredients
@@ -98,7 +100,7 @@ public class RecipeController {
      *        Ascending or descending
      * @param page
      *        Keeps track of the page showing the results
-     * @return RecipeService getSearch with all parameters from url
+     * @return List of results from API and if there is more results.
      */
     @GetMapping("/get/api/search")
     public ListRes search(@RequestParam("search") String search,
@@ -114,10 +116,11 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/api/id
+     * GET API call to /recipe/get/api/id=(id)
+     * Gets the recipe with id from the API.
      * @param id
      *       id of the recipe wanted
-     * @return RecipeService getSearchById with id from url
+     * @return Recipe from the API.
      */
     @GetMapping("/get/api/id")
     public RecipeRes searchById(@RequestParam("id") int id) {
@@ -125,14 +128,15 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/api/random
-     * @return random 12 recipes
+     * GET API call to /recipe/get/api/random
+     * Gets 12 random recipes from the API.
+     * @return 12 random recipes
      */
     @GetMapping("/get/api/random")
     public ListRes getRandom() { return recipeService.getRandom(); }
 
     /**
-     * GET API call to /api/recipe/get/favourite?accountId=(id)&page=(page)
+     * GET API call to /recipe/get/favourite?accountId=(id)&page=(page)
      * Gets favourite recipes for account with selected page.
      * @param accountId
      *        id of account to be searched for
@@ -147,7 +151,7 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/doLater?accountId=(id)&page=(page)
+     * GET API call to /recipe/get/doLater?accountId=(id)&page=(page)
      * Gets doLater recipes for account with selected page.
      * @param accountId
      *        id of account to be searched for
@@ -162,11 +166,11 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/recipe?recipeId=(id)
-     * Gets recipe with specified ID.
+     * GET API call to /recipe/get/recipe?recipeId=(id)
+     * Gets recipe with specified ID from the database.
      * @param recipeId
      *        id of recipe to be searched for.
-     * @return Found recipe.
+     * @return Recipe from the database.
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
     @GetMapping("/get/db")
@@ -175,13 +179,13 @@ public class RecipeController {
     }
 
     /**
-     * GET API call to /api/recipe/get/date?accountId=(id)&data=(date)
+     * GET API call to /recipe/get/date?accountId=(id)&data=(date)
      * Gets recipe for specified date.
      * @param accountId
      *        id of account that is searching
      * @param date
      *        date of recipe we want
-     * @return Found recipe.
+     * @return Found recipe. If no recipe for date then just null.
      */
     @PreAuthorize("#accountId == authentication.principal.id")
     @GetMapping("/get/date")
@@ -191,9 +195,10 @@ public class RecipeController {
 
     /**
      * DELETE API call to /api/recipe/del?recipeId=(id)
+     * Deletes recipe with ID from the database.
      * @param recipeId
-     *        Recipe of the recipe to be deleted
-     * @return true if successful
+     *        id of the recipe to be deleted
+     * @return true if successful, error otherwise.
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
     @DeleteMapping("/del")

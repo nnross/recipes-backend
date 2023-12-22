@@ -1,12 +1,11 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
-import com.example.recipe.account.AccountRepository;
 import com.example.recipe.security.JwtService;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +19,12 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.io.IOException;
-import java.util.List;
-
-import static junit.framework.TestCase.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties="secret.key=cHJvcGVydHlzdWJzdGFuY2V3aXRocmlkaW5nZ3JlYXRhcnRpY2xld2l0aGluZGlzYXA")
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class RecipeIntegrationTest {
+@SuppressWarnings("unused")
+class RecipeIntegrationTest {
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -65,7 +62,7 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/recipe/get/db?recipeId=1")
+        webClient.get().uri("/recipe/get/db?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -596,7 +593,7 @@ public class RecipeIntegrationTest {
                         )
         );
 
-        webClient.get().uri("/api/recipe/get/api/id?id=1")
+        webClient.get().uri("/recipe/get/api/id?id=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -655,7 +652,7 @@ public class RecipeIntegrationTest {
                         )
         );
 
-        webClient.get().uri("/api/recipe/get/api/search?search=pasta&ingredients=&cuisine=&diet=&intolerances=&type=&sort=&sortDirection=&page=0")
+        webClient.get().uri("/recipe/get/api/search?search=pasta&ingredients=&cuisine=&diet=&intolerances=&type=&sort=&sortDirection=&page=0")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -678,7 +675,7 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/recipe/get/favourite?accountId=1&page=0")
+        webClient.get().uri("/recipe/get/favourite?accountId=1&page=0")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -696,7 +693,7 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/recipe/get/doLater?accountId=1&page=0")
+        webClient.get().uri("/recipe/get/doLater?accountId=1&page=0")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -714,7 +711,7 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/recipe/get/date?accountId=1&date=2022-12-12")
+        webClient.get().uri("/recipe/get/date?accountId=1&date=2022-12-12")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -741,7 +738,7 @@ public class RecipeIntegrationTest {
     @Test
     void favouriteRecipeWorks() {
         Recipe recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(false, recipe.getFavourite().booleanValue());
+        Assertions.assertFalse(recipe.getFavourite());
         Account account = new Account(
                 1,
                 "test username",
@@ -750,19 +747,19 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.put().uri("/api/recipe/favourite?recipeId=1")
+        webClient.put().uri("/recipe/set/favourite?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
 
         recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(true, recipe.getFavourite().booleanValue());
+        Assertions.assertTrue(recipe.getFavourite());
 
     }
     @Test
     void doLaterRecipeWorks() {
         Recipe recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(false, recipe.getDoLater().booleanValue());
+        Assertions.assertFalse(recipe.getDoLater());
         Account account = new Account(
                 1,
                 "test username",
@@ -771,18 +768,18 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.put().uri("/api/recipe/doLater?recipeId=1")
+        webClient.put().uri("/recipe/set/doLater?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
 
         recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(true, recipe.getDoLater().booleanValue());
+        Assertions.assertTrue(recipe.getDoLater());
     }
     @Test
     void finishRecipeWorks() {
         Recipe recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(recipe.getFinished().booleanValue(), false);
+        Assertions.assertFalse(recipe.getFinished());
         Account account = new Account(
                 1,
                 "test username",
@@ -791,13 +788,13 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.put().uri("/api/recipe/finished?recipeId=1")
+        webClient.put().uri("/recipe/set/finished?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
 
         recipe = recipeRepository.findById(1).orElse(null);
-        assertEquals(recipe.getFinished().booleanValue(), true);
+        Assertions.assertTrue(recipe.getFinished());
     }
     @Test
     void deleteRecipeWorks() {
@@ -810,12 +807,12 @@ public class RecipeIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.delete().uri("/api/recipe/del?recipeId=1")
+        webClient.delete().uri("/recipe/del?recipeId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk();
 
-        assertEquals(res - 1, recipeRepository.findAll().size());
+        Assertions.assertEquals(res - 1, recipeRepository.findAll().size());
     }
     @Test
     void addRecipeWorks() {
@@ -828,7 +825,7 @@ public class RecipeIntegrationTest {
         );
         String token = jwtService.newToken(account);
         int res = recipeRepository.findAll().size();
-        webClient.post().uri("/api/recipe/add")
+        webClient.post().uri("/recipe/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(http -> http.setBearerAuth(token))
                 .bodyValue(
@@ -864,7 +861,7 @@ public class RecipeIntegrationTest {
                 .exchange()
                 .expectStatus().isOk();
 
-        assertEquals(recipeRepository.findAll().size(), res + 1);
+        Assertions.assertEquals(recipeRepository.findAll().size(), res + 1);
     }
 
     @Test
@@ -1766,7 +1763,7 @@ public class RecipeIntegrationTest {
                         )
         );
 
-        webClient.get().uri("/api/recipe/get/api/random")
+        webClient.get().uri("/recipe/get/api/random")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()

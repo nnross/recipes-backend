@@ -6,10 +6,8 @@ import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
 import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.measurement.Measurement;
-import com.example.recipe.recipe.Day;
 import com.example.recipe.recipe.Recipe;
 import com.example.recipe.recipe.RecipeRepository;
-import com.example.recipe.recipe.RecipeService;
 import com.example.recipe.security.JwtService;
 import com.example.recipe.type.Type;
 import com.example.recipe.unit.Unit;
@@ -22,12 +20,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties="secret.key=cHJvcGVydHlzdWJzdGFuY2V3aXRocmlkaW5nZ3JlYXRhcnRpY2xld2l0aGluZGlzYXA")
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PagesIntegrationTest {
+@SuppressWarnings("unused")
+class PagesIntegrationTest {
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -49,7 +48,7 @@ public class PagesIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/pages/get/personal?accountId=1")
+        webClient.get().uri("/pages/get/personal?accountId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -82,15 +81,15 @@ public class PagesIntegrationTest {
                 false,
                 Date.valueOf(LocalDate.now()),
                 "test instructions",
-                Arrays.asList(new Category(1, "test")),
-                Arrays.asList(new Type(1, "test")),
+                List.of(new Category(1, "test")),
+                List.of(new Type(1, "test")),
                 new Account(1, "test", "test", "test", "test"),
-                Arrays.asList(new Country(1, "test")),
-                Arrays.asList(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 1F))
+                List.of(new Country(1, "test")),
+                List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 1F))
         ));
 
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/pages/get/todays?accountId=1")
+        webClient.get().uri("/pages/get/todays?accountId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()

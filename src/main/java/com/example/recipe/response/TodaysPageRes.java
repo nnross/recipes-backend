@@ -5,8 +5,9 @@ import com.example.recipe.recipe.Day;
 import java.util.Map;
 
 /**
- * Class to return todays page data.
+ * Class to return today's page data.
  */
+@SuppressWarnings("unused")
 public class TodaysPageRes {
     FullRecipeRes recipe;
     Map<String, Day> calendar;

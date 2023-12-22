@@ -3,12 +3,12 @@ package com.example.recipe.response;
 import com.example.recipe.recipe.Day;
 import com.example.recipe.recipe.RecipeStats;
 
-import java.util.List;
 import java.util.Map;
 
 /**
  * Class to return personal page data.
  */
+@SuppressWarnings("unused")
 public class PersonalPageRes {
     private ListRes recipes;
     private RecipeStats stats;

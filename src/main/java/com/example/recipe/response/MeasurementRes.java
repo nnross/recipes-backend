@@ -3,6 +3,7 @@ package com.example.recipe.response;
 /**
  * Formats measurements for return as wanted
  */
+@SuppressWarnings("unused")
 public class MeasurementRes {
     private String name;
     private float amount;

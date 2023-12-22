@@ -5,6 +5,7 @@ import java.util.List;
 /**
  * Formats recipe from API
  */
+@SuppressWarnings("unused")
 public class RecipeFormat {
     private int id;
     private String title;

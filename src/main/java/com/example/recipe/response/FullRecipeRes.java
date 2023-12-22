@@ -3,6 +3,10 @@ package com.example.recipe.response;
 import java.sql.Date;
 import java.util.List;
 
+/**
+ * Full recipe as returnable.
+ */
+@SuppressWarnings("unused")
 public class FullRecipeRes {
     private int id;
     private String title;

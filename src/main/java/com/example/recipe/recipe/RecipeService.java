@@ -10,12 +10,12 @@ import com.example.recipe.country.CountryRepository;
 import com.example.recipe.enums.*;
 import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
-import com.example.recipe.measurement.MeasurementRepository;
 import com.example.recipe.response.*;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.UnitRepository;
 import com.example.recipe.type.Type;
 import exceptions.BadRequestException;
+import exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -53,16 +53,13 @@ public class RecipeService {
     private TypeRepository typeRepository;
 
     @Autowired
-    private MeasurementRepository measurementRepository;
-
-    @Autowired
     private RecipeUtils recipeUtils;
 
     /**
      * Adds a recipe to the database.
      * @param recipe
      *        Recipe to be added
-     * @return true if successful.
+     * @return true if successful, error otherwise.
      */
     public Boolean add(Recipe recipe) {
         for (Measurement measurement : recipe.getMeasurements()) {
@@ -91,7 +88,7 @@ public class RecipeService {
             recipeRepository.save(recipe);
         }
         catch (Exception e) {
-            throw new BadRequestException("error while saving to database");
+            throw new DatabaseException("error while saving to database");
         }
         return true;
     }
@@ -100,7 +97,7 @@ public class RecipeService {
      * Toggles the favourite on the selected recipe
      * @param recipeId
      *        Recipe to be toggled.
-     * @return true if successful
+     * @return true if successful, error otherwise.
      */
     public Boolean toggleFavourite(int recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
@@ -111,7 +108,7 @@ public class RecipeService {
             recipeRepository.save(recipe);
         }
         catch (Exception e) {
-            throw new RuntimeException("error while saving to database");
+            throw new DatabaseException("error while saving to database");
         }
         return true;
     }
@@ -120,7 +117,7 @@ public class RecipeService {
      * Toggles the doLater on the selected recipe
      * @param recipeId
      *        Recipe to be toggled.
-     * @return true if successful
+     * @return true if successful, error otherwise
      */
     public Boolean toggleDoLater(int recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
@@ -131,7 +128,7 @@ public class RecipeService {
             recipeRepository.save(recipe);
         }
         catch (Exception e) {
-            throw new RuntimeException("error while saving to database");
+            throw new DatabaseException("error while saving to database");
         }
         return true;
     }
@@ -140,7 +137,7 @@ public class RecipeService {
      * Marks the selected recipe as finished
      * @param recipeId
      *        Recipe to be marked as finished
-     * @return true if successful
+     * @return true if successful, error otherwise.
      */
     public Boolean finishRecipe(int recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
@@ -151,14 +148,13 @@ public class RecipeService {
             recipeRepository.save(recipe);
         }
         catch (Exception e) {
-            throw new RuntimeException("error while saving to database");
+            throw new DatabaseException("error while saving to database");
         }
         return true;
     }
 
     /**
-     * Checks that filters and sort are correct
-     * and keeps track of page
+     * Searches the API for results with selected filters.
      * @param search
      *        Recipes to get from the API
      * @param ingredients
@@ -177,54 +173,63 @@ public class RecipeService {
      *        Ascending or descending
      * @param page
      *        Keeps track of the page showing the results
-     * @return ListRes of recipe
+     * @return ListRes of recipes
      */
-    public ListRes getSearch(String search, String ingredients, String cuisine, String diet, String intolerances, String type, String sort, String sortDirection, int page) {
+    public ListRes getSearch(
+            String search,
+            String ingredients,
+            String cuisine,
+            String diet,
+            String intolerances,
+            String type,
+            String sort,
+            String sortDirection,
+            int page) {
         if(!ingredients.isEmpty()){
             try {
-                Ingredient ingredient = Ingredient.valueOf(ingredients.toUpperCase());
+                Ingredient.valueOf(ingredients.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid ingredient filter");
             }
         }
         if(!cuisine.isEmpty()){
             try {
-                Cuisine cuisines = Cuisine.valueOf(cuisine.toUpperCase());
+                Cuisine.valueOf(cuisine.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid cuisine filter");
             }
         }
         if(!diet.isEmpty()){
             try {
-                Diet diets = Diet.valueOf(diet.toUpperCase().replaceAll(" ", "_"));
+                Diet.valueOf(diet.toUpperCase().replace(" ", "_"));
             } catch (Exception e) {
                 throw new BadRequestException("invalid diet filter");
             }
         }
         if(!intolerances.isEmpty()){
             try {
-                Intolerance intolerance = Intolerance.valueOf(intolerances.toUpperCase());
+                Intolerance.valueOf(intolerances.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid intolerance filter");
             }
         }
         if(!type.isEmpty()){
             try {
-                Types types = Types.valueOf(type.toUpperCase().replaceAll(" ", "_"));
+                Types.valueOf(type.toUpperCase().replace(" ", "_"));
             } catch (Exception e) {
                 throw new BadRequestException("invalid type filter");
             }
         }
         if(!sort.isEmpty()){
             try {
-                Sort sorts = Sort.valueOf(sort.toUpperCase());
+                Sort.valueOf(sort.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid sort");
             }
         }
         if(!sortDirection.isEmpty()){
             try {
-                SortDirection sortDirections = SortDirection.valueOf(sortDirection.toUpperCase());
+                SortDirection.valueOf(sortDirection.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid sort direction");
             }
@@ -232,13 +237,13 @@ public class RecipeService {
         int offset = page*12;
         List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, offset).getResults();
         return new ListRes(recipes, true);
-    };
+    }
 
     /**
-     * Formats ingredients correctly
+     * Searches the API with id.
      * @param id
-     *       Id of the recipe wanted
-     * @return Recipe as RecipeRes
+     *        id of the recipe wanted
+     * @return Found recipe as RecipeRes
      */
     public RecipeRes getSearchById(int id) {
         RecipeFormat res = recipeUtils.getRecipeById(id);
@@ -284,7 +289,7 @@ public class RecipeService {
     }
 
     /**
-     * Formats random recipes
+     * Gets random recipes from the API.
      * @return a ListRes of random recipes
      */
     public ListRes getRandom() {
@@ -296,7 +301,7 @@ public class RecipeService {
      * Gets the statistics of recipes for specified account.
      * @param accountId
      *        id of the account we want stats for.
-     * @return The stats in RecipeStats foramat
+     * @return The stats in RecipeStats format
      */
     public RecipeStats getStats(int accountId) {
         RecipeStats res = new RecipeStats();
@@ -332,7 +337,7 @@ public class RecipeService {
         return new ListRes(recipeRepository.getFavourite(
                 accountId, pageRequest),
                 !recipeRepository.getFavourite(accountId, nextPageRequest).isEmpty());
-    };
+    }
 
     /**
      * Gets doLater recipes with page from database.
@@ -352,11 +357,11 @@ public class RecipeService {
         return new ListRes(
                 recipeRepository.getDoLater(accountId, pageRequest),
                 !recipeRepository.getDoLater(accountId, nextPageRequest).isEmpty());
-    };
+    }
 
 
     /**
-     * Gets recipe from the database.
+     * Gets recipe from the database with id.
      * @param recipeId
      *        id of the recipe we want to search.
      * @return found recipe.
@@ -383,7 +388,7 @@ public class RecipeService {
             recipeRepository.deleteById(id);
         }
         catch (Exception e) {
-            throw new RuntimeException("error while deleting from database");
+            throw new DatabaseException("error while deleting from database");
         }
         return true;
     }
@@ -394,7 +399,7 @@ public class RecipeService {
      *        id of account of recipe
      * @param date
      *        Wanted date of recipe
-     * @return recipe that matches the date.
+     * @return recipe that matches the date. If no recipe return null.
      */
     public FullRecipeRes getRecipeForDate(int accountId, Date date) {
         Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
@@ -405,30 +410,23 @@ public class RecipeService {
     /**
      * Gets weekly calendar for account
      * @param accountId
-     *        Id of the account
+     *        id of the account
      * @return Map of weekdays and Day objects
      */
     public Map<String, Day> getCalendar(int accountId) {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        Map<String, Day> weeklyCalendar = new HashMap<String, Day>();
+        Map<String, Day> weeklyCalendar = new HashMap<>();
         boolean isRecipe;
         boolean isFinished;
         for (int i = 0; i < 7; i++) {
             LocalDate currentDate = monday.plusDays(i);
             Date date = Date.valueOf(currentDate);
-            try {
-                Optional<Recipe> recipe = recipeRepository.getByDate(accountId, date);
-                isRecipe = true;
-                if (recipe.get().getFinished()) {
-                    isFinished = true;
-                } else {
-                    isFinished = false;
-                }
-            } catch(Exception e) {
-                isRecipe = false;
-                isFinished = false;
-            }
+
+            Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
+            isRecipe = recipe != null;
+            isFinished = recipe != null && recipe.getFinished();
+            
             Day day = new Day(currentDate, accountId, isRecipe, isFinished);
             weeklyCalendar.put(currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()), day);
         }

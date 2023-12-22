@@ -3,12 +3,13 @@ package com.example.recipe.pages;
 import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
 import com.example.recipe.account.AccountRepository;
-import com.example.recipe.recipe.*;
+import com.example.recipe.recipe.Day;
+import com.example.recipe.recipe.RecipeRepository;
+import com.example.recipe.recipe.RecipeService;
+import com.example.recipe.recipe.RecipeStats;
 import com.example.recipe.response.FullRecipeRes;
 import com.example.recipe.response.ListRes;
-import com.example.recipe.response.StatRes;
 import com.example.recipe.security.JwtService;
-import com.example.recipe.unit.Unit;
 import exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,7 +38,8 @@ import static org.mockito.Mockito.verify;
 @ContextConfiguration(classes = {RecipeApplication.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ExtendWith(MockitoExtension.class)
-public class PagesServiceTest {
+@SuppressWarnings("unused")
+class PagesServiceTest {
 
     @Mock
     private RecipeRepository recipeRepository;
@@ -68,7 +69,7 @@ public class PagesServiceTest {
         given(recipeService.getCalendar(anyInt())).willReturn(calendar);
         given(recipeService.getStats(anyInt())).willReturn(new RecipeStats());
 
-        given(recipeService.getFavourite(anyInt(), anyInt())).willReturn(new ListRes(Arrays.asList("test"), false));
+        given(recipeService.getFavourite(anyInt(), anyInt())).willReturn(new ListRes(List.of("test"), false));
 
         testPagesService.getPersonal(1);
 

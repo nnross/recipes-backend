@@ -10,17 +10,18 @@ import org.springframework.web.bind.annotation.*;
  * Controller for the account calls.
  */
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/account")
 public class AccountController {
 
     @Autowired
     private AccountService accountService;
 
     /**
-     * API GET call to /api/account/get?accountId=(id)
+     * API GET call to /account/get?accountId=(id)
      * Takes an id and returns an account with that id.
+     * Authorization with accountId being same as in context.
      * @param id
-     *        Id of the account wanted
+     *        id of the account wanted
      * @return the account with the given id
      */
     @PreAuthorize("#id == authentication.principal.id")
@@ -30,7 +31,7 @@ public class AccountController {
     }
 
     /**
-     * API POST call to /api/account/login
+     * API POST call to /account/login
      * with account in body
      * Calls the AccountService to log in the user.
      * @param request
@@ -43,34 +44,36 @@ public class AccountController {
     }
 
     /**
-     * POST API call to /api/account/create
+     * POST API call to /account/create
      * with account in body
      * Creates a new account
      * @param account
-     *       New account's name, username, email and password
+     *        New account's name, username, email and password
      * @return AuthRes with token and account id
      */
     @PostMapping("/create")
     public AuthRes create(@RequestBody Account account) { return accountService.create(account); }
 
     /**
-     * API DELETE call to /api/account/delete?accountId=(id)
+     * API DELETE call to /account/delete?accountId=(id)
+     * Authorization with accountId is same as in context
      * @param id
-     *       Id of the account to be deleted
-     * @return true if deleted, false if failed
+     *       id of the account to be deleted
+     * @return true if deleted, error otherwise.
      */
     @PreAuthorize("#id == authentication.principal.id")
     @DeleteMapping("/delete")
     public Boolean delete(@RequestParam("accountId") int id) { return accountService.delete(id); }
 
     /**
-     * API PUT call to /api/account/update
+     * API PUT call to /account/update?accountId=(id)
      * with account in body
+     * Authorization with accountId being same as in context.
      * @param account
-     *       Updated account name, username, email, password
+     *        Updated account name, username, email, password
      * @param id
-     *       Id of the account being updated
-     * @return true id updated, false if failed
+     *        id of the account being updated
+     * @return true if updated, otherwise error.
      */
     @PreAuthorize("#id == authentication.principal.id")
     @PutMapping("/update")

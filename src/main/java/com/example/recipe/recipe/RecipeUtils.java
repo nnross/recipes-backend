@@ -17,7 +17,7 @@ public class RecipeUtils {
     String request_url;
 
     /**
-     * Makes the get call to the API
+     * Gets search results from the API.
      * @param search
      *        Recipes to get from the API
      * @param ingredients
@@ -49,10 +49,10 @@ public class RecipeUtils {
     }
 
     /**
-     * Makes the get call to the API for one recipe by id
+     * Gets recipe by id from the API.
      * @param id
-     *        Id of the recipe wanted
-     * @return Data for recipe by id as RecipeFormat
+     *        id of the recipe wanted
+     * @return Data for recipe as RecipeFormat
      */
     public RecipeFormat getRecipeById(int id) {
         WebClient webClient = WebClient.create(request_url);
@@ -64,6 +64,10 @@ public class RecipeUtils {
                 .block();
     }
 
+    /**
+     * Gets 12 random recipes from the API.
+     * @return 12 random recipes as RandomResponse.
+     */
     public RandomResponse randomResults() {
         WebClient webClient = WebClient.create(request_url);
 

@@ -10,12 +10,10 @@ import com.example.recipe.measurement.Measurement;
 import com.example.recipe.response.StatRes;
 import com.example.recipe.type.Type;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest()
 @ContextConfiguration(classes = RecipeApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class RecipeRepositoryTest {
+class RecipeRepositoryTest {
 
     @Autowired
     private RecipeRepository testRecipeRepository;
@@ -59,11 +57,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
@@ -94,11 +92,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
@@ -129,15 +127,14 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
-        PageRequest page = PageRequest.of(0, 4);
 
         Recipe foundEntity = testRecipeRepository.getByDate(account.getId(), new Date(2022, 12, 12)).orElse(null);
         Recipe foundNoneEntity = testRecipeRepository.getByDate(0, new Date(2020, 10, 12)).orElse(null);
@@ -165,11 +162,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(country),
-                Arrays.asList(new Measurement())
+                Collections.singletonList(country),
+                List.of(new Measurement())
         );
         Recipe recipe2 = new Recipe(
                 2,
@@ -185,11 +182,11 @@ public class RecipeRepositoryTest {
                 true,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(country2),
-                Arrays.asList(new Measurement())
+                Collections.singletonList(country2),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
@@ -223,11 +220,11 @@ public class RecipeRepositoryTest {
                 true,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
         Recipe recipe2 = new Recipe(
                 2,
@@ -243,11 +240,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
@@ -255,7 +252,6 @@ public class RecipeRepositoryTest {
 
         int foundEntity = testRecipeRepository.getDoneCount(account.getId()).orElse(null);
         int foundNoneEntity = testRecipeRepository.getDoneCount(0).orElse(null);
-        assertNotNull(foundEntity);
         assertEquals(1, foundEntity);
         assertEquals(0, foundNoneEntity);
     }
@@ -277,11 +273,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
         Recipe recipe2 = new Recipe(
                 2,
@@ -297,11 +293,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
@@ -309,7 +305,6 @@ public class RecipeRepositoryTest {
 
         int foundEntity = testRecipeRepository.getFavouriteCount(account.getId()).orElse(null);
         int foundNoneEntity = testRecipeRepository.getFavouriteCount(0).orElse(null);
-        assertNotNull(foundEntity);
         assertEquals(1, foundEntity);
         assertEquals(0, foundNoneEntity);
     }
@@ -331,11 +326,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
         Recipe recipe2 = new Recipe(
                 2,
@@ -351,11 +346,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);
@@ -363,7 +358,6 @@ public class RecipeRepositoryTest {
 
         int foundEntity = testRecipeRepository.getDoLaterCount(account.getId()).orElse(null);
         int foundNoneEntity = testRecipeRepository.getDoLaterCount(0).orElse(null);
-        assertNotNull(foundEntity);
         assertEquals(1, foundEntity);
         assertEquals(0, foundNoneEntity);
     }
@@ -385,11 +379,11 @@ public class RecipeRepositoryTest {
                 false,
                 new Date(2022, 12, 12),
                 "test instructions",
-                Arrays.asList(new Category()),
-                Arrays.asList(new Type()),
+                List.of(new Category()),
+                List.of(new Type()),
                 account,
-                Arrays.asList(new Country()),
-                Arrays.asList(new Measurement())
+                List.of(new Country()),
+                List.of(new Measurement())
         );
 
         testRecipeRepository.save(recipe);

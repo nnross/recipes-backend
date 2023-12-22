@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Creates the recipe entity for the database.
  */
+@SuppressWarnings("unused")
 @Entity
 @Table(name="recipe")
 public class Recipe {

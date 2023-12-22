@@ -2,27 +2,22 @@ package com.example.recipe.pages;
 
 import com.example.recipe.account.Account;
 import com.example.recipe.recipe.Day;
-import com.example.recipe.recipe.RecipeController;
-import com.example.recipe.recipe.RecipeService;
 import com.example.recipe.recipe.RecipeStats;
 import com.example.recipe.response.*;
-import com.example.recipe.security.Authorization;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -34,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value= PagesController.class)
 @ContextConfiguration(classes = PagesController.class)
 @EnableMethodSecurity
-public class PagesControllerTest {
+class PagesControllerTest {
     @MockBean
     PagesService pagesService;
 
@@ -43,7 +38,7 @@ public class PagesControllerTest {
 
     @Test
     void getPersonalPageWorks() throws Exception {
-        ListRes recipes = new ListRes(Arrays.asList("recipe"), false);
+        ListRes recipes = new ListRes(List.of("recipe"), false);
         RecipeStats stats = new RecipeStats(null, 2, 5, 10);
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
@@ -53,7 +48,7 @@ public class PagesControllerTest {
 
         given(pagesService.getPersonal(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/personal?accountId=1").with(csrf())
+        mockMvc.perform(get("/pages/get/personal?accountId=1").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipes.recipes[0]").value(response.getRecipes().getRecipes().get(0)))
@@ -63,7 +58,7 @@ public class PagesControllerTest {
 
     @Test
     void getPersonalPageThrowsWithNoParams() throws Exception {
-        ListRes recipes = new ListRes(Arrays.asList("recipe"), false);
+        ListRes recipes = new ListRes(List.of("recipe"), false);
         RecipeStats stats = new RecipeStats(null, 2, 5, 10);
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
@@ -73,14 +68,14 @@ public class PagesControllerTest {
 
         given(pagesService.getPersonal(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/personal").with(csrf())
+        mockMvc.perform(get("/pages/get/personal").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void getPersonalPageThrowsWithNotOwnAccount() throws Exception {
-        ListRes recipes = new ListRes(Arrays.asList("recipe"), false);
+        ListRes recipes = new ListRes(List.of("recipe"), false);
         RecipeStats stats = new RecipeStats(null, 2, 5, 10);
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
@@ -90,7 +85,7 @@ public class PagesControllerTest {
 
         given(pagesService.getPersonal(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/personal?accountId=2").with(csrf())
+        mockMvc.perform(get("/pages/get/personal?accountId=2").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }
@@ -112,10 +107,10 @@ public class PagesControllerTest {
                 true,
                 false,
                 new Date(2022,12,12),
-                Arrays.asList("dish"),
-                Arrays.asList("cuisine"),
-                Arrays.asList("diet"),
-                Arrays.asList(new MeasurementRes("name", 12, "unit"))
+                List.of("dish"),
+                List.of("cuisine"),
+                List.of("diet"),
+                List.of(new MeasurementRes("name", 12, "unit"))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
@@ -125,7 +120,7 @@ public class PagesControllerTest {
 
         given(pagesService.getTodays(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/todays?accountId=1").with(csrf())
+        mockMvc.perform(get("/pages/get/todays?accountId=1").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipe.title").value(response.getRecipe().getTitle()))
@@ -148,10 +143,10 @@ public class PagesControllerTest {
                 true,
                 false,
                 new Date(2022,12,12),
-                Arrays.asList("dish"),
-                Arrays.asList("cuisine"),
-                Arrays.asList("diet"),
-                Arrays.asList(new MeasurementRes("name", 12, "unit"))
+                List.of("dish"),
+                List.of("cuisine"),
+                List.of("diet"),
+                List.of(new MeasurementRes("name", 12, "unit"))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
@@ -161,7 +156,7 @@ public class PagesControllerTest {
 
         given(pagesService.getTodays(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/todays").with(csrf())
+        mockMvc.perform(get("/pages/get/todays").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isBadRequest());
     }
@@ -182,10 +177,10 @@ public class PagesControllerTest {
                 true,
                 false,
                 new Date(2022,12,12),
-                Arrays.asList("dish"),
-                Arrays.asList("cuisine"),
-                Arrays.asList("diet"),
-                Arrays.asList(new MeasurementRes("name", 12, "unit"))
+                List.of("dish"),
+                List.of("cuisine"),
+                List.of("diet"),
+                List.of(new MeasurementRes("name", 12, "unit"))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
@@ -195,7 +190,7 @@ public class PagesControllerTest {
 
         given(pagesService.getTodays(anyInt())).willReturn(response);
 
-        mockMvc.perform(get("/api/pages/get/todays?accountId=2").with(csrf())
+        mockMvc.perform(get("/pages/get/todays?accountId=2").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }

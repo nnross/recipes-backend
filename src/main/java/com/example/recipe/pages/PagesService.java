@@ -16,6 +16,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Map;
 
+/**
+ * Logic for the page calls.
+ */
 @Service
 public class PagesService {
 
@@ -27,7 +30,7 @@ public class PagesService {
 
 
     /**
-     * Gets the personal page data and constucts a PersonalPageRes.
+     * Gets the personal page data and constructs a PersonalPageRes.
      * @param accountId
      *        id of account we want data for.
      * @return personal page data as PersonalPageRes.
@@ -41,10 +44,10 @@ public class PagesService {
         Map<String, Day> calendar = recipeService.getCalendar(accountId);
 
         return new PersonalPageRes(recipes, stats, calendar);
-    };
+    }
 
     /**
-     * Gets the todays page data and constucts a TodaysPageRes.
+     * Gets the today's page data and constructs a TodaysPageRes.
      * @param accountId
      *        id of account we want data for.
      * @return personal page data as PersonalPageRes.
@@ -59,5 +62,5 @@ public class PagesService {
         Map<String, Day> calendar = recipeService.getCalendar(accountId);
 
         return new TodaysPageRes(recipe, calendar);
-    };
+    }
 }
