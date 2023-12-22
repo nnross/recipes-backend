@@ -3,6 +3,7 @@ package com.example.recipe.apiClasses;
 /**
  * Formats Ingredient object from API
  */
+@SuppressWarnings("unused")
 public class RecipeIngredients {
     private String name;
 

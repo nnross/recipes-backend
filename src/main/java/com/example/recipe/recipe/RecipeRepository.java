@@ -1,6 +1,5 @@
 package com.example.recipe.recipe;
 
-import com.example.recipe.response.RecipeRes;
 import com.example.recipe.response.StatRes;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,11 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Repository for the recipes.
+ */
 @Repository
 public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Integer>, JpaRepository<Recipe, Integer> {
 
@@ -84,8 +85,14 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      * @return recipe with selected date.
      */
     @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_to_do_date = ?2", nativeQuery = true)
-    Optional<Recipe> getByDate(int accountId, Date date);
+    Optional<Recipe> getByDate(int accountId, LocalDate date);
 
+    /**
+     * Query to get all recipes for account with id
+     * @param accountId
+     *        id of account we want recipes for.
+     * @return All accounts recipes.
+     */
     @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1", nativeQuery = true)
     List<Recipe> getAllForAccount(int accountId);
 }

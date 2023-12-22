@@ -1,10 +1,8 @@
 package com.example.recipe.account;
 
-import com.example.recipe.RecipeApplication;
 import com.example.recipe.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
@@ -35,7 +33,7 @@ class AccountIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.get().uri("/api/account/get?accountId=1")
+        webClient.get().uri("/account/get?accountId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -48,7 +46,7 @@ class AccountIntegrationTest {
     @Test
     void addAccountWorks() {
         int items = accountRepository.findAll().size();
-        webClient.post().uri("/api/account/create")
+        webClient.post().uri("/account/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(
                         """
@@ -80,7 +78,7 @@ class AccountIntegrationTest {
         );
         String token = jwtService.newToken(account);
 
-        webClient.delete().uri("/api/account/delete?accountId=1")
+        webClient.delete().uri("/account/delete?accountId=1")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()
@@ -92,7 +90,7 @@ class AccountIntegrationTest {
 
     @Test
     void loginWorks() {
-        webClient.post().uri("/api/account/login")
+        webClient.post().uri("/account/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(
                         """
@@ -118,7 +116,7 @@ class AccountIntegrationTest {
                 "test"
         );
         String token = jwtService.newToken(account);
-        webClient.put().uri("/api/account/update?accountId=1")
+        webClient.put().uri("/account/update?accountId=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(http -> http.setBearerAuth(token))
                 .bodyValue(

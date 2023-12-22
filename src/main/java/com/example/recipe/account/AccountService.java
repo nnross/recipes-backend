@@ -6,10 +6,10 @@ import com.example.recipe.response.AuthRes;
 import com.example.recipe.security.AuthRequest;
 import com.example.recipe.security.JwtService;
 import exceptions.BadRequestException;
+import exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +40,7 @@ public class AccountService {
     /**
      * Finds the account with the given id.
      * @param id
-     *       Id of the account to get
+     *       id of the account to get
      * @return An account with the id
      */
     public Account getAccount(int id) {
@@ -51,7 +51,7 @@ public class AccountService {
     }
 
     /**
-     * Logs user in.
+     * Logs user in to the application and creates a token for login.
      * @param request
      *       AuthRequest of username and password
      * @return AuthRes of token and user's id
@@ -68,7 +68,7 @@ public class AccountService {
     }
 
     /**
-     * Creates a new account.
+     * Creates a new account and creates a token for the account.
      * @param account
      *       Account with name, username, email and password for new user
      * @return AuthRes of token and user's id
@@ -88,7 +88,7 @@ public class AccountService {
         try {
             accountRepository.save(account);
         } catch(Exception e) {
-            throw new RuntimeException("Failed to save to database");
+            throw new DatabaseException("Failed to save to database");
         }
 
         String token = jwtService.newToken(account);
@@ -98,8 +98,8 @@ public class AccountService {
     /**
      * Deletes an account.
      * @param id
-     *       Id of the account to be deleted
-     * @return true if account was deleted, false if not
+     *        id of the account to be deleted
+     * @return true if account was deleted, error otherwise.
      */
     public Boolean delete(int id) {
         Account account = accountRepository.findById(id).orElseThrow(() ->
@@ -116,7 +116,7 @@ public class AccountService {
             accountRepository.delete(account);
         }
         catch (Exception e) {
-            throw new RuntimeException("Failed to delete account");
+            throw new DatabaseException("Failed to delete account");
         }
 
         return true;
@@ -125,10 +125,10 @@ public class AccountService {
     /**
      * Updates user's account information.
      * @param account
-     *      Contains user's new name, username, email and password
+     *        Contains user's new name, username, email and password
      * @param id
-     *      Id of the account being updated
-     * @return true if account was updated, false if not
+     *        id of the account being updated
+     * @return true if account was updated, error otherwise.
      */
     public Boolean update(Account account, int id) {
         Account oldAccount = accountRepository.findById(id).orElseThrow(() ->
@@ -157,7 +157,7 @@ public class AccountService {
         try {
             accountRepository.save(oldAccount);
         } catch(Exception e) {
-            throw new RuntimeException("Failed to save changes to database");
+            throw new DatabaseException("Failed to save changes to database");
         }
         return true;
     }

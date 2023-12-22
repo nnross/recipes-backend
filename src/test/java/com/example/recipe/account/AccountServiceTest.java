@@ -13,6 +13,7 @@ import com.example.recipe.security.JwtService;
 import com.example.recipe.type.Type;
 import com.example.recipe.unit.Unit;
 import exceptions.BadRequestException;
+import exceptions.DatabaseException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -34,12 +35,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 
-// TODO: annotations
 @ActiveProfiles("test")
 @DataJpaTest()
 @ContextConfiguration(classes = RecipeApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 class AccountServiceTest {
 
     @Mock
@@ -194,7 +195,7 @@ class AccountServiceTest {
         );
 
         assertThatThrownBy(() ->  testAccountService.create(account))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("Failed to save to database");
     }
 
@@ -377,7 +378,7 @@ class AccountServiceTest {
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
 
         assertThatThrownBy(() -> testAccountService.update(updateAccount, updateAccount.getId()))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("Failed to save changes to database");
     }
 
@@ -393,7 +394,7 @@ class AccountServiceTest {
         measurements.add(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12));
 
         given(recipeRepository.getAllForAccount(anyInt()))
-                .willReturn(Arrays.asList(new Recipe(
+                .willReturn(List.of(new Recipe(
                         1,
                         "title",
                         "recipe desc",
@@ -405,7 +406,7 @@ class AccountServiceTest {
                         true,
                         true,
                         true,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                         "test instructions",
                         categories,
                         types,
@@ -427,7 +428,7 @@ class AccountServiceTest {
         doThrow(new RuntimeException("error")).when(accountRepository).delete(any());
 
         assertThatThrownBy(() ->  testAccountService.delete(0))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("Failed to delete account");
     }
 

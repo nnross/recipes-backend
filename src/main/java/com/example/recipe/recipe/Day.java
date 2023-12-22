@@ -1,11 +1,11 @@
 package com.example.recipe.recipe;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 /**
  * Creates day for weekly calendar
  */
+@SuppressWarnings("unused")
 public class Day {
     private LocalDate date;
     private int accountId;

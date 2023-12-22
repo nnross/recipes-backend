@@ -3,6 +3,7 @@ package com.example.recipe.apiClasses;
 /**
  * Formats Measures object from API
  */
+@SuppressWarnings("unused")
 public class Measures {
     private Metric metric;
 
@@ -11,7 +12,6 @@ public class Measures {
     }
 
     public Measures() {
-
     }
 
     public Metric getMetric() {

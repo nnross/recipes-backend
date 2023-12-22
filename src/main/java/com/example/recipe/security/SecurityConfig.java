@@ -20,6 +20,7 @@ import java.util.List;
 /**
  * Configuration for spring security
  */
+@SuppressWarnings("unused")
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -59,7 +60,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // endpoints without security and with security
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/account/create", "/api/account/login", "/error", "/api/recipe/get/api/search", "/api/recipe/get/api/id")
+                .requestMatchers("/account/create", "/account/login", "/error", "/recipe/get/api/search", "/recipe/get/api/id", "/recipe/get/api/random")
                 .permitAll()
                 .anyRequest()
                 .authenticated());

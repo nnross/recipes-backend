@@ -1,13 +1,13 @@
 package com.example.recipe.measurement;
 
 import com.example.recipe.ingredient.Ingredient;
-import com.example.recipe.recipe.Recipe;
 import com.example.recipe.unit.Unit;
 import jakarta.persistence.*;
 
 /**
  * Creates the measurement entity for the database.
  */
+@SuppressWarnings("unused")
 @Entity
 @Table(name="measurement")
 public class Measurement {

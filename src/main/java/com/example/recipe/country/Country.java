@@ -1,10 +1,6 @@
 package com.example.recipe.country;
 
-import com.example.recipe.recipe.Recipe;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-import java.util.List;
 
 /**
  * Creates the country entity for the database.

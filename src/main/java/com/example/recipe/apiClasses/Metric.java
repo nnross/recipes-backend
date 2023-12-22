@@ -3,6 +3,7 @@ package com.example.recipe.apiClasses;
 /**
  * Formats Metric object from API
  */
+@SuppressWarnings("unused")
 public class Metric {
     private int amount;
     private String unitShort;

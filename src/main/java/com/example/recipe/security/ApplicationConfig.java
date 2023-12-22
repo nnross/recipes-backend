@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * Configuration for the spring security application
  */
+@SuppressWarnings("unused")
 @Configuration
 public class ApplicationConfig {
 
