@@ -26,7 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -406,7 +406,7 @@ class AccountServiceTest {
                         true,
                         true,
                         true,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                         "test instructions",
                         categories,
                         types,

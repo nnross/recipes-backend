@@ -23,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -97,7 +96,7 @@ class PagesServiceTest {
 
         testPagesService.getTodays(1);
 
-        verify(recipeService).getRecipeForDate(1, Date.valueOf(LocalDate.now()));
+        verify(recipeService).getRecipeForDate(1, LocalDate.now());
         verify(recipeService).getCalendar(1);
     }
 

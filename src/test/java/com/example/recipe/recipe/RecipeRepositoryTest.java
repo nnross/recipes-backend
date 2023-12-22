@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,7 +55,7 @@ class RecipeRepositoryTest {
                 true,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -90,7 +90,7 @@ class RecipeRepositoryTest {
                 false,
                 true,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -125,7 +125,7 @@ class RecipeRepositoryTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -136,8 +136,8 @@ class RecipeRepositoryTest {
 
         testRecipeRepository.save(recipe);
 
-        Recipe foundEntity = testRecipeRepository.getByDate(account.getId(), new Date(2022, 12, 12)).orElse(null);
-        Recipe foundNoneEntity = testRecipeRepository.getByDate(0, new Date(2020, 10, 12)).orElse(null);
+        Recipe foundEntity = testRecipeRepository.getByDate(account.getId(), LocalDate.of(2022,12,12)).orElse(null);
+        Recipe foundNoneEntity = testRecipeRepository.getByDate(0, LocalDate.of(2022,12,10)).orElse(null);
         assertEquals("test title", foundEntity.getTitle());
         assertNotNull(foundEntity);
         assertNull(foundNoneEntity);
@@ -160,7 +160,7 @@ class RecipeRepositoryTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -180,7 +180,7 @@ class RecipeRepositoryTest {
                 true,
                 true,
                 true,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -218,7 +218,7 @@ class RecipeRepositoryTest {
                 false,
                 false,
                 true,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -238,7 +238,7 @@ class RecipeRepositoryTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -271,7 +271,7 @@ class RecipeRepositoryTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -291,7 +291,7 @@ class RecipeRepositoryTest {
                 true,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -324,7 +324,7 @@ class RecipeRepositoryTest {
                 false,
                 true,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -344,7 +344,7 @@ class RecipeRepositoryTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),
@@ -377,7 +377,7 @@ class RecipeRepositoryTest {
                 true,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 "test instructions",
                 List.of(new Category()),
                 List.of(new Type()),

@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +105,7 @@ class PagesControllerTest {
                 true,
                 true,
                 false,
-                new Date(2022,12,12),
+                LocalDate.of(2022,12,12),
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
@@ -142,7 +141,7 @@ class PagesControllerTest {
                 true,
                 true,
                 false,
-                new Date(2022,12,12),
+                LocalDate.of(2022,12,12),
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
@@ -176,7 +175,7 @@ class PagesControllerTest {
                 true,
                 true,
                 false,
-                new Date(2022,12,12),
+                LocalDate.of(2022,12,12),
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),

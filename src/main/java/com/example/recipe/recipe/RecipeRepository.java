@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +85,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      * @return recipe with selected date.
      */
     @Query(value = "SELECT * FROM recipe r WHERE r.recipe_account = ?1 AND r.recipe_to_do_date = ?2", nativeQuery = true)
-    Optional<Recipe> getByDate(int accountId, Date date);
+    Optional<Recipe> getByDate(int accountId, LocalDate date);
 
     /**
      * Query to get all recipes for account with id

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -401,7 +400,7 @@ public class RecipeService {
      *        Wanted date of recipe
      * @return recipe that matches the date. If no recipe return null.
      */
-    public FullRecipeRes getRecipeForDate(int accountId, Date date) {
+    public FullRecipeRes getRecipeForDate(int accountId, LocalDate date) {
         Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
         if (recipe == null) return null;
         return converter.fullRecipeConverter(recipe);
@@ -421,12 +420,11 @@ public class RecipeService {
         boolean isFinished;
         for (int i = 0; i < 7; i++) {
             LocalDate currentDate = monday.plusDays(i);
-            Date date = Date.valueOf(currentDate);
 
-            Recipe recipe = recipeRepository.getByDate(accountId, date).orElse(null);
+            Recipe recipe = recipeRepository.getByDate(accountId, currentDate).orElse(null);
             isRecipe = recipe != null;
             isFinished = recipe != null && recipe.getFinished();
-            
+
             Day day = new Day(currentDate, accountId, isRecipe, isFinished);
             weeklyCalendar.put(currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()), day);
         }

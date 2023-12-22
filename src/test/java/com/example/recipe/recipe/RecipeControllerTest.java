@@ -15,7 +15,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -416,7 +416,7 @@ class RecipeControllerTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
@@ -467,7 +467,7 @@ class RecipeControllerTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
@@ -498,7 +498,7 @@ class RecipeControllerTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
@@ -530,7 +530,7 @@ class RecipeControllerTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
@@ -581,7 +581,7 @@ class RecipeControllerTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
@@ -611,7 +611,7 @@ class RecipeControllerTest {
                 false,
                 false,
                 false,
-                new Date(2022, 12, 12),
+                LocalDate.of(2022,12,12),
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),

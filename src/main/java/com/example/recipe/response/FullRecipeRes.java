@@ -1,6 +1,6 @@
 package com.example.recipe.response;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -21,14 +21,14 @@ public class FullRecipeRes {
     private boolean favourite;
     private boolean doLater;
     private boolean finished;
-    private Date date;
+    private LocalDate date;
 
     private List<String> dishTypes;
     private List<String> cuisines;
     private List<String> diets;
     private List<MeasurementRes> measurements;
 
-    public FullRecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, int account, boolean favourite, boolean doLater, boolean finished, Date date, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
+    public FullRecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, int account, boolean favourite, boolean doLater, boolean finished, LocalDate date, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -156,11 +156,11 @@ public class FullRecipeRes {
         this.finished = finished;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

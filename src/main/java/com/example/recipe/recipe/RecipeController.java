@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * Controller for recipe calls
@@ -189,7 +189,7 @@ public class RecipeController {
      */
     @PreAuthorize("#accountId == authentication.principal.id")
     @GetMapping("/get/date")
-    public FullRecipeRes getDate(@RequestParam("accountId") int accountId, @RequestParam("date") Date date) {
+    public FullRecipeRes getDate(@RequestParam("accountId") int accountId, @RequestParam("date") LocalDate date) {
         return recipeService.getRecipeForDate(accountId, date);
     }
 

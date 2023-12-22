@@ -37,7 +37,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.sql.Date;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -670,7 +669,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         true,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022, 12, 12),
                         "test instructions",
                         List.of(new Category()),
                         List.of(new Type()),
@@ -707,7 +706,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         true,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                         "test instructions",
                         List.of(new Category()),
                         List.of(new Type()),
@@ -715,9 +714,9 @@ class RecipeServiceTest {
                         List.of(new Country(1, "test Country")),
                         List.of(new Measurement(1, new Unit(1, "test"), new Ingredient(1, "test"), 12))))
                 );
-        FullRecipeRes res = testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
+        FullRecipeRes res = testRecipeService.getRecipeForDate(1, LocalDate.of(2022,12,12));
 
-        verify(recipeRepository).getByDate(1, new Date(2022, 12, 12));
+        verify(recipeRepository).getByDate(1, LocalDate.of(2022,12,12));
         assertEquals("test Country", res.getCuisines().get(0));
     }
 
@@ -725,9 +724,9 @@ class RecipeServiceTest {
     void getRecipeByDateForAccountWorksWithNoRecipe() {
         given(recipeRepository.getByDate(anyInt(), any())).willReturn(Optional.empty());
 
-        FullRecipeRes res = testRecipeService.getRecipeForDate(1, new Date(2022, 12, 12));
+        FullRecipeRes res = testRecipeService.getRecipeForDate(1, LocalDate.of(2022,12,12));
 
-        verify(recipeRepository).getByDate(1, new Date(2022, 12, 12));
+        verify(recipeRepository).getByDate(1, LocalDate.of(2022,12,12));
         assertNull(res);
     }
 
@@ -746,7 +745,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         true,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                         "test instructions",
                         List.of(new Category()),
                         List.of(new Type()),
@@ -777,7 +776,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         false,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                         "test instructions",
                         List.of(new Category()),
                         List.of(new Type()),
@@ -830,7 +829,7 @@ class RecipeServiceTest {
                     true,
                     true,
                     true,
-                    new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                     "test instructions",
                     categories,
                     types,
@@ -875,7 +874,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         true,
-                        new Date(2022, 12, 12),
+                        LocalDate.of(2022,12,12),
                         "test instructions",
                         categories,
                         types,

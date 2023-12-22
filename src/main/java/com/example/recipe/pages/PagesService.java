@@ -12,7 +12,6 @@ import exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -56,9 +55,7 @@ public class PagesService {
         accountRepository.findById(accountId).orElseThrow(() ->
                 new BadRequestException("no account with id"));
 
-        Date today = Date.valueOf(LocalDate.now());
-
-        FullRecipeRes recipe = recipeService.getRecipeForDate(accountId, today);
+        FullRecipeRes recipe = recipeService.getRecipeForDate(accountId, LocalDate.now());
         Map<String, Day> calendar = recipeService.getCalendar(accountId);
 
         return new TodaysPageRes(recipe, calendar);

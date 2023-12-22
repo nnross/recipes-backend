@@ -18,7 +18,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,7 +78,7 @@ class PagesIntegrationTest {
                 false,
                 false,
                 false,
-                Date.valueOf(LocalDate.now()),
+                LocalDate.now(),
                 "test instructions",
                 List.of(new Category(1, "test")),
                 List.of(new Type(1, "test")),

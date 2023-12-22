@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -56,7 +56,7 @@ public class Recipe {
     private Boolean finished;
 
     @Column(name = "recipe_toDoDate")
-    private Date toDoDate;
+    private LocalDate toDoDate;
 
     @Column(name = "recipe_instructions", nullable = false)
     private String instructions;
@@ -96,7 +96,7 @@ public class Recipe {
     private List<Measurement> measurements;
 
 
-    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, Date toDoDate, String instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
+    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, LocalDate toDoDate, String instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -208,11 +208,11 @@ public class Recipe {
         this.finished = finished;
     }
 
-    public Date getToDoDate() {
+    public LocalDate getToDoDate() {
         return toDoDate;
     }
 
-    public void setToDoDate(Date toDoDate) {
+    public void setToDoDate(LocalDate toDoDate) {
         this.toDoDate = toDoDate;
     }
 
