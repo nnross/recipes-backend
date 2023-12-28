@@ -357,7 +357,7 @@ public class RecipeService {
         if (page < 0) {
             throw new BadRequestException("Invalid page");
         }
-        PageRequest pageRequest = PageRequest.of(page, 6);
+        PageRequest pageRequest = PageRequest.of(page, 5);
         PageRequest nextPageRequest = PageRequest.of(page + 1, 6);
         return new ListRes(recipeRepository.getFavourite(
                 accountId, pageRequest),
@@ -377,7 +377,7 @@ public class RecipeService {
         if (page < 0) {
             throw new BadRequestException("Invalid page");
         }
-        PageRequest pageRequest = PageRequest.of(page, 6);
+        PageRequest pageRequest = PageRequest.of(page, 5);
         PageRequest nextPageRequest = PageRequest.of(page + 1, 6);
         return new ListRes(
                 recipeRepository.getDoLater(accountId, pageRequest),

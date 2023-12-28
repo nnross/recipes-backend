@@ -683,7 +683,7 @@ class RecipeServiceTest {
         }));
         testRecipeService.getFavourite(1, 0);
 
-        verify(recipeRepository).getFavourite(1, PageRequest.of(0, 6));
+        verify(recipeRepository).getFavourite(1, PageRequest.of(0, 5));
     }
 
     @Test
@@ -709,7 +709,7 @@ class RecipeServiceTest {
         }));
         testRecipeService.getDoLater(1, 0);
 
-        verify(recipeRepository).getDoLater(1, PageRequest.of(0, 6));
+        verify(recipeRepository).getDoLater(1, PageRequest.of(0, 5));
     }
 
     @Test
