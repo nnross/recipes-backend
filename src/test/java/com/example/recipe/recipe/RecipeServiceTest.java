@@ -757,8 +757,7 @@ class RecipeServiceTest {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertEquals(monday, res.get("Monday").getDate());
-        assertEquals(true, res.get("Monday").getIsRecipe());
-        assertEquals(true, res.get("Monday").getIsFinished());
+        assertEquals(2, res.get("Monday").getState());
     }
 
     @Test
@@ -788,8 +787,7 @@ class RecipeServiceTest {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertEquals(monday, res.get("Monday").getDate());
-        assertEquals(true, res.get("Monday").getIsRecipe());
-        assertEquals(false, res.get("Monday").getIsFinished());
+        assertEquals(1, res.get("Monday").getState());
     }
 
     @Test
@@ -800,8 +798,6 @@ class RecipeServiceTest {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertEquals(monday, res.get("Monday").getDate());
-        assertEquals(false, res.get("Monday").getIsRecipe());
-        assertEquals(false, res.get("Monday").getIsFinished());
     }
 
 

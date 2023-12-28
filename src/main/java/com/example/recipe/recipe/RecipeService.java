@@ -416,17 +416,19 @@ public class RecipeService {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         Map<String, Day> weeklyCalendar = new HashMap<>();
-        boolean isRecipe;
-        boolean isFinished;
+
         for (int i = 0; i < 7; i++) {
             LocalDate currentDate = monday.plusDays(i);
 
             Recipe recipe = recipeRepository.getByDate(accountId, currentDate).orElse(null);
-            isRecipe = recipe != null;
-            isFinished = recipe != null && recipe.getFinished();
+            int state = 0;
+            if (recipe != null) state = 1;
+            if (recipe != null && recipe.getFinished()) state = 2;
 
-            Day day = new Day(currentDate, accountId, isRecipe, isFinished);
-            weeklyCalendar.put(currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()), day);
+
+            weeklyCalendar.put(
+                    currentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()),
+                    new Day(currentDate, state));
         }
         return weeklyCalendar;
     }
