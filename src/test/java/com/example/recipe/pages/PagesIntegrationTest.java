@@ -94,6 +94,6 @@ class PagesIntegrationTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.recipe.title").isEqualTo("test title")
-                .jsonPath("$.calendar.Monday.isRecipe").isEqualTo(false);
+                .jsonPath("$.calendar.Monday.state").isEqualTo(0);
     }
 }

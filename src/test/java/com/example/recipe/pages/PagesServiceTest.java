@@ -63,7 +63,7 @@ class PagesServiceTest {
     void getPersonalPageWorks() {
         given(accountRepository.findById(any())).willReturn(Optional.of(new Account()));
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         given(recipeService.getCalendar(anyInt())).willReturn(calendar);
         given(recipeService.getStats(anyInt())).willReturn(new RecipeStats());
@@ -90,7 +90,7 @@ class PagesServiceTest {
         given(accountRepository.findById(anyInt())).willReturn(Optional.of(new Account()));
         given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(new FullRecipeRes());
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         given(recipeService.getCalendar(anyInt())).willReturn(calendar);
 
