@@ -254,21 +254,26 @@ public class RecipeService {
                     ingredient.getMeasures().getMetric().getAmount(),
                     ingredient.getMeasures().getMetric().getUnitShort()));
         }
-        List<String> diets = new ArrayList<>();
-        if (res.isDairyFree()) {
-            diets.add("dairy free");
+        String inst = res.getInstructions().replaceAll("<ol>", "").replaceAll("</ol>", "").replaceAll("<li>", "");
+        List<String> instList = new ArrayList<>(Arrays.asList(inst.split("</li>")));
+        System.out.println("instlist" + instList);
+
+        List<String> diets = new ArrayList<String>();
+        for(String diet : res.getDiets()) {
+            diets.add(diet.replaceAll("\\s", ""));
         }
-        if (res.isVegan()) {
+        if (res.isDairyFree() && !diets.contains("dairyfree")) {
+            diets.add("dairyfree");
+        }
+        if (res.isVegan() && !diets.contains("vegan")) {
             diets.add("vegan");
         }
-        if (res.isVegetarian()) {
+        if (res.isVegetarian() && !diets.contains("vegetarian")) {
             diets.add("vegetarian");
         }
-        if (res.isGlutenFree()) {
-            diets.add("gluten free");
+        if (res.isGlutenFree() && !diets.contains("glutenfree")) {
+            diets.add("glutenfree");
         }
-
-        diets.addAll(res.getDiets());
 
         return new RecipeRes(
                 res.getId(),
@@ -277,7 +282,7 @@ public class RecipeService {
                 res.getServings(),
                 res.getReadyInMinutes(),
                 res.getSourceUrl(),
-                res.getInstructions(),
+                instList,
                 res.getSummary(),
                 res.getHealthScore(),
                 res.getDishTypes(),

@@ -13,7 +13,7 @@ public class RecipeRes {
     private int servings;
     private int readyInMinutes;
     private String sourceUrl;
-    private String instructions;
+    private List<String> instructions;
     private String summary;
     private double healthScore;
 
@@ -22,7 +22,7 @@ public class RecipeRes {
     private List<String> diets;
     private List<MeasurementRes> measurements;
 
-    public RecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
+    public RecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, List<String> instructions, String summary, double healthScore, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -94,11 +94,11 @@ public class RecipeRes {
         this.sourceUrl = sourceUrl;
     }
 
-    public String getInstructions() {
+    public List<String> getInstructions() {
         return instructions;
     }
 
-    public void setInstructions(String instructions) {
+    public void setInstructions(List<String> instructions) {
         this.instructions = instructions;
     }
 
