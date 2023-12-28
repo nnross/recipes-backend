@@ -77,6 +77,22 @@ public class RecipeController {
     }
 
     /**
+     * PUT API call to /recipe/set/date?recipeId=(id)&date=(date)
+     * Sets date for recipe.
+     * Authorization with isOwnRecipe()
+     * @param recipeId
+     *        id of the recipe
+     * @param date
+     *        date wanted for the recipe
+     * @return true if successful, error otherwise.
+     */
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
+    @PutMapping("/set/date")
+    public Boolean finished(@RequestParam("recipeId") int recipeId, @RequestParam("date") LocalDate date) {
+        return recipeService.setDate(recipeId, date);
+    }
+
+    /**
      * GET API call to /recipe/get/api/search
      *         ?search=(search)?ingredients=(ingredients)?cuisine=(cuisine)?diet=(diet)?intolerances=(intolerances)
      *         ?type=(type)?sort=(sort)?sortDirection=(sortDirection)?page=(page)

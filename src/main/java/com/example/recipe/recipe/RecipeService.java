@@ -83,6 +83,10 @@ public class RecipeService {
                     new BadRequestException("category not in database"));
         }
 
+        if (recipeRepository.getByDate(recipe.getAccount().getId(), recipe.getToDoDate()).orElse(null) != null) {
+            throw new BadRequestException("recipe with date already exists");
+        }
+
         try {
             recipeRepository.save(recipe);
         }
@@ -122,6 +126,28 @@ public class RecipeService {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
                 new BadRequestException("no recipe with id"));
         recipe.setDoLater(!recipe.getDoLater());
+
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new DatabaseException("error while saving to database");
+        }
+        return true;
+    }
+
+    /**
+     * Sets date for recipe
+     * @param recipeId
+     *        Recipe to be toggled.
+     * @param date
+     *        date to be set.
+     * @return true if successful, error otherwise
+     */
+    public Boolean setDate(int recipeId, LocalDate date) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+        recipe.setToDoDate(date);
 
         try {
             recipeRepository.save(recipe);

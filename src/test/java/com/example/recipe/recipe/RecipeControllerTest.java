@@ -218,6 +218,41 @@ class RecipeControllerTest {
     }
 
     @Test
+    void setDateRecipeWorks() throws Exception {
+        Account account = new Account(1, "test", "test", "test", "test");
+
+        given(recipeService.setDate(anyInt(), any())).willReturn(true);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
+
+        mockMvc.perform(put("/recipe/set/date?recipeId=1&date=2022-12-12", 1).with(csrf())
+                        .with(user(account)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void setDateRecipeThrowsWithNoParams() throws Exception {
+        Account account = new Account(1, "test", "test", "test", "test");
+
+        given(recipeService.setDate(anyInt(), any())).willReturn(true);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
+
+        mockMvc.perform(put("/recipe/set/doLater", 1).with(csrf())
+                        .with(user(account)))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    void setDateRecipeThrowsWithNotOwnRecipe() throws Exception {
+        Account account = new Account(1, "test", "test", "test", "test");
+
+        given(recipeService.setDate(anyInt(), any())).willReturn(true);
+        given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
+
+        mockMvc.perform(put("/recipe/set/doLater", 1).with(csrf())
+                        .with(user(account)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void finishRecipeWorks() throws Exception {
         Account account = new Account(1, "test", "test", "test", "test");
 
