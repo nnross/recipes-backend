@@ -152,10 +152,13 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                            "name": "updatedName",
-                            "username": "updatedUsername",
-                            "email": "updatedEmail",
-                            "pass": "updatedPass"
+                            "account": {
+                                "name": "updatedName",
+                                "username": "updatedUsername",
+                                "email": "updatedEmail",
+                                "pass": "updatedPass"
+                                },
+                            "confirmation": "updatedPass"
                         }
                         """)
                         .with(user(account)))
@@ -176,10 +179,13 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                            "name": "updatedName",
-                            "username": "updatedUsername",
-                            "email": "updatedEmail",
-                            "pass": "updatedPass"
+                            "account": {
+                                "name": "updatedName",
+                                "username": "updatedUsername",
+                                "email": "updatedEmail",
+                                "pass": "updatedPass"
+                                },
+                            "confirmation": "updatedPass"
                         }
                         """)
                         .with(user(account)))
@@ -217,10 +223,13 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                            "name": "updatedName",
-                            "username": "updatedUsername",
-                            "password": "updatedPass",
-                            "email": "updatedEmail"
+                            "account": {
+                                "name": "updatedName",
+                                "username": "updatedUsername",
+                                "email": "updatedEmail",
+                                "pass": "updatedPass"
+                                },
+                            "confirmation": "updatedPass"
                         }
                         """)
                         .with(user(account)))

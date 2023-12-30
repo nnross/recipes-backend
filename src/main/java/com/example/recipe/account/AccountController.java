@@ -77,7 +77,7 @@ public class AccountController {
      */
     @PreAuthorize("#id == authentication.principal.id")
     @PutMapping("/update")
-    public Boolean update(@RequestBody Account account, @RequestParam("accountId") int id) {
+    public Boolean update(@RequestBody UpdateAccount account, @RequestParam("accountId") int id) {
         return accountService.update(account, id);
     }
 }
