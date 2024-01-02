@@ -247,16 +247,19 @@ public class RecipeService {
     public RecipeRes getSearchById(int id) {
         RecipeFormat res = recipeUtils.getRecipeById(id);
 
+        String summary = res.getSummary().replaceAll("<b>", "").replaceAll("</b>", "").substring(0, Math.min(res.getSummary().length(), 300))+"...";
+
         List<MeasurementRes> measurements = new ArrayList<>();
         for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
-            measurements.add(new MeasurementRes(
-                    ingredient.getName(),
+            MeasurementRes measurement = new MeasurementRes(ingredient.getName(),
                     ingredient.getMeasures().getMetric().getAmount(),
-                    ingredient.getMeasures().getMetric().getUnitShort()));
+                    ingredient.getMeasures().getMetric().getUnitShort());
+            if(!measurements.contains(measurement)){
+                measurements.add(measurement);
+            }
         }
         String inst = res.getInstructions().replaceAll("<ol>", "").replaceAll("</ol>", "").replaceAll("<li>", "");
         List<String> instList = new ArrayList<>(Arrays.asList(inst.split("</li>")));
-        System.out.println("instlist" + instList);
 
         List<String> diets = new ArrayList<String>();
         for(String diet : res.getDiets()) {
@@ -283,7 +286,7 @@ public class RecipeService {
                 res.getReadyInMinutes(),
                 res.getSourceUrl(),
                 instList,
-                res.getSummary(),
+                summary,
                 res.getHealthScore(),
                 res.getDishTypes(),
                 res.getCuisines(),

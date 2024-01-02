@@ -1,5 +1,7 @@
 package com.example.recipe.response;
 
+import java.util.Objects;
+
 /**
  * Formats measurements for return as wanted
  */
@@ -38,4 +40,20 @@ public class MeasurementRes {
     public void setUnit(String unit) {
         this.unit = unit;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        MeasurementRes other = (MeasurementRes) obj;
+        return Objects.equals(name, other.name)
+                && Objects.equals(amount, other.amount)
+                && Objects.equals(unit, other.unit);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, amount, unit);
+    }
+
 }
