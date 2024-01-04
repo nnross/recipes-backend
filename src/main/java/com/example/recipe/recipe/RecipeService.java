@@ -176,38 +176,46 @@ public class RecipeService {
      */
     public ListRes getSearch(
             String search,
-            String ingredients,
-            String cuisine,
-            String diet,
-            String intolerances,
+            List<String> ingredients,
+            List<String> cuisine,
+            List<String> diet,
+            List<String> intolerances,
             String type,
             String sort,
             String sortDirection,
             int page) {
         if(!ingredients.isEmpty()){
             try {
-                Ingredient.valueOf(ingredients.toUpperCase());
+                for (String ingredient: ingredients) {
+                    Ingredient.valueOf(ingredient.toUpperCase());
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid ingredient filter");
             }
         }
         if(!cuisine.isEmpty()){
             try {
-                Cuisine.valueOf(cuisine.toUpperCase());
+                for (String oneCuisine: cuisine) {
+                    Cuisine.valueOf(oneCuisine.toUpperCase());
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid cuisine filter");
             }
         }
         if(!diet.isEmpty()){
             try {
-                Diet.valueOf(diet.toUpperCase().replace(" ", "_"));
+                for (String oneDiet: diet) {
+                    Diet.valueOf(oneDiet.toUpperCase().replace(" ", "_"));
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid diet filter");
             }
         }
         if(!intolerances.isEmpty()){
             try {
-                Intolerance.valueOf(intolerances.toUpperCase());
+                for (String intolerance: intolerances) {
+                    Intolerance.valueOf(intolerance.toUpperCase());
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid intolerance filter");
             }
@@ -234,7 +242,7 @@ public class RecipeService {
             }
         }
         int offset = page*12;
-        List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, offset).getResults();
+        List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients.toString(), cuisine.toString(), diet.toString(), intolerances.toString(), type, sort, sortDirection, offset).getResults();
         return new ListRes(recipes, !recipes.isEmpty());
     }
 

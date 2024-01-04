@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Controller for recipe calls
@@ -104,10 +105,10 @@ public class RecipeController {
      */
     @GetMapping("/get/api/search")
     public ListRes search(@RequestParam("search") String search,
-                          @RequestParam("ingredients") String ingredients,
-                          @RequestParam("cuisine") String cuisine,
-                          @RequestParam("diet") String diet,
-                          @RequestParam("intolerances") String intolerances,
+                          @RequestParam("ingredients") List<String> ingredients,
+                          @RequestParam("cuisine") List<String> cuisine,
+                          @RequestParam("diet") List<String> diet,
+                          @RequestParam("intolerances") List<String> intolerances,
                           @RequestParam("type") String type,
                           @RequestParam("sort") String sort,
                           @RequestParam("sortDirection") String sortDirection,
