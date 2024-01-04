@@ -242,7 +242,7 @@ public class RecipeService {
             }
         }
         int offset = page*12;
-        List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients.toString(), cuisine.toString(), diet.toString(), intolerances.toString(), type, sort, sortDirection, offset).getResults();
+        List<ShortRecipe> recipes = recipeUtils.searchResults(search, String.join(",", ingredients), String.join(",", cuisine), String.join(",", diet), String.join(",", intolerances), type, sort, sortDirection, offset).getResults();
         return new ListRes(recipes, !recipes.isEmpty());
     }
 
