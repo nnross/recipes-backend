@@ -286,7 +286,7 @@ class RecipeControllerTest {
                 2,
                 12,
                 "test source",
-                "test instructions",
+                List.of("test instructions"),
                 "test summary",
                 100,
                 List.of("dinner"),
@@ -304,7 +304,7 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.servings").value(recipe.getServings()))
                 .andExpect(jsonPath("$.readyInMinutes").value(recipe.getReadyInMinutes()))
                 .andExpect(jsonPath("$.sourceUrl").value(recipe.getSourceUrl()))
-                .andExpect(jsonPath("$.instructions").value(recipe.getInstructions()))
+                .andExpect(jsonPath("$.instructions[0]").value(recipe.getInstructions().get(0)))
                 .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
                 .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
                 .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))

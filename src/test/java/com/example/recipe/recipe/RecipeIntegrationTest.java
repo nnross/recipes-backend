@@ -606,7 +606,7 @@ class RecipeIntegrationTest {
                 .jsonPath("$.instructions").isEqualTo("Score both sides of fish with shallow cross-cuts.  Heat dressing in large skillet on medium heat.  Add fish; cook 6 to 8 min. on each side or until fish is lightly browned on both sides and flakes easily with fork.  Transfer fish to platter; cover to keep warm.                                            Add coconut milk, onions and chiles to skillet; cook on medium-low heat 10 min. or until coconut milk is reduced by half.  Stir in peppers and cream cheese; cook 3 min. or until cream cheese is melted and sauce is well blended, stirring frequently.                                            Serve fish topped with sauce.")
                 .jsonPath("$.healthScore").isEqualTo(22)
                 .jsonPath("$.dishTypes[0]").isEqualTo("lunch")
-                .jsonPath("$.diets[0]").isEqualTo("gluten free")
+                .jsonPath("$.diets[0]").isEqualTo("glutenfree")
                 .jsonPath("$.cuisines[0]").isEqualTo("asian")
                 .jsonPath("$.measurements[0].unit").isEqualTo("g");
     }

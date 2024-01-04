@@ -15,6 +15,9 @@ public class ShortRecipe {
         this.image = image;
     }
 
+    public ShortRecipe() {
+    }
+
     public int getId() {
         return id;
     }

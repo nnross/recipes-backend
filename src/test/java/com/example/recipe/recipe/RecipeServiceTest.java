@@ -2,10 +2,7 @@ package com.example.recipe.recipe;
 
 import com.example.recipe.RecipeApplication;
 import com.example.recipe.account.Account;
-import com.example.recipe.apiClasses.Measures;
-import com.example.recipe.apiClasses.Metric;
-import com.example.recipe.apiClasses.RecipeFormat;
-import com.example.recipe.apiClasses.RecipeIngredients;
+import com.example.recipe.apiClasses.*;
 import com.example.recipe.category.Category;
 import com.example.recipe.category.CategoryRepository;
 import com.example.recipe.country.Country;
@@ -416,58 +413,58 @@ class RecipeServiceTest {
     @Test
     void searchRecipeWorks() {
         given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), anyInt()))
-                .willReturn(new RecipeResponse());
+                .willReturn(new RecipeResponse(List.of(new ShortRecipe())));
 
-        testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "main course", "time", "asc", 0);
+        testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "time", "asc", 0);
 
         verify(recipeUtils).searchResults("search", "pork", "asian", "vegan", "dairy", "main course", "time", "asc", 0);
     }
 
     @Test
     void searchRecipeThrowsWithBadIngredient() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "bad", "asian", "vegan", "dairy", "main course", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("bad"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid ingredient filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadCuisine() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "bad", "vegan", "dairy", "main course", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("bad"), List.of("vegan"), List.of("dairy"), "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid cuisine filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadDiet() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "bad", "dairy", "main course", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("bad"), List.of("dairy"), "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid diet filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadIntolerance() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "bad", "main course", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("bad"), "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid intolerance filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadType() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "bad", "time", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("dairy"), "bad", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid type filter");
     }
 
     @Test
     void searchRecipeThrowsWithBadSort() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "main course", "bad", "asc", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "bad", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid sort");
     }
 
     @Test
     void searchRecipeThrowsWithBadSortDir() {
-        assertThatThrownBy(() -> testRecipeService.getSearch("search", "pork", "asian", "vegan", "dairy", "main course", "time", "bad", 0))
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "time", "bad", 0))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("invalid sort direction");
     }
@@ -496,7 +493,7 @@ class RecipeServiceTest {
                 ));
         RecipeRes res = testRecipeService.getSearchById(1);
 
-        assertEquals("dairy free", res.getDiets().get(0));
+        assertEquals("vegan", res.getDiets().get(0));
         assertEquals("test name", res.getMeasurements().get(0).getName());
         assertEquals(2, res.getMeasurements().get(0).getAmount());
         verify(recipeUtils).getRecipeById(1);
