@@ -34,7 +34,7 @@ public class Converters {
         }
 
         for (Measurement measurement : recipe.getMeasurements()) {
-            measurements.add(new MeasurementRes(measurement.getIngredient().getName(), measurement.getAmount(), measurement.getUnit().getName()));
+            measurements.add(new MeasurementRes(measurement.getIngredient(), measurement.getAmount(), measurement.getUnit()));
         }
 
         for (Category category : recipe.getCategory()) {

@@ -12,6 +12,7 @@ import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.response.*;
 import com.example.recipe.type.TypeRepository;
+import com.example.recipe.unit.Unit;
 import com.example.recipe.unit.UnitRepository;
 import com.example.recipe.type.Type;
 import exceptions.BadRequestException;
@@ -72,17 +73,14 @@ public class RecipeService {
             typeRepository.findById(type.getId()).orElseThrow(() ->
                     new BadRequestException("type not in database"));
         }
-
         for (Country country : recipe.getCountry()) {
             countryRepository.findById(country.getId()).orElseThrow(() ->
                     new BadRequestException("country not in database"));
         }
-
         for (Category category : recipe.getCategory()) {
             categoryRepository.findById(category.getId()).orElseThrow(() ->
                     new BadRequestException("category not in database"));
         }
-
         try {
             recipeRepository.save(recipe);
         }
@@ -253,15 +251,23 @@ public class RecipeService {
      * @return Found recipe as RecipeRes
      */
     public RecipeRes getSearchById(int id) {
+        // If recipe already in database.
+        if (recipeRepository.findById(id).orElse(null) != null) return null;
+
+
+
         RecipeFormat res = recipeUtils.getRecipeById(id);
 
         String summary = res.getSummary().replaceAll("<b>", "").replaceAll("</b>", "").substring(0, Math.min(res.getSummary().length(), 300))+"...";
 
         List<MeasurementRes> measurements = new ArrayList<>();
         for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
-            MeasurementRes measurement = new MeasurementRes(ingredient.getName(),
+            String unit = ingredient.getMeasures().getMetric().getUnitShort();
+
+            MeasurementRes measurement = new MeasurementRes(
+                    ingredientRepository.getIngredientByName(ingredient.getName()).orElseGet(() -> ingredientRepository.save(new com.example.recipe.ingredient.Ingredient(ingredient.getName()))),
                     ingredient.getMeasures().getMetric().getAmount(),
-                    ingredient.getMeasures().getMetric().getUnitShort());
+                    unitRepository.getUnitByName(unit).orElseGet(() -> unitRepository.save(new Unit(unit))));
             if(!measurements.contains(measurement)){
                 measurements.add(measurement);
             }
@@ -269,22 +275,36 @@ public class RecipeService {
         String inst = res.getInstructions().replaceAll("<ol>", "").replaceAll("</ol>", "").replaceAll("<li>", "");
         List<String> instList = new ArrayList<>(Arrays.asList(inst.split("</li>")));
 
-        List<String> diets = new ArrayList<String>();
-        for(String diet : res.getDiets()) {
-            diets.add(diet.replaceAll("\\s", ""));
+        List<Type> types = new ArrayList<>();
+        List<Country> countries = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
+
+        for (String type : res.getDishTypes()) {
+            types.add(typeRepository.getTypeByName(type).orElseGet(() -> typeRepository.save(new Type(type))));
         }
-        if (res.isDairyFree() && !diets.contains("dairyfree")) {
-            diets.add("dairyfree");
+
+        for (String cuisine : res.getCuisines()) {
+            countries.add(countryRepository.getCountryByName(cuisine).orElseGet(() -> countryRepository.save(new Country(cuisine))));
         }
-        if (res.isVegan() && !diets.contains("vegan")) {
-            diets.add("vegan");
+
+        for(String category : res.getDiets()) {
+            category.replaceAll("\\s", "");
+            categories.add(categoryRepository.getCategoryByName(category).orElseGet(() -> categoryRepository.save(new Category(category))));
         }
-        if (res.isVegetarian() && !diets.contains("vegetarian")) {
-            diets.add("vegetarian");
+        if (res.isDairyFree() && !categories.contains("dairyfree")) {
+            categories.add(categoryRepository.getCategoryByName("dairyfree").orElse(null));
         }
-        if (res.isGlutenFree() && !diets.contains("glutenfree")) {
-            diets.add("glutenfree");
+        if (res.isVegan() && !categories.contains("vegan")) {
+            categories.add(categoryRepository.getCategoryByName("vegan").orElse(null));
         }
+        if (res.isVegetarian() && !categories.contains("vegetarian")) {
+            categories.add(categoryRepository.getCategoryByName("vegetarian").orElse(null));
+        }
+        if (res.isGlutenFree() && !categories.contains("glutenfree")) {
+            categories.add(categoryRepository.getCategoryByName("glutenfree").orElse(null));
+        }
+
+        System.out.println(categories);
 
         return new RecipeRes(
                 res.getId(),
@@ -296,9 +316,9 @@ public class RecipeService {
                 instList,
                 summary,
                 res.getHealthScore(),
-                res.getDishTypes(),
-                res.getCuisines(),
-                diets,
+                types,
+                countries,
+                categories,
                 measurements
         );
     }

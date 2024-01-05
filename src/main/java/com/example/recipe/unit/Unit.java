@@ -21,6 +21,10 @@ public class Unit {
         this.name = name;
     }
 
+    public Unit(String name) {
+        this.name = name;
+    }
+
     public Unit() {
     }
 

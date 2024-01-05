@@ -21,7 +21,7 @@ import java.util.List;
 public class Recipe {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recipe_id", nullable = false, updatable = false, unique = true)
     private int id;
 
@@ -59,7 +59,7 @@ public class Recipe {
     private LocalDate toDoDate;
 
     @Column(name = "recipe_instructions", nullable = false)
-    private String instructions;
+    private List<String> instructions;
 
     @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.MERGE})
     @JoinTable(
@@ -95,8 +95,7 @@ public class Recipe {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Measurement> measurements;
 
-
-    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, LocalDate toDoDate, String instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
+    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, LocalDate toDoDate, List<String> instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -216,11 +215,11 @@ public class Recipe {
         this.toDoDate = toDoDate;
     }
 
-    public String getInstructions() {
+    public List<String> getInstructions() {
         return instructions;
     }
 
-    public void setInstructions(String instructions) {
+    public void setInstructions(List<String> instructions) {
         this.instructions = instructions;
     }
 
