@@ -131,6 +131,29 @@ public class RecipeService {
     }
 
     /**
+     * Sets recipes date to selected and saves it to database.
+     * @param recipeId
+     *        id of the recipe.
+     * @param date
+     *        date to be set.
+     * @return true if successful, error otherwise.
+     */
+    public Boolean setCalendar(int recipeId, String date) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() ->
+                new BadRequestException("no recipe with id"));
+
+        recipe.setToDoDate(LocalDate.parse(date));
+
+        try {
+            recipeRepository.save(recipe);
+        }
+        catch (Exception e) {
+            throw new DatabaseException("error while saving to database");
+        }
+        return true;
+    }
+
+    /**
      * Marks the selected recipe as finished
      * @param recipeId
      *        Recipe to be marked as finished
@@ -289,7 +312,8 @@ public class RecipeService {
 
         for(String category : res.getDiets()) {
             category.replaceAll("\\s", "");
-            categories.add(categoryRepository.getCategoryByName(category).orElseGet(() -> categoryRepository.save(new Category(category))));
+            if (category.equals("pescatarian")) categories.add(categoryRepository.getCategoryByName("pescatarian").orElse(null));
+            if (category.equals("nut free")) categories.add(categoryRepository.getCategoryByName("nutfree").orElse(null));
         }
         if (res.isDairyFree() && !categories.contains("dairyfree")) {
             categories.add(categoryRepository.getCategoryByName("dairyfree").orElse(null));
@@ -303,8 +327,6 @@ public class RecipeService {
         if (res.isGlutenFree() && !categories.contains("glutenfree")) {
             categories.add(categoryRepository.getCategoryByName("glutenfree").orElse(null));
         }
-
-        System.out.println(categories);
 
         return new RecipeRes(
                 res.getId(),
