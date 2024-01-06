@@ -1,9 +1,11 @@
 package com.example.recipe.pages;
 
 import com.example.recipe.account.Account;
+import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.recipe.Day;
 import com.example.recipe.recipe.RecipeStats;
 import com.example.recipe.response.*;
+import com.example.recipe.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -99,7 +101,7 @@ class PagesControllerTest {
                 4,
                 10,
                 "source",
-                "instructions",
+                List.of("instructions"),
                 "summary",
                 200,
                 1,
@@ -110,7 +112,7 @@ class PagesControllerTest {
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
@@ -136,7 +138,7 @@ class PagesControllerTest {
                 4,
                 10,
                 "source",
-                "instructions",
+                List.of("instructions"),
                 "summary",
                 200,
                 1,
@@ -147,7 +149,7 @@ class PagesControllerTest {
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
@@ -170,7 +172,7 @@ class PagesControllerTest {
                 4,
                 10,
                 "source",
-                "instructions",
+                List.of("instructions"),
                 "summary",
                 200,
                 1,
@@ -181,7 +183,7 @@ class PagesControllerTest {
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));

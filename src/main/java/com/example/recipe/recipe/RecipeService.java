@@ -85,6 +85,7 @@ public class RecipeService {
         if (recipeRepository.getByDate(recipe.getAccount().getId(), recipe.getToDoDate()).orElse(null) != null) {
             throw new BadRequestException("recipe with date already exists");
         }
+
         try {
             recipeRepository.save(recipe);
         }

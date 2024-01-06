@@ -5,6 +5,7 @@ import com.example.recipe.account.AccountRepository;
 import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
 import com.example.recipe.ingredient.Ingredient;
+import com.example.recipe.instructions.Instruction;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.recipe.Recipe;
 import com.example.recipe.recipe.RecipeRepository;
@@ -79,7 +80,7 @@ class PagesIntegrationTest {
                 false,
                 false,
                 LocalDate.now(),
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category(1, "test")),
                 List.of(new Type(1, "test")),
                 new Account(1, "test", "test", "test", "test"),

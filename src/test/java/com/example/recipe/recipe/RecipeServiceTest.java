@@ -9,6 +9,7 @@ import com.example.recipe.country.Country;
 import com.example.recipe.country.CountryRepository;
 import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.ingredient.IngredientRepository;
+import com.example.recipe.instructions.Instruction;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.measurement.MeasurementRepository;
 import com.example.recipe.response.FullRecipeRes;
@@ -115,7 +116,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category(1, "test")),
                 List.of(new Type(1, "test")),
                 new Account(1, "test", "test", "test", "test"),
@@ -143,7 +144,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -173,7 +174,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -204,7 +205,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -236,7 +237,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -269,7 +270,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -304,7 +305,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -338,7 +339,7 @@ class RecipeServiceTest {
                 false,
                 false,
                 null,
-                "test instructions",
+                List.of(new Instruction("test instructions")),
                 List.of(new Category()),
                 List.of(new Type()),
                 new Account(),
@@ -537,6 +538,10 @@ class RecipeServiceTest {
 
     @Test
     void getRecipeFromAPIWorks() {
+        given(recipeRepository.findById(anyInt())).willReturn(Optional.empty());
+        given(typeRepository.getTypeByName(any())).willReturn(Optional.of(new Type("lunch")));
+        given(categoryRepository.getCategoryByName(any())).willReturn(Optional.of(new Category("vegan")));
+        given(ingredientRepository.getIngredientByName(any())).willReturn(Optional.of(new Ingredient("test ingredient")));
         given(recipeUtils.getRecipeById(anyInt()))
                 .willReturn(new RecipeFormat(
                         1,
@@ -557,12 +562,22 @@ class RecipeServiceTest {
                         List.of("vegan"),
                         List.of(new RecipeIngredients("test name", new Measures(new Metric(2, "tbsp"))))
                 ));
+
         RecipeRes res = testRecipeService.getSearchById(1);
 
-        assertEquals("vegan", res.getDiets().get(0));
-        assertEquals("test name", res.getMeasurements().get(0).getName());
+        assertEquals("vegan", res.getDiets().get(0).getName());
+        assertEquals("test ingredient", res.getMeasurements().get(0).getName().getName());
         assertEquals(2, res.getMeasurements().get(0).getAmount());
         verify(recipeUtils).getRecipeById(1);
+    }
+
+    @Test
+    void getRecipeFromAPIReturnsNullIfInDb() {
+        given(recipeRepository.findById(anyInt())).willReturn(Optional.of(new Recipe()));
+
+        RecipeRes res = testRecipeService.getSearchById(1);
+
+        assertEquals(null, res);
     }
 
     @Test
@@ -733,7 +748,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         LocalDate.of(2022, 12, 12),
-                        "test instructions",
+                        List.of(new Instruction("test instructions")),
                         List.of(new Category()),
                         List.of(new Type()),
                         new Account(),
@@ -770,7 +785,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         LocalDate.of(2022,12,12),
-                        "test instructions",
+                        List.of(new Instruction("test instructions")),
                         List.of(new Category()),
                         List.of(new Type()),
                         new Account(),
@@ -809,7 +824,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         LocalDate.of(2022,12,12),
-                        "test instructions",
+                        List.of(new Instruction("test instructions")),
                         List.of(new Category()),
                         List.of(new Type()),
                         new Account(),
@@ -839,7 +854,7 @@ class RecipeServiceTest {
                         true,
                         false,
                         LocalDate.of(2022,12,12),
-                        "test instructions",
+                        List.of(new Instruction("test instructions")),
                         List.of(new Category()),
                         List.of(new Type()),
                         new Account(),
@@ -889,7 +904,7 @@ class RecipeServiceTest {
                     true,
                     true,
                         LocalDate.of(2022,12,12),
-                    "test instructions",
+                        List.of(new Instruction("test instructions")),
                     categories,
                     types,
                     new Account(),
@@ -934,7 +949,7 @@ class RecipeServiceTest {
                         true,
                         true,
                         LocalDate.of(2022,12,12),
-                        "test instructions",
+                        List.of(new Instruction("test instructions")),
                         categories,
                         types,
                         new Account(),

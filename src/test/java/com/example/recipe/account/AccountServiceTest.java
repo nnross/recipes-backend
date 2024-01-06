@@ -5,6 +5,7 @@ import com.example.recipe.RecipeApplication;
 import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
 import com.example.recipe.ingredient.Ingredient;
+import com.example.recipe.instructions.Instruction;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.recipe.Recipe;
 import com.example.recipe.recipe.RecipeRepository;
@@ -461,7 +462,7 @@ class AccountServiceTest {
                         true,
                         true,
                         LocalDate.of(2022,12,12),
-                        "test instructions",
+                        List.of(new Instruction("test instructions")),
                         categories,
                         types,
                         new Account(),

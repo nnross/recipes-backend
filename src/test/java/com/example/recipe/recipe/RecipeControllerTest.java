@@ -1,11 +1,16 @@
 package com.example.recipe.recipe;
 
 import com.example.recipe.account.Account;
+import com.example.recipe.category.Category;
+import com.example.recipe.country.Country;
+import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.response.FullRecipeRes;
 import com.example.recipe.response.ListRes;
 import com.example.recipe.response.MeasurementRes;
 import com.example.recipe.response.RecipeRes;
 import com.example.recipe.security.Authorization;
+import com.example.recipe.type.Type;
+import com.example.recipe.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -62,7 +67,7 @@ class RecipeControllerTest {
                                     "doLater": false,
                                     "finished": true,
                                     "toDoDate": null,
-                                    "instructions": "test instructions",
+                                    "instructions": ["test instructions"],
                                     "healthScore": 2,
                                     "category": [{"id": 1}],
                                     "type": [{"id": 1}],
@@ -121,7 +126,7 @@ class RecipeControllerTest {
                                     "doLater": false,
                                     "finished": true,
                                     "toDoDate": null,
-                                    "instructions": "test instructions",
+                                    "instructions": ["test instructions"],
                                     "healthScore": 2,
                                     "category": [{"id": 1}],
                                     "type": [{"id": 1}],
@@ -224,7 +229,7 @@ class RecipeControllerTest {
         given(recipeService.setDate(anyInt(), any())).willReturn(true);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
 
-        mockMvc.perform(put("/recipe/set/date?recipeId=1&date=2022-12-12", 1).with(csrf())
+        mockMvc.perform(put("/recipe/set/calendar?recipeId=1&date=2022-12-12", 1).with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk());
     }
@@ -324,10 +329,10 @@ class RecipeControllerTest {
                 List.of("test instructions"),
                 "test summary",
                 100,
-                List.of("dinner"),
-                List.of("indian"),
-                List.of("vegetarian"),
-                List.of(new MeasurementRes("ingredient", 12, "unit"))
+                List.of(new Type("dinner")),
+                List.of(new Country("indian")),
+                List.of(new Category("vegetarian")),
+                List.of(new MeasurementRes(new Ingredient("ingredient"), 12, new Unit("unit")))
         );
         given(recipeService.getSearchById(anyInt())).willReturn(recipe);
 
@@ -342,10 +347,10 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.instructions[0]").value(recipe.getInstructions().get(0)))
                 .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
                 .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
-                .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))
-                .andExpect(jsonPath("$.cuisines.[0]").value(recipe.getCuisines().get(0)))
-                .andExpect(jsonPath("$.diets[0]").value(recipe.getDiets().get(0)))
-                .andExpect(jsonPath("$.measurements[0].unit").value(recipe.getMeasurements().get(0).getUnit()))
+                .andExpect(jsonPath("$.dishTypes[0].name").value(recipe.getDishTypes().get(0).getName()))
+                .andExpect(jsonPath("$.cuisines.[0].name").value(recipe.getCuisines().get(0).getName()))
+                .andExpect(jsonPath("$.diets[0].name").value(recipe.getDiets().get(0).getName()))
+                .andExpect(jsonPath("$.measurements[0].unit.name").value(recipe.getMeasurements().get(0).getUnit().getName()))
                 .andExpect(jsonPath("$.id").value(recipe.getId()));
     }
 
@@ -444,7 +449,7 @@ class RecipeControllerTest {
                 12,
                 20,
                 "test source",
-                "test instruction",
+                List.of("test instruction"),
                 "test summary",
                 120,
                 account.getId(),
@@ -455,7 +460,7 @@ class RecipeControllerTest {
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         given(recipeService.getRecipe(anyInt())).willReturn(recipe);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
@@ -468,7 +473,7 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.servings").value(recipe.getServings()))
                 .andExpect(jsonPath("$.readyInMinutes").value(recipe.getReadyInMinutes()))
                 .andExpect(jsonPath("$.sourceUrl").value(recipe.getSourceUrl()))
-                .andExpect(jsonPath("$.instructions").value(recipe.getInstructions()))
+                .andExpect(jsonPath("$.instructions[0]").value(recipe.getInstructions().get(0)))
                 .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
                 .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
                 .andExpect(jsonPath("$.account").value(recipe.getAccount()))
@@ -479,9 +484,9 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.cuisines[0]").value(recipe.getCuisines().get(0)))
                 .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))
                 .andExpect(jsonPath("$.diets[0]").value(recipe.getDiets().get(0)))
-                .andExpect(jsonPath("$.measurements[0].name").value(recipe.getMeasurements().get(0).getName()))
+                .andExpect(jsonPath("$.measurements[0].name.name").value(recipe.getMeasurements().get(0).getName().getName()))
                 .andExpect(jsonPath("$.measurements[0].amount").value(recipe.getMeasurements().get(0).getAmount()))
-                .andExpect(jsonPath("$.measurements[0].unit").value(recipe.getMeasurements().get(0).getUnit()))
+                .andExpect(jsonPath("$.measurements[0].unit.name").value(recipe.getMeasurements().get(0).getUnit().getName()))
                 .andExpect(jsonPath("$.id").value(recipe.getId()));
     }
 
@@ -495,7 +500,7 @@ class RecipeControllerTest {
                 12,
                 20,
                 "test source",
-                "test instruction",
+                List.of("test instruction"),
                 "test summary",
                 120,
                 account.getId(),
@@ -506,7 +511,7 @@ class RecipeControllerTest {
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         given(recipeService.getRecipe(anyInt())).willReturn(recipe);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(false);
@@ -526,7 +531,7 @@ class RecipeControllerTest {
                 12,
                 20,
                 "test source",
-                "test instruction",
+                List.of("test instruction"),
                 "test summary",
                 120,
                 account.getId(),
@@ -537,7 +542,7 @@ class RecipeControllerTest {
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         given(recipeService.getRecipe(anyInt())).willReturn(recipe);
         given(authorization.isOwnRecipe(any(), anyInt())).willReturn(true);
@@ -558,7 +563,7 @@ class RecipeControllerTest {
                 12,
                 20,
                 "test source",
-                "test instruction",
+                List.of("test instruction"),
                 "test summary",
                 120,
                 account.getId(),
@@ -569,7 +574,7 @@ class RecipeControllerTest {
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
 
         given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(recipe);
@@ -582,7 +587,7 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.servings").value(recipe.getServings()))
                 .andExpect(jsonPath("$.readyInMinutes").value(recipe.getReadyInMinutes()))
                 .andExpect(jsonPath("$.sourceUrl").value(recipe.getSourceUrl()))
-                .andExpect(jsonPath("$.instructions").value(recipe.getInstructions()))
+                .andExpect(jsonPath("$.instructions[0]").value(recipe.getInstructions().get(0)))
                 .andExpect(jsonPath("$.summary").value(recipe.getSummary()))
                 .andExpect(jsonPath("$.healthScore").value(recipe.getHealthScore()))
                 .andExpect(jsonPath("$.account").value(recipe.getAccount()))
@@ -593,9 +598,9 @@ class RecipeControllerTest {
                 .andExpect(jsonPath("$.cuisines[0]").value(recipe.getCuisines().get(0)))
                 .andExpect(jsonPath("$.dishTypes[0]").value(recipe.getDishTypes().get(0)))
                 .andExpect(jsonPath("$.diets[0]").value(recipe.getDiets().get(0)))
-                .andExpect(jsonPath("$.measurements[0].name").value(recipe.getMeasurements().get(0).getName()))
+                .andExpect(jsonPath("$.measurements[0].name.name").value(recipe.getMeasurements().get(0).getName().getName()))
                 .andExpect(jsonPath("$.measurements[0].amount").value(recipe.getMeasurements().get(0).getAmount()))
-                .andExpect(jsonPath("$.measurements[0].unit").value(recipe.getMeasurements().get(0).getUnit()))
+                .andExpect(jsonPath("$.measurements[0].unit.name").value(recipe.getMeasurements().get(0).getUnit().getName()))
                 .andExpect(jsonPath("$.id").value(recipe.getId()));
     }
 
@@ -609,7 +614,7 @@ class RecipeControllerTest {
                 12,
                 20,
                 "test source",
-                "test instruction",
+                List.of("test instruction"),
                 "test summary",
                 120,
                 account.getId(),
@@ -620,7 +625,7 @@ class RecipeControllerTest {
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(recipe);
 
@@ -639,7 +644,7 @@ class RecipeControllerTest {
                 12,
                 20,
                 "test source",
-                "test instruction",
+                List.of("test instruction"),
                 "test summary",
                 120,
                 account.getId(),
@@ -650,7 +655,7 @@ class RecipeControllerTest {
                 List.of("dinner"),
                 List.of("indian"),
                 List.of("vegan"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         given(recipeService.getRecipeForDate(anyInt(), any())).willReturn(recipe);
 

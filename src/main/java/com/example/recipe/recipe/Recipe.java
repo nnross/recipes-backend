@@ -3,6 +3,7 @@ package com.example.recipe.recipe;
 import com.example.recipe.account.Account;
 import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
+import com.example.recipe.instructions.Instruction;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.type.Type;
 import jakarta.persistence.*;
@@ -58,8 +59,11 @@ public class Recipe {
     @Column(name = "recipe_toDoDate")
     private LocalDate toDoDate;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "recipe_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "recipe_instructions", nullable = false)
-    private List<String> instructions;
+    private List<Instruction> instructions;
 
     @ManyToMany(cascade={CascadeType.REMOVE, CascadeType.MERGE})
     @JoinTable(
@@ -95,7 +99,7 @@ public class Recipe {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Measurement> measurements;
 
-    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, LocalDate toDoDate, List<String> instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
+    public Recipe(int id, String title, String description, String original, int time, int servings, String image, double healthScore, Boolean favourite, Boolean doLater, Boolean finished, LocalDate toDoDate, List<Instruction> instructions, List<Category> category, List<Type> type, Account account, List<Country> country, List<Measurement> measurements) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -215,11 +219,11 @@ public class Recipe {
         this.toDoDate = toDoDate;
     }
 
-    public List<String> getInstructions() {
+    public List<Instruction> getInstructions() {
         return instructions;
     }
 
-    public void setInstructions(List<String> instructions) {
+    public void setInstructions(List<Instruction> instructions) {
         this.instructions = instructions;
     }
 
