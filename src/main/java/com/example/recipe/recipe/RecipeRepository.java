@@ -23,7 +23,7 @@ public interface RecipeRepository extends PagingAndSortingRepository<Recipe, Int
      *        id for account
      * @return List of ResStats with the count of recipes and name of country.
      */
-    @Query(value = "SELECT COUNT(recipe_country) AS count, c.country_name AS name FROM recipe_country_mapping m LEFT JOIN country c ON m.country_id = c.country_id LEFT JOIN recipe r ON r.recipe_id = m.recipe_country WHERE r.recipe_account = ?1 GROUP BY recipe_country", nativeQuery = true)
+    @Query(value = "SELECT COUNT(recipe_country) AS count, c.country_name AS name FROM recipe_country_mapping m LEFT JOIN country c ON m.country_id = c.country_id LEFT JOIN recipe r ON r.recipe_id = m.recipe_country WHERE r.recipe_account = ?1 GROUP BY c.country_name", nativeQuery = true)
     List<StatRes> getStats(int accountId);
 
     /**

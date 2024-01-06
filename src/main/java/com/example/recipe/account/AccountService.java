@@ -7,6 +7,7 @@ import com.example.recipe.security.AuthRequest;
 import com.example.recipe.security.JwtService;
 import exceptions.BadRequestException;
 import exceptions.DatabaseException;
+import exceptions.ForbiddenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -124,15 +125,20 @@ public class AccountService {
 
     /**
      * Updates user's account information.
-     * @param account
-     *        Contains user's new name, username, email and password
+     * @param newAccount
+     *        Contains user's new name, username, email and password and confirmation
      * @param id
      *        id of the account being updated
      * @return true if account was updated, error otherwise.
      */
-    public Boolean update(Account account, int id) {
+    public Boolean update(UpdateAccount newAccount, int id) {
+        Account account = newAccount.getAccount();
         Account oldAccount = accountRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("Invalid id"));
+
+        if (!passwordEncoder.matches(newAccount.getConfirmation(), oldAccount.getPassword())) {
+            throw new ForbiddenException("Wrong confirmation");
+        }
 
         if ((accountRepository.findByUsername(account.getUsername()).isPresent()
                 && !oldAccount.getUsername().equals(account.getUsername()))

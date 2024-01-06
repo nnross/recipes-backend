@@ -100,6 +100,7 @@ class RecipeServiceTest {
         given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
         given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
         given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
+        given(recipeRepository.getByDate(anyInt(), any())).willReturn(Optional.empty());
 
         Recipe recipe = new Recipe(
                 1,
@@ -282,6 +283,41 @@ class RecipeServiceTest {
     }
 
     @Test
+    void addRecipeThrowsWithBadDate() {
+        given(categoryRepository.findById(any())).willReturn(Optional.empty());
+        given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
+        given(typeRepository.findById(any())).willReturn(Optional.of(new Type()));
+        given(countryRepository.findById(any())).willReturn(Optional.of(new Country()));
+        given(ingredientRepository.findById(any())).willReturn(Optional.of(new Ingredient()));
+        given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
+        given(recipeRepository.getByDate(anyInt(), any())).willReturn(Optional.of(new Recipe()));
+        Recipe recipe = new Recipe(
+                1,
+                "test title",
+                "test desc",
+                "test original",
+                12,
+                2,
+                "test image",
+                120,
+                false,
+                false,
+                false,
+                null,
+                "test instructions",
+                List.of(new Category()),
+                List.of(new Type()),
+                new Account(),
+                List.of(new Country()),
+                List.of(new Measurement(1, new Unit(), new Ingredient(), 12))
+        );
+
+        assertThatThrownBy(() -> testRecipeService.add(recipe))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("recipe with date already exists");
+    }
+
+    @Test
     void addRecipeThrowsWithErrorWhileSaving() {
         given(categoryRepository.findById(any())).willReturn(Optional.of(new Category()));
         given(unitRepository.findById(any())).willReturn(Optional.of(new Unit()));
@@ -375,6 +411,36 @@ class RecipeServiceTest {
         doThrow(new RuntimeException()).when(recipeRepository).save(any());
 
         assertThatThrownBy(() -> testRecipeService.toggleDoLater(1))
+                .isInstanceOf(DatabaseException.class)
+                .hasMessageContaining("error while saving to database");
+    }
+
+    @Test
+    void setDateRecipeWorks() {
+        Recipe recipe = new Recipe();
+        given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
+
+        testRecipeService.setDate( 1, LocalDate.of(2022,12,12));
+        recipe.setToDoDate(LocalDate.of(2022,12,12));
+        verify(recipeRepository).save(recipe);
+
+    }
+    @Test
+    void setDateThrowsWithNoRecipe() {
+        given(recipeRepository.findById(any())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> testRecipeService.setDate(1, LocalDate.of(2022, 12,12)))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("no recipe with id");
+    }
+
+    @Test
+    void setDateThrowsWithErrorWhileSaving() {
+        Recipe recipe = new Recipe();
+        given(recipeRepository.findById(any())).willReturn(Optional.of(recipe));
+        doThrow(new RuntimeException()).when(recipeRepository).save(any());
+
+        assertThatThrownBy(() -> testRecipeService.setDate(1, LocalDate.of(2022, 12, 12)))
                 .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("error while saving to database");
     }
@@ -614,7 +680,7 @@ class RecipeServiceTest {
         }));
         testRecipeService.getFavourite(1, 0);
 
-        verify(recipeRepository).getFavourite(1, PageRequest.of(0, 6));
+        verify(recipeRepository).getFavourite(1, PageRequest.of(0, 5));
     }
 
     @Test
@@ -640,7 +706,7 @@ class RecipeServiceTest {
         }));
         testRecipeService.getDoLater(1, 0);
 
-        verify(recipeRepository).getDoLater(1, PageRequest.of(0, 6));
+        verify(recipeRepository).getDoLater(1, PageRequest.of(0, 5));
     }
 
     @Test
@@ -754,8 +820,7 @@ class RecipeServiceTest {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertEquals(monday, res.get("Monday").getDate());
-        assertEquals(true, res.get("Monday").getIsRecipe());
-        assertEquals(true, res.get("Monday").getIsFinished());
+        assertEquals(2, res.get("Monday").getState());
     }
 
     @Test
@@ -785,8 +850,7 @@ class RecipeServiceTest {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertEquals(monday, res.get("Monday").getDate());
-        assertEquals(true, res.get("Monday").getIsRecipe());
-        assertEquals(false, res.get("Monday").getIsFinished());
+        assertEquals(1, res.get("Monday").getState());
     }
 
     @Test
@@ -797,8 +861,6 @@ class RecipeServiceTest {
         LocalDate today = LocalDate.now();
         LocalDate monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertEquals(monday, res.get("Monday").getDate());
-        assertEquals(false, res.get("Monday").getIsRecipe());
-        assertEquals(false, res.get("Monday").getIsFinished());
     }
 
 

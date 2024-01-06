@@ -65,23 +65,6 @@ public class RecipeController {
 
 
     /**
-     * PUT API call to /recipe/calendar?recipeId=(id)&date=(date)
-     * sets a new date for selected recipe
-     * Authorization with isOwnRecipe()
-     * @param recipeId
-     *        id of the recipe to set date.
-     * @param date
-     *        date to be set.
-     * @return true id successful, error otherwise.
-     */
-    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
-    @PutMapping("/set/calendar")
-    public Boolean calendar(@RequestParam("recipeId") int recipeId, @RequestParam("date") String date) {
-        return recipeService.setCalendar(recipeId, date);
-    }
-
-
-    /**
      * PUT API call to /recipe/finished?recipeId=(id)
      * Sets recipe as finished.
      * Authorization with isOwnRecipe()
@@ -93,6 +76,22 @@ public class RecipeController {
     @PutMapping("/set/finished")
     public Boolean finished(@RequestParam("recipeId") int recipeId) {
         return recipeService.finishRecipe(recipeId);
+    }
+
+    /**
+     * PUT API call to /recipe/set/calendar?recipeId=(id)&date=(date)
+     * Sets date for recipe.
+     * Authorization with isOwnRecipe()
+     * @param recipeId
+     *        id of the recipe
+     * @param date
+     *        date wanted for the recipe
+     * @return true if successful, error otherwise.
+     */
+    @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
+    @PutMapping("/set/calendar")
+    public Boolean finished(@RequestParam("recipeId") int recipeId, @RequestParam("date") LocalDate date) {
+        return recipeService.setDate(recipeId, date);
     }
 
     /**

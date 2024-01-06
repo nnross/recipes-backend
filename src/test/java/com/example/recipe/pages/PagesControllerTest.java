@@ -40,7 +40,7 @@ class PagesControllerTest {
         ListRes recipes = new ListRes(List.of("recipe"), false);
         RecipeStats stats = new RecipeStats(null, 2, 5, 10);
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         PersonalPageRes response = new PersonalPageRes(recipes, stats, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
@@ -52,7 +52,8 @@ class PagesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipes.recipes[0]").value(response.getRecipes().getRecipes().get(0)))
                 .andExpect(jsonPath("$.stats.done").value(response.getStats().getDone()))
-                .andExpect(jsonPath("$.calendar.monday.isRecipe").value(response.getCalendar().get("monday").getIsRecipe()));
+                .andExpect(jsonPath("$.calendar.monday.state").value(0))
+                .andExpect(jsonPath("$.calendar.monday.date").value("2022-12-12"));
     }
 
     @Test
@@ -60,7 +61,7 @@ class PagesControllerTest {
         ListRes recipes = new ListRes(List.of("recipe"), false);
         RecipeStats stats = new RecipeStats(null, 2, 5, 10);
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         PersonalPageRes response = new PersonalPageRes(recipes, stats, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
@@ -77,7 +78,7 @@ class PagesControllerTest {
         ListRes recipes = new ListRes(List.of("recipe"), false);
         RecipeStats stats = new RecipeStats(null, 2, 5, 10);
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         PersonalPageRes response = new PersonalPageRes(recipes, stats, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
@@ -112,7 +113,7 @@ class PagesControllerTest {
                 List.of(new MeasurementRes("name", 12, "unit"))
         );
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
@@ -123,7 +124,8 @@ class PagesControllerTest {
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipe.title").value(response.getRecipe().getTitle()))
-                .andExpect(jsonPath("$.calendar.monday.isRecipe").value(response.getCalendar().get("monday").getIsRecipe()));
+                .andExpect(jsonPath("$.calendar.monday.state").value(0))
+                .andExpect(jsonPath("$.calendar.monday.date").value("2022-12-12"));
     }
     @Test
     void getCalendarPageThrowsWithNoParams() throws Exception {
@@ -148,7 +150,7 @@ class PagesControllerTest {
                 List.of(new MeasurementRes("name", 12, "unit"))
         );
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
@@ -182,7 +184,7 @@ class PagesControllerTest {
                 List.of(new MeasurementRes("name", 12, "unit"))
         );
         Map<String, Day> calendar = new HashMap<>();
-        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 1, true, false));
+        calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
 
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");

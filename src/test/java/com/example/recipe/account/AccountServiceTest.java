@@ -14,6 +14,7 @@ import com.example.recipe.type.Type;
 import com.example.recipe.unit.Unit;
 import exceptions.BadRequestException;
 import exceptions.DatabaseException;
+import exceptions.ForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,8 +51,8 @@ class AccountServiceTest {
     private RecipeRepository recipeRepository;
     @Mock
     private JwtService jwtService;
-    @Mock
-    private PasswordEncoder passwordEncoder;
+
+    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     @Mock
     private AuthenticationManager authenticationManager;
     @InjectMocks
@@ -233,19 +234,23 @@ class AccountServiceTest {
     void updateAccountWorks() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.empty());
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
+        Account account = new Account(1, "test name", "test username", "testEmail", "test");
 
-        Account updateAccount = new Account(
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
                 1,
                 "test2 name",
                 "username",
                 "example@gmail.com",
                 "passWord123!"
+                ),
+                "test"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        testAccountService.update(updateAccount, updateAccount.getId());
+        testAccountService.update(updateAccount, updateAccount.getAccount().getId());
 
         verify(accountRepository).save(account);
     }
@@ -253,108 +258,152 @@ class AccountServiceTest {
     @Test
     void updateAccountThrowsWithNoMatchingAccount() {
 
-        Account updateAccount = new Account(
-                1,
-                "test2 name",
-                "username 2",
-                "example2@gmail.com",
-                "passWord123!"
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "test2 name",
+                        "username",
+                        "example@gmail.com",
+                        "passWord123!"
+                ),
+                "pass"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.empty());
-        int AccountId = updateAccount.getId();
+        int AccountId = updateAccount.getAccount().getId();
         assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Invalid id");
 
-        verify(accountRepository, never()).save(updateAccount);
+        verify(accountRepository, never()).save(updateAccount.getAccount());
+    }
+
+    @Test
+    void updateAccountThrowsWithBadConfirmation() {
+
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
+
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "test2 name",
+                        "username",
+                        "example@gmail.com",
+                        "passWord123!"
+                ),
+                "pass"
+        );
+
+        given(accountRepository.findById(any())).willReturn(Optional.of(account));
+        int AccountId = updateAccount.getAccount().getId();
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("Wrong confirmation");
+
+        verify(accountRepository, never()).save(updateAccount.getAccount());
     }
 
     @Test
     void updateAccountThrowsWithBadEmail() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.of(new Account()));
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
 
-        Account updateAccount = new Account(
-                1,
-                "test2 name",
-                "username2",
-                "example2@gmail.com",
-                "passWord123!"
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "test2 name",
+                        "username",
+                        "example@gmail.com",
+                        "passWord123!"
+                ),
+                "testPass"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        int AccountId = updateAccount.getId();
+        int AccountId = updateAccount.getAccount().getId();
         assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Invalid email");
 
-        verify(accountRepository, never()).save(updateAccount);
+        verify(accountRepository, never()).save(updateAccount.getAccount());
     }
 
     @Test
     void updateAccountThrowsWithBadUsername() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.of(new Account()));
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
 
-        Account updateAccount = new Account(
-                1,
-                "test2 name",
-                "username2",
-                "example@gmail.com",
-                "passWord123!"
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "test2 name",
+                        "username",
+                        "example@gmail.com",
+                        "passWord123!"
+                ),
+                "testPass"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        int AccountId = updateAccount.getId();
+        int AccountId = updateAccount.getAccount().getId();
         assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Invalid username");
 
-        verify(accountRepository, never()).save(updateAccount);
+        verify(accountRepository, never()).save(updateAccount.getAccount());
     }
 
     @Test
     void updateAccountThrowsWithBadPassword() {
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
-        Account updateAccount = new Account(
-                1,
-                "test2 name",
-                "username2",
-                "example2@gmail.com",
-                "psas!"
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "test2 name",
+                        "username",
+                        "example@gmail.com",
+                        "pass"
+                ),
+                "testPass"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        int AccountId = updateAccount.getId();
+        int AccountId = updateAccount.getAccount().getId();
         assertThatThrownBy(() -> testAccountService.update(updateAccount, AccountId))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Invalid password");
 
-        verify(accountRepository, never()).save(updateAccount);
+        verify(accountRepository, never()).save(updateAccount.getAccount());
     }
 
     @Test
     void updateAccountWorksWithSameEmailAndUsername() {
         given(accountRepository.findByUsername(any())).willReturn(Optional.of(new Account()));
         given(accountRepository.findByEmail(any())).willReturn(Optional.of(new Account()));
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
         Account account = new Account(1, "testusername2", "test name", "testEmail", "testPass");
-        Account updateAccount = new Account(
-                1,
-                "testusername2",
-                "test name",
-                "testEmail",
-                "passWord321!"
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "testusername2",
+                        "username",
+                        "testEmail",
+                        "passWord123!"
+                ),
+                "testPass"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
-        testAccountService.update(updateAccount, updateAccount.getId());
+        testAccountService.update(updateAccount, updateAccount.getAccount().getId());
 
         verify(accountRepository).save(account);
     }
@@ -364,20 +413,25 @@ class AccountServiceTest {
         given(accountRepository.findByUsername(any())).willReturn(Optional.empty());
         given(accountRepository.findByEmail(any())).willReturn(Optional.empty());
         given(accountRepository.save(any())).willThrow(new RuntimeException("error"));
+        given(passwordEncoder.matches(any(), any())).willReturn(true);
 
-        Account account = new Account(1, "test name", "test username", "testPass", "testEmail");
 
-        Account updateAccount = new Account(
-                1,
-                "test2 name",
-                "username",
-                "example@gmail.com",
-                "passWord123!"
+        Account account = new Account(1, "test name", "test username", "testEmail", "testPass");
+
+        UpdateAccount updateAccount = new UpdateAccount(
+                new Account(
+                        1,
+                        "test2 name",
+                        "username",
+                        "example@gmail.com",
+                        "passWord123!"
+                ),
+                "testPass"
         );
 
         given(accountRepository.findById(any())).willReturn(Optional.of(account));
 
-        assertThatThrownBy(() -> testAccountService.update(updateAccount, updateAccount.getId()))
+        assertThatThrownBy(() -> testAccountService.update(updateAccount, updateAccount.getAccount().getId()))
                 .isInstanceOf(DatabaseException.class)
                 .hasMessageContaining("Failed to save changes to database");
     }

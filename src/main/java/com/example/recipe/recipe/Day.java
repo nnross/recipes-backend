@@ -8,15 +8,11 @@ import java.time.LocalDate;
 @SuppressWarnings("unused")
 public class Day {
     private LocalDate date;
-    private int accountId;
-    private Boolean isRecipe;
-    private Boolean isFinished;
+    private int state;
 
-    public Day(LocalDate date, int accountId, Boolean isRecipe, Boolean isFinished) {
+    public Day(LocalDate date, int state) {
         this.date = date;
-        this.accountId = accountId;
-        this.isRecipe = isRecipe;
-        this.isFinished = isFinished;
+        this.state = state;
     }
 
     public LocalDate getDate() {
@@ -27,29 +23,11 @@ public class Day {
         this.date = date;
     }
 
-    public int getAccountId() {
-        return accountId;
+    public int getState() {
+        return state;
     }
 
-    public void setAccountId(int accountId) {
-        this.accountId = accountId;
-    }
-
-    public Boolean getIsRecipe() {
-        return isRecipe;
-    }
-
-    public void setIsRecipe(Boolean recipe) {
-        isRecipe = recipe;
-    }
-
-    public Boolean getIsFinished() {
-        return isFinished;
-    }
-
-    public void setIsFinished(Boolean finished) {
-        isFinished = finished;
+    public void setState(int state) {
+        this.state = state;
     }
 }
-
-

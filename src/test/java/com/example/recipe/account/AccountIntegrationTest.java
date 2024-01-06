@@ -122,10 +122,13 @@ class AccountIntegrationTest {
                 .bodyValue(
                         """
                         {
-                            "name": "newName",
-                            "username": "newUser",
-                            "email": "test email",
-                            "password": "testPass123!"
+                            "account": {
+                                "name": "newName",
+                                "username": "newUser",
+                                "email": "test email",
+                                "password": "testPass124!"
+                            },
+                            "confirmation": "test"
                         }
                         """
                 )
