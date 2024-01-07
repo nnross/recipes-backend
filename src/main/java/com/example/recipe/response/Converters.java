@@ -62,9 +62,9 @@ public class Converters {
                 recipe.getDoLater(),
                 recipe.getFinished(),
                 recipe.getToDoDate(),
-                categories,
-                countries,
                 types,
+                countries,
+                categories,
                 measurements
         );
     }

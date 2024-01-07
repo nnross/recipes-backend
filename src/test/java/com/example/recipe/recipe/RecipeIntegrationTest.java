@@ -79,8 +79,8 @@ class RecipeIntegrationTest {
                 .jsonPath("$.doLater").isEqualTo(false)
                 .jsonPath("$.finished").isEqualTo(false)
                 .jsonPath("$.date").isEqualTo("2022-12-12")
-                .jsonPath("$.dishTypes[0]").isEqualTo("test category")
-                .jsonPath("$.diets[0]").isEqualTo("test type")
+                .jsonPath("$.dishTypes[0]").isEqualTo("test type")
+                .jsonPath("$.diets[0]").isEqualTo("test category")
                 .jsonPath("$.cuisines[0]").isEqualTo("test country")
                 .jsonPath("$.measurements[0].unit.name").isEqualTo("test unit")
 
@@ -728,8 +728,8 @@ class RecipeIntegrationTest {
                 .jsonPath("$.doLater").isEqualTo(false)
                 .jsonPath("$.finished").isEqualTo(false)
                 .jsonPath("$.date").isEqualTo("2022-12-12")
-                .jsonPath("$.dishTypes[0]").isEqualTo("test category")
-                .jsonPath("$.diets[0]").isEqualTo("test type")
+                .jsonPath("$.dishTypes[0]").isEqualTo("test type")
+                .jsonPath("$.diets[0]").isEqualTo("test category")
                 .jsonPath("$.cuisines[0]").isEqualTo("test country")
                 .jsonPath("$.measurements[0].unit.name").isEqualTo("test unit")
                 .jsonPath("$.id").isEqualTo("1");
