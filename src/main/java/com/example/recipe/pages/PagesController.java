@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 /**
  * Controller for calls where you get the whole page of data.
  */
@@ -39,7 +41,7 @@ public class PagesController {
      */
     @PreAuthorize("#accountId == authentication.principal.id")
     @GetMapping("/get/todays")
-    public TodaysPageRes getTodays(@RequestParam int accountId) {
-        return pagesService.getTodays(accountId);
+    public TodaysPageRes getTodays(@RequestParam("accountId") int accountId, @RequestParam("date") String date) {
+        return pagesService.getTodays(accountId, date);
     }
 }

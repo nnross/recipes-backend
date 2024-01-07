@@ -51,11 +51,11 @@ public class PagesService {
      *        id of account we want data for.
      * @return personal page data as PersonalPageRes.
      */
-    public TodaysPageRes getTodays(int accountId) {
+    public TodaysPageRes getTodays(int accountId, String date) {
         accountRepository.findById(accountId).orElseThrow(() ->
                 new BadRequestException("no account with id"));
-
-        FullRecipeRes recipe = recipeService.getRecipeForDate(accountId, LocalDate.now());
+        LocalDate dateToLocal = LocalDate.parse(date);
+        FullRecipeRes recipe = recipeService.getRecipeForDate(accountId, dateToLocal);
         Map<String, Day> calendar = recipeService.getCalendar(accountId);
 
         return new TodaysPageRes(recipe, calendar);
