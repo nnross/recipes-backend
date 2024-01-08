@@ -94,9 +94,9 @@ class PagesServiceTest {
 
         given(recipeService.getCalendar(anyInt())).willReturn(calendar);
 
-        testPagesService.getTodays(1);
+        testPagesService.getTodays(1, "2022-12-12");
 
-        verify(recipeService).getRecipeForDate(1, LocalDate.now());
+        verify(recipeService).getRecipeForDate(1, LocalDate.parse("2022-12-12"));
         verify(recipeService).getCalendar(1);
     }
 
@@ -104,7 +104,7 @@ class PagesServiceTest {
     void getCalendarPageThrowsWithNoAccount() {
         given(accountRepository.findById(any())).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> testPagesService.getTodays(1))
+        assertThatThrownBy(() -> testPagesService.getTodays(1, "2022-12-12"))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("no account with id");
     }

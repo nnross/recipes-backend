@@ -3,6 +3,7 @@ package com.example.recipe.apiClasses;
 /**
  * Formats recipe from API for search
  */
+@SuppressWarnings("unused")
 public class ShortRecipe {
 
     private int id;
@@ -13,6 +14,9 @@ public class ShortRecipe {
         this.id = id;
         this.title = title;
         this.image = image;
+    }
+
+    public ShortRecipe() {
     }
 
     public int getId() {

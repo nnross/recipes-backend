@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/pages")
+@SuppressWarnings("unused")
 public class PagesController {
     @Autowired
     private PagesService pagesService;
@@ -39,7 +40,7 @@ public class PagesController {
      */
     @PreAuthorize("#accountId == authentication.principal.id")
     @GetMapping("/get/todays")
-    public TodaysPageRes getTodays(@RequestParam int accountId) {
-        return pagesService.getTodays(accountId);
+    public TodaysPageRes getTodays(@RequestParam("accountId") int accountId, @RequestParam("date") String date) {
+        return pagesService.getTodays(accountId, date);
     }
 }

@@ -7,12 +7,21 @@ import lombok.Data;
  * Includes the token and accountId.
  */
 @Data
+@SuppressWarnings("unused")
 public class AuthRes {
-    private String token;
-    private int accountId;
+    final private String token;
+    final private int accountId;
 
     public AuthRes(String token, int accountId) {
         this.token = token;
         this.accountId = accountId;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public int getAccountId() {
+        return accountId;
     }
 }

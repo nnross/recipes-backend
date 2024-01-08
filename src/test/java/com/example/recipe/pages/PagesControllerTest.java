@@ -1,9 +1,11 @@
 package com.example.recipe.pages;
 
 import com.example.recipe.account.Account;
+import com.example.recipe.ingredient.Ingredient;
 import com.example.recipe.recipe.Day;
 import com.example.recipe.recipe.RecipeStats;
 import com.example.recipe.response.*;
+import com.example.recipe.unit.Unit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -99,7 +102,7 @@ class PagesControllerTest {
                 4,
                 10,
                 "source",
-                "instructions",
+                List.of("instructions"),
                 "summary",
                 200,
                 1,
@@ -110,7 +113,7 @@ class PagesControllerTest {
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
@@ -118,9 +121,9 @@ class PagesControllerTest {
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
 
-        given(pagesService.getTodays(anyInt())).willReturn(response);
+        given(pagesService.getTodays(anyInt(), any())).willReturn(response);
 
-        mockMvc.perform(get("/pages/get/todays?accountId=1").with(csrf())
+        mockMvc.perform(get("/pages/get/todays?accountId=1&date=2022-12-12").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipe.title").value(response.getRecipe().getTitle()))
@@ -136,7 +139,7 @@ class PagesControllerTest {
                 4,
                 10,
                 "source",
-                "instructions",
+                List.of("instructions"),
                 "summary",
                 200,
                 1,
@@ -147,7 +150,7 @@ class PagesControllerTest {
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
@@ -155,7 +158,7 @@ class PagesControllerTest {
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
 
-        given(pagesService.getTodays(anyInt())).willReturn(response);
+        given(pagesService.getTodays(anyInt(), any())).willReturn(response);
 
         mockMvc.perform(get("/pages/get/todays").with(csrf())
                         .with(user(account)))
@@ -170,7 +173,7 @@ class PagesControllerTest {
                 4,
                 10,
                 "source",
-                "instructions",
+                List.of("instructions"),
                 "summary",
                 200,
                 1,
@@ -181,7 +184,7 @@ class PagesControllerTest {
                 List.of("dish"),
                 List.of("cuisine"),
                 List.of("diet"),
-                List.of(new MeasurementRes("name", 12, "unit"))
+                List.of(new MeasurementRes(new Ingredient("name"), 12, new Unit("unit")))
         );
         Map<String, Day> calendar = new HashMap<>();
         calendar.put("monday", new Day(LocalDate.of(2022, 12, 12), 0));
@@ -189,9 +192,9 @@ class PagesControllerTest {
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
 
-        given(pagesService.getTodays(anyInt())).willReturn(response);
+        given(pagesService.getTodays(anyInt(), any())).willReturn(response);
 
-        mockMvc.perform(get("/pages/get/todays?accountId=2").with(csrf())
+        mockMvc.perform(get("/pages/get/todays?accountId=2&date=2022-12-12").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }

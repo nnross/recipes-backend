@@ -21,6 +21,10 @@ public class Country {
         this.name = name;
     }
 
+    public Country(String name) {
+        this.name = name;
+    }
+
     public Country() {
     }
 

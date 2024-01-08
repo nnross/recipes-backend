@@ -21,6 +21,7 @@ import java.util.List;
  * Logic for account calls.
  */
 @Service
+@SuppressWarnings("unused")
 public class AccountService {
     @Autowired
     private AccountRepository accountRepository;

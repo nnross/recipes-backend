@@ -1,5 +1,9 @@
 package com.example.recipe.response;
 
+import com.example.recipe.category.Category;
+import com.example.recipe.country.Country;
+import com.example.recipe.type.Type;
+
 import java.util.List;
 
 /**
@@ -13,16 +17,16 @@ public class RecipeRes {
     private int servings;
     private int readyInMinutes;
     private String sourceUrl;
-    private String instructions;
+    private List<String> instructions;
     private String summary;
     private double healthScore;
 
-    private List<String> dishTypes;
-    private List<String> cuisines;
-    private List<String> diets;
+    private List<Type> dishTypes;
+    private List<Country> cuisines;
+    private List<Category> diets;
     private List<MeasurementRes> measurements;
 
-    public RecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
+    public RecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, List<String> instructions, String summary, double healthScore, List<Type> dishTypes, List<Country> cuisines, List<Category> diets, List<MeasurementRes> measurements) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -38,12 +42,20 @@ public class RecipeRes {
         this.measurements = measurements;
     }
 
-    public List<String> getDishTypes() {
+    public List<Type> getDishTypes() {
         return dishTypes;
     }
 
-    public void setDishTypes(List<String> dishTypes) {
+    public void setDishTypes(List<Type> dishTypes) {
         this.dishTypes = dishTypes;
+    }
+
+    public void setCuisines(List<Country> cuisines) {
+        this.cuisines = cuisines;
+    }
+
+    public void setDiets(List<Category> diets) {
+        this.diets = diets;
     }
 
     public int getId() {
@@ -52,6 +64,14 @@ public class RecipeRes {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public List<Country> getCuisines() {
+        return cuisines;
+    }
+
+    public List<Category> getDiets() {
+        return diets;
     }
 
     public String getTitle() {
@@ -94,11 +114,11 @@ public class RecipeRes {
         this.sourceUrl = sourceUrl;
     }
 
-    public String getInstructions() {
+    public List<String> getInstructions() {
         return instructions;
     }
 
-    public void setInstructions(String instructions) {
+    public void setInstructions(List<String> instructions) {
         this.instructions = instructions;
     }
 
@@ -116,22 +136,6 @@ public class RecipeRes {
 
     public void setHealthScore(double healthScore) {
         this.healthScore = healthScore;
-    }
-
-    public List<String> getCuisines() {
-        return cuisines;
-    }
-
-    public void setCuisines(List<String> cuisines) {
-        this.cuisines = cuisines;
-    }
-
-    public List<String> getDiets() {
-        return diets;
-    }
-
-    public void setDiets(List<String> diets) {
-        this.diets = diets;
     }
 
     public List<MeasurementRes> getMeasurements() {

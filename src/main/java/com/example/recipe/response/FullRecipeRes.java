@@ -14,7 +14,7 @@ public class FullRecipeRes {
     private int servings;
     private int readyInMinutes;
     private String sourceUrl;
-    private String instructions;
+    private List<String> instructions;
     private String summary;
     private double healthScore;
     private int account;
@@ -28,7 +28,7 @@ public class FullRecipeRes {
     private List<String> diets;
     private List<MeasurementRes> measurements;
 
-    public FullRecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, String instructions, String summary, double healthScore, int account, boolean favourite, boolean doLater, boolean finished, LocalDate date, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
+    public FullRecipeRes(int id, String title, String image, int servings, int readyInMinutes, String sourceUrl, List<String> instructions, String summary, double healthScore, int account, boolean favourite, boolean doLater, boolean finished, LocalDate date, List<String> dishTypes, List<String> cuisines, List<String> diets, List<MeasurementRes> measurements) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -100,11 +100,11 @@ public class FullRecipeRes {
         this.sourceUrl = sourceUrl;
     }
 
-    public String getInstructions() {
+    public List<String> getInstructions() {
         return instructions;
     }
 
-    public void setInstructions(String instructions) {
+    public void setInstructions(List<String> instructions) {
         this.instructions = instructions;
     }
 

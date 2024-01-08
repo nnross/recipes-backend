@@ -12,6 +12,7 @@ import com.example.recipe.ingredient.IngredientRepository;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.response.*;
 import com.example.recipe.type.TypeRepository;
+import com.example.recipe.unit.Unit;
 import com.example.recipe.unit.UnitRepository;
 import com.example.recipe.type.Type;
 import exceptions.BadRequestException;
@@ -30,6 +31,7 @@ import java.util.*;
  * Logic for recipe calls.
  */
 @Service
+@SuppressWarnings("unused")
 public class RecipeService {
     Converters converter = new Converters();
 
@@ -72,12 +74,10 @@ public class RecipeService {
             typeRepository.findById(type.getId()).orElseThrow(() ->
                     new BadRequestException("type not in database"));
         }
-
         for (Country country : recipe.getCountry()) {
             countryRepository.findById(country.getId()).orElseThrow(() ->
                     new BadRequestException("country not in database"));
         }
-
         for (Category category : recipe.getCategory()) {
             categoryRepository.findById(category.getId()).orElseThrow(() ->
                     new BadRequestException("category not in database"));
@@ -202,38 +202,46 @@ public class RecipeService {
      */
     public ListRes getSearch(
             String search,
-            String ingredients,
-            String cuisine,
-            String diet,
-            String intolerances,
+            List<String> ingredients,
+            List<String> cuisine,
+            List<String> diet,
+            List<String> intolerances,
             String type,
             String sort,
             String sortDirection,
             int page) {
         if(!ingredients.isEmpty()){
             try {
-                Ingredient.valueOf(ingredients.toUpperCase());
+                for (String ingredient: ingredients) {
+                    Ingredient.valueOf(ingredient.toUpperCase());
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid ingredient filter");
             }
         }
         if(!cuisine.isEmpty()){
             try {
-                Cuisine.valueOf(cuisine.toUpperCase());
+                for (String oneCuisine: cuisine) {
+                    Cuisine.valueOf(oneCuisine.toUpperCase());
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid cuisine filter");
             }
         }
         if(!diet.isEmpty()){
             try {
-                Diet.valueOf(diet.toUpperCase().replace(" ", "_"));
+                for (String oneDiet: diet) {
+                    Diet.valueOf(oneDiet.toUpperCase().replace(" ", "_"));
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid diet filter");
             }
         }
         if(!intolerances.isEmpty()){
             try {
-                Intolerance.valueOf(intolerances.toUpperCase());
+                for (String intolerance: intolerances) {
+                    Intolerance.valueOf(intolerance.toUpperCase());
+                }
             } catch (Exception e) {
                 throw new BadRequestException("invalid intolerance filter");
             }
@@ -260,8 +268,8 @@ public class RecipeService {
             }
         }
         int offset = page*12;
-        List<ShortRecipe> recipes = recipeUtils.searchResults(search, ingredients, cuisine, diet, intolerances, type, sort, sortDirection, offset).getResults();
-        return new ListRes(recipes, true);
+        List<ShortRecipe> recipes = recipeUtils.searchResults(search, String.join(",", ingredients), String.join(",", cuisine), String.join(",", diet), String.join(",", intolerances), type, sort, sortDirection, offset).getResults();
+        return new ListRes(recipes, !recipes.isEmpty());
     }
 
     /**
@@ -271,30 +279,56 @@ public class RecipeService {
      * @return Found recipe as RecipeRes
      */
     public RecipeRes getSearchById(int id) {
+        // If recipe already in database.
+        if (recipeRepository.findById(id).orElse(null) != null) return null;
+
         RecipeFormat res = recipeUtils.getRecipeById(id);
+
+        String summary = res.getSummary().replaceAll("<b>", "").replaceAll("</b>", "").substring(0, Math.min(res.getSummary().length(), 300))+"...";
 
         List<MeasurementRes> measurements = new ArrayList<>();
         for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
-            measurements.add(new MeasurementRes(
-                    ingredient.getName(),
+            String unit = ingredient.getMeasures().getMetric().getUnitShort();
+
+            MeasurementRes measurement = new MeasurementRes(
+                    ingredientRepository.getIngredientByName(ingredient.getName()).orElseGet(() -> ingredientRepository.save(new com.example.recipe.ingredient.Ingredient(ingredient.getName()))),
                     ingredient.getMeasures().getMetric().getAmount(),
-                    ingredient.getMeasures().getMetric().getUnitShort()));
+                    unitRepository.getUnitByName(unit).orElseGet(() -> unitRepository.save(new Unit(unit))));
+            if(!measurements.contains(measurement)){
+                measurements.add(measurement);
+            }
         }
-        List<String> diets = new ArrayList<>();
-        if (res.isDairyFree()) {
-            diets.add("dairy free");
-        }
-        if (res.isVegan()) {
-            diets.add("vegan");
-        }
-        if (res.isVegetarian()) {
-            diets.add("vegetarian");
-        }
-        if (res.isGlutenFree()) {
-            diets.add("gluten free");
+        String inst = res.getInstructions().replaceAll("<ol>", "").replaceAll("</ol>", "").replaceAll("<li>", "");
+        List<String> instList = new ArrayList<>(Arrays.asList(inst.split("</li>")));
+
+        List<Type> types = new ArrayList<>();
+        List<Country> countries = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
+
+        for (String type : res.getDishTypes()) {
+            types.add(typeRepository.getTypeByName(type).orElseGet(() -> typeRepository.save(new Type(type))));
         }
 
-        diets.addAll(res.getDiets());
+        for (String cuisine : res.getCuisines()) {
+            countries.add(countryRepository.getCountryByName(cuisine).orElseGet(() -> countryRepository.save(new Country(cuisine))));
+        }
+
+        for(String category : res.getDiets()) {
+            if (category.equals("pescatarian")) categories.add(categoryRepository.getCategoryByName("pescatarian").orElse(null));
+            if (category.equals("nutfree")) categories.add(categoryRepository.getCategoryByName("nutfree").orElse(null));
+        }
+        if (res.isDairyFree()) {
+            categories.add(categoryRepository.getCategoryByName("dairyfree").orElse(null));
+        }
+        if (res.isVegan()) {
+            categories.add(categoryRepository.getCategoryByName("vegan").orElse(null));
+        }
+        if (res.isVegetarian()) {
+            categories.add(categoryRepository.getCategoryByName("vegetarian").orElse(null));
+        }
+        if (res.isGlutenFree()) {
+            categories.add(categoryRepository.getCategoryByName("glutenfree").orElse(null));
+        }
 
         return new RecipeRes(
                 res.getId(),
@@ -303,12 +337,12 @@ public class RecipeService {
                 res.getServings(),
                 res.getReadyInMinutes(),
                 res.getSourceUrl(),
-                res.getInstructions(),
-                res.getSummary(),
+                instList,
+                summary,
                 res.getHealthScore(),
-                res.getDishTypes(),
-                res.getCuisines(),
-                diets,
+                types,
+                countries,
+                categories,
                 measurements
         );
     }

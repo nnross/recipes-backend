@@ -8,12 +8,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Controller for recipe calls
  */
 @RestController
 @RequestMapping("/recipe")
+@SuppressWarnings("unused")
 public class RecipeController {
 
     @Autowired
@@ -62,6 +64,7 @@ public class RecipeController {
         return recipeService.toggleDoLater(recipeId);
     }
 
+
     /**
      * PUT API call to /recipe/finished?recipeId=(id)
      * Sets recipe as finished.
@@ -77,7 +80,7 @@ public class RecipeController {
     }
 
     /**
-     * PUT API call to /recipe/set/date?recipeId=(id)&date=(date)
+     * PUT API call to /recipe/set/calendar?recipeId=(id)&date=(date)
      * Sets date for recipe.
      * Authorization with isOwnRecipe()
      * @param recipeId
@@ -87,7 +90,7 @@ public class RecipeController {
      * @return true if successful, error otherwise.
      */
     @PreAuthorize("@authorization.isOwnRecipe(authentication, #recipeId)")
-    @PutMapping("/set/date")
+    @PutMapping("/set/calendar")
     public Boolean finished(@RequestParam("recipeId") int recipeId, @RequestParam("date") LocalDate date) {
         return recipeService.setDate(recipeId, date);
     }
@@ -120,10 +123,10 @@ public class RecipeController {
      */
     @GetMapping("/get/api/search")
     public ListRes search(@RequestParam("search") String search,
-                          @RequestParam("ingredients") String ingredients,
-                          @RequestParam("cuisine") String cuisine,
-                          @RequestParam("diet") String diet,
-                          @RequestParam("intolerances") String intolerances,
+                          @RequestParam("ingredients") List<String> ingredients,
+                          @RequestParam("cuisine") List<String> cuisine,
+                          @RequestParam("diet") List<String> diet,
+                          @RequestParam("intolerances") List<String> intolerances,
                           @RequestParam("type") String type,
                           @RequestParam("sort") String sort,
                           @RequestParam("sortDirection") String sortDirection,

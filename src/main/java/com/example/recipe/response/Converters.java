@@ -2,6 +2,7 @@ package com.example.recipe.response;
 
 import com.example.recipe.category.Category;
 import com.example.recipe.country.Country;
+import com.example.recipe.instructions.Instruction;
 import com.example.recipe.measurement.Measurement;
 import com.example.recipe.recipe.Recipe;
 import com.example.recipe.type.Type;
@@ -24,6 +25,7 @@ public class Converters {
         List<MeasurementRes> measurements = new ArrayList<>();
         List<String> categories = new ArrayList<>();
         List<String> countries = new ArrayList<>();
+        List<String> instructions = new ArrayList<>();
 
         for (Type type : recipe.getType()) {
             types.add(type.getName());
@@ -34,11 +36,15 @@ public class Converters {
         }
 
         for (Measurement measurement : recipe.getMeasurements()) {
-            measurements.add(new MeasurementRes(measurement.getIngredient().getName(), measurement.getAmount(), measurement.getUnit().getName()));
+            measurements.add(new MeasurementRes(measurement.getIngredient(), measurement.getAmount(), measurement.getUnit()));
         }
 
         for (Category category : recipe.getCategory()) {
             categories.add(category.getName());
+        }
+
+        for (Instruction instruction : recipe.getInstructions()) {
+            instructions.add(instruction.getBody());
         }
 
         return new FullRecipeRes(
@@ -48,7 +54,7 @@ public class Converters {
                 recipe.getServings(),
                 recipe.getTime(),
                 recipe.getOriginal(),
-                recipe.getInstructions(),
+                instructions,
                 recipe.getDescription(),
                 recipe.getHealthScore(),
                 recipe.getAccount().getId(),
@@ -56,9 +62,9 @@ public class Converters {
                 recipe.getDoLater(),
                 recipe.getFinished(),
                 recipe.getToDoDate(),
-                categories,
-                countries,
                 types,
+                countries,
+                categories,
                 measurements
         );
     }
