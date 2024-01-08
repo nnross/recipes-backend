@@ -31,6 +31,7 @@ import java.util.*;
  * Logic for recipe calls.
  */
 @Service
+@SuppressWarnings("unused")
 public class RecipeService {
     Converters converter = new Converters();
 
@@ -281,8 +282,6 @@ public class RecipeService {
         // If recipe already in database.
         if (recipeRepository.findById(id).orElse(null) != null) return null;
 
-
-
         RecipeFormat res = recipeUtils.getRecipeById(id);
 
         String summary = res.getSummary().replaceAll("<b>", "").replaceAll("</b>", "").substring(0, Math.min(res.getSummary().length(), 300))+"...";
@@ -315,20 +314,19 @@ public class RecipeService {
         }
 
         for(String category : res.getDiets()) {
-            category.replaceAll("\\s", "");
             if (category.equals("pescatarian")) categories.add(categoryRepository.getCategoryByName("pescatarian").orElse(null));
-            if (category.equals("nut free")) categories.add(categoryRepository.getCategoryByName("nutfree").orElse(null));
+            if (category.equals("nutfree")) categories.add(categoryRepository.getCategoryByName("nutfree").orElse(null));
         }
-        if (res.isDairyFree() && !categories.contains("dairyfree")) {
+        if (res.isDairyFree()) {
             categories.add(categoryRepository.getCategoryByName("dairyfree").orElse(null));
         }
-        if (res.isVegan() && !categories.contains("vegan")) {
+        if (res.isVegan()) {
             categories.add(categoryRepository.getCategoryByName("vegan").orElse(null));
         }
-        if (res.isVegetarian() && !categories.contains("vegetarian")) {
+        if (res.isVegetarian()) {
             categories.add(categoryRepository.getCategoryByName("vegetarian").orElse(null));
         }
-        if (res.isGlutenFree() && !categories.contains("glutenfree")) {
+        if (res.isGlutenFree()) {
             categories.add(categoryRepository.getCategoryByName("glutenfree").orElse(null));
         }
 

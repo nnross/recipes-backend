@@ -19,6 +19,7 @@ import java.util.Map;
  * Logic for the page calls.
  */
 @Service
+@SuppressWarnings("unused")
 public class PagesService {
 
     @Autowired

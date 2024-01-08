@@ -3,6 +3,7 @@ package com.example.recipe.response;
 /**
  * Formats labels to return as wanted
  */
+@SuppressWarnings("unused")
 public class LabelRes {
     private String type;
     private int id;

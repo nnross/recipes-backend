@@ -1,6 +1,5 @@
 package com.example.recipe.category;
 
-import com.example.recipe.country.Country;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;

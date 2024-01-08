@@ -2,8 +2,12 @@ package com.example.recipe.instructions;
 
 import jakarta.persistence.*;
 
+/**
+ * Table for instructions.
+ */
 @Entity
 @Table(name="instruction")
+@SuppressWarnings("unused")
 public class Instruction {
 
     @Id

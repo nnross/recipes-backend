@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 /**
  * Controller for calls where you get the whole page of data.
  */
 @RestController
 @RequestMapping("/pages")
+@SuppressWarnings("unused")
 public class PagesController {
     @Autowired
     private PagesService pagesService;

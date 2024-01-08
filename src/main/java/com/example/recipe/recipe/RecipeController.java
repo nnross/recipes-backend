@@ -15,6 +15,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/recipe")
+@SuppressWarnings("unused")
 public class RecipeController {
 
     @Autowired
