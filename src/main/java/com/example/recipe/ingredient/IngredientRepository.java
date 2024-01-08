@@ -14,6 +14,12 @@ import java.util.Optional;
 @Repository
 public interface IngredientRepository extends PagingAndSortingRepository<Ingredient, Integer>, JpaRepository<Ingredient, Integer> {
 
+    /**
+     * Query to get the ingredient by name
+     * @param name
+     *        name of the ingredient wanted
+     * @return ingredient by name
+     */
     @Query(value = "SELECT * FROM ingredient i WHERE i.ingredient_name = ?1", nativeQuery = true)
     Optional<Ingredient> getIngredientByName(String name);
 }

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -120,9 +121,9 @@ class PagesControllerTest {
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
 
-        given(pagesService.getTodays(anyInt())).willReturn(response);
+        given(pagesService.getTodays(anyInt(), any())).willReturn(response);
 
-        mockMvc.perform(get("/pages/get/todays?accountId=1").with(csrf())
+        mockMvc.perform(get("/pages/get/todays?accountId=1&date=2022-12-12").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.recipe.title").value(response.getRecipe().getTitle()))
@@ -157,7 +158,7 @@ class PagesControllerTest {
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
 
-        given(pagesService.getTodays(anyInt())).willReturn(response);
+        given(pagesService.getTodays(anyInt(), any())).willReturn(response);
 
         mockMvc.perform(get("/pages/get/todays").with(csrf())
                         .with(user(account)))
@@ -191,9 +192,9 @@ class PagesControllerTest {
         TodaysPageRes response = new TodaysPageRes(recipe, calendar);
         Account account = new Account(1, "test", "test", "test", "test");
 
-        given(pagesService.getTodays(anyInt())).willReturn(response);
+        given(pagesService.getTodays(anyInt(), any())).willReturn(response);
 
-        mockMvc.perform(get("/pages/get/todays?accountId=2").with(csrf())
+        mockMvc.perform(get("/pages/get/todays?accountId=2&date=2022-12-12").with(csrf())
                         .with(user(account)))
                 .andExpect(status().isForbidden());
     }

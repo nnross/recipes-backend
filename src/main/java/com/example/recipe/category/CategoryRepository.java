@@ -14,6 +14,12 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends PagingAndSortingRepository<Category, Integer>, JpaRepository<Category, Integer> {
 
+    /**
+     * Query to get the category by name
+     * @param name
+     *        name of the category wanted
+     * @return category by name
+     */
     @Query(value = "SELECT * FROM category c WHERE c.category_name = ?1", nativeQuery = true)
     Optional<Category> getCategoryByName(String name);
 }

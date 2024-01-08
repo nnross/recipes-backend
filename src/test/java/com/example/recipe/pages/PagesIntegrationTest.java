@@ -79,7 +79,7 @@ class PagesIntegrationTest {
                 false,
                 false,
                 false,
-                LocalDate.now(),
+                LocalDate.parse("2022-12-12"),
                 List.of(new Instruction("test instructions")),
                 List.of(new Category(1, "test")),
                 List.of(new Type(1, "test")),
@@ -89,7 +89,7 @@ class PagesIntegrationTest {
         ));
 
         String token = jwtService.newToken(account);
-        webClient.get().uri("/pages/get/todays?accountId=1")
+        webClient.get().uri("/pages/get/todays?accountId=1&date=2022-12-12")
                 .headers(http -> http.setBearerAuth(token))
                 .exchange()
                 .expectStatus().isOk()

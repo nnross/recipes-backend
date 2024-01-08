@@ -14,6 +14,12 @@ import java.util.Optional;
 @Repository
 public interface UnitRepository extends PagingAndSortingRepository<Unit, Integer>, JpaRepository<Unit, Integer> {
 
+    /**
+     * Query for the unit by name
+     * @param name
+     *        name of the unit wanted
+     * @return unit for the name
+     */
     @Query(value = "SELECT * FROM unit u WHERE u.unit_name = ?1", nativeQuery = true)
     Optional<Unit> getUnitByName(String name);
 }

@@ -15,6 +15,12 @@ import java.util.Optional;
 @Repository
 public interface TypeRepository extends PagingAndSortingRepository<Type, Integer>, JpaRepository<Type, Integer> {
 
+    /**
+     * Query to get the type by name
+     * @param name
+     *        name of the type wanted
+     * @return type by name
+     */
     @Query(value = "SELECT * FROM type t WHERE t.type_name = ?1", nativeQuery = true)
     Optional<Type> getTypeByName(String name);
 }
