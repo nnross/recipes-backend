@@ -20,6 +20,7 @@ import com.example.recipe.type.Type;
 import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.Unit;
 import com.example.recipe.unit.UnitRepository;
+import exceptions.ApiException;
 import exceptions.BadRequestException;
 import exceptions.DatabaseException;
 import org.junit.jupiter.api.Test;
@@ -488,6 +489,26 @@ class RecipeServiceTest {
     }
 
     @Test
+    void searchRecipe402errorWorks() {
+        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), anyInt()))
+                .willThrow(new RuntimeException("402 error"));
+
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "time", "asc", 0))
+                .isInstanceOf(ApiException.class)
+                .hasMessageContaining("API limit reached");
+    }
+
+    @Test
+    void searchRecipe502errorWorks() {
+        given(recipeUtils.searchResults(any(), any(), any(), any(), any(), any(), any(), any(), anyInt()))
+                .willThrow(new RuntimeException("502 error"));
+
+        assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("pork"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "time", "asc", 0))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("API error");
+    }
+
+    @Test
     void searchRecipeThrowsWithBadIngredient() {
         assertThatThrownBy(() -> testRecipeService.getSearch("search", List.of("bad"), List.of("asian"), List.of("vegan"), List.of("dairy"), "main course", "time", "asc", 0))
                 .isInstanceOf(BadRequestException.class)
@@ -559,7 +580,7 @@ class RecipeServiceTest {
                         true,
                         List.of("main course"),
                         List.of("indian"),
-                        List.of("vegan"),
+                        List.of("vegan", "nutfree", "pescatarian"),
                         List.of(new RecipeIngredients("test name", new Measures(new Metric(2, "tbsp"))))
                 ));
 
@@ -569,6 +590,26 @@ class RecipeServiceTest {
         assertEquals("test ingredient", res.getMeasurements().get(0).getName().getName());
         assertEquals(2, res.getMeasurements().get(0).getAmount());
         verify(recipeUtils).getRecipeById(1);
+    }
+
+    @Test
+    void getRecipeFromAPI402ErrorWorks() {
+        given(recipeUtils.getRecipeById(anyInt())).willThrow(new RuntimeException("402 error"));
+        given(recipeRepository.findById(anyInt())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> testRecipeService.getSearchById(1))
+                .isInstanceOf(ApiException.class)
+                .hasMessageContaining("API limit reached");
+    }
+
+    @Test
+    void getRecipeFromAPI502ErrorWorks() {
+        given(recipeUtils.getRecipeById(anyInt())).willThrow(new RuntimeException("502 error"));
+        given(recipeRepository.findById(anyInt())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> testRecipeService.getSearchById(1))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("API error");
     }
 
     @Test
@@ -972,6 +1013,23 @@ class RecipeServiceTest {
         testRecipeService.getRandom();
 
         verify(recipeUtils).randomResults();
+    }
+    @Test
+    void randomRecipe402errorWorks() {
+        given(recipeUtils.randomResults())
+                .willThrow(new RuntimeException("402 error"));
+
+        assertThatThrownBy(() ->  testRecipeService.getRandom())
+                .isInstanceOf(ApiException.class)
+                .hasMessageContaining("API limit reached");
+    }
+    @Test
+    void randomRecipe403errorWorks() {
+        given(recipeUtils.randomResults()).willThrow(new RuntimeException("403 error"));
+
+        assertThatThrownBy(() ->  testRecipeService.getRandom())
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("API error");
     }
 }
 
