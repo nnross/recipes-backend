@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for recipes-backend-shy-fog-3872 on 2024-01-09T18:31:31+02:00
+# fly.toml app configuration file generated for recipes-backend on 2024-01-16T15:18:25+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "recipes-backend-shy-fog-3872"
+app = "recipes-backend"
 primary_region = "arn"
 
 [build]
@@ -19,4 +19,4 @@ primary_region = "arn"
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 1024
+  memory_mb = 256
