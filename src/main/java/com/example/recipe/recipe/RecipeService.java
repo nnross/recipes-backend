@@ -15,6 +15,7 @@ import com.example.recipe.type.TypeRepository;
 import com.example.recipe.unit.Unit;
 import com.example.recipe.unit.UnitRepository;
 import com.example.recipe.type.Type;
+import exceptions.ApiException;
 import exceptions.BadRequestException;
 import exceptions.DatabaseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,65 +211,72 @@ public class RecipeService {
             String sort,
             String sortDirection,
             int page) {
-        if(!ingredients.isEmpty()){
+        if (!ingredients.isEmpty()) {
             try {
-                for (String ingredient: ingredients) {
+                for (String ingredient : ingredients) {
                     Ingredient.valueOf(ingredient.toUpperCase());
                 }
             } catch (Exception e) {
                 throw new BadRequestException("invalid ingredient filter");
             }
         }
-        if(!cuisine.isEmpty()){
+        if (!cuisine.isEmpty()) {
             try {
-                for (String oneCuisine: cuisine) {
+                for (String oneCuisine : cuisine) {
                     Cuisine.valueOf(oneCuisine.toUpperCase());
                 }
             } catch (Exception e) {
                 throw new BadRequestException("invalid cuisine filter");
             }
         }
-        if(!diet.isEmpty()){
+        if (!diet.isEmpty()) {
             try {
-                for (String oneDiet: diet) {
+                for (String oneDiet : diet) {
                     Diet.valueOf(oneDiet.toUpperCase().replace(" ", "_"));
                 }
             } catch (Exception e) {
                 throw new BadRequestException("invalid diet filter");
             }
         }
-        if(!intolerances.isEmpty()){
+        if (!intolerances.isEmpty()) {
             try {
-                for (String intolerance: intolerances) {
+                for (String intolerance : intolerances) {
                     Intolerance.valueOf(intolerance.toUpperCase());
                 }
             } catch (Exception e) {
                 throw new BadRequestException("invalid intolerance filter");
             }
         }
-        if(!type.isEmpty()){
+        if (!type.isEmpty()) {
             try {
                 Types.valueOf(type.toUpperCase().replace(" ", "_"));
             } catch (Exception e) {
                 throw new BadRequestException("invalid type filter");
             }
         }
-        if(!sort.isEmpty()){
+        if (!sort.isEmpty()) {
             try {
                 Sort.valueOf(sort.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid sort");
             }
         }
-        if(!sortDirection.isEmpty()){
+        if (!sortDirection.isEmpty()) {
             try {
                 SortDirection.valueOf(sortDirection.toUpperCase());
             } catch (Exception e) {
                 throw new BadRequestException("invalid sort direction");
             }
         }
-        int offset = page*12;
-        List<ShortRecipe> recipes = recipeUtils.searchResults(search, String.join(",", ingredients), String.join(",", cuisine), String.join(",", diet), String.join(",", intolerances), type, sort, sortDirection, offset).getResults();
+        int offset = page * 12;
+        List<ShortRecipe> recipes;
+        try {
+            recipes = recipeUtils.searchResults(search, String.join(",", ingredients), String.join(",", cuisine), String.join(",", diet), String.join(",", intolerances), type, sort, sortDirection, offset).getResults();
+        } catch (Exception e) {
+            if (e.getMessage().split(" ")[0].equals("402")) throw new ApiException("API limit reached");
+            else throw new BadRequestException("API error");
+        }
+
         return new ListRes(recipes, !recipes.isEmpty());
     }
 
@@ -281,20 +289,24 @@ public class RecipeService {
     public RecipeRes getSearchById(int id) {
         // If recipe already in database.
         if (recipeRepository.findById(id).orElse(null) != null) return null;
-
-        RecipeFormat res = recipeUtils.getRecipeById(id);
-
-        String summary = res.getSummary().replaceAll("<b>", "").replaceAll("</b>", "").substring(0, Math.min(res.getSummary().length(), 300))+"...";
-
+        RecipeFormat res;
+        try {
+            res = recipeUtils.getRecipeById(id);
+        } catch (Exception e) {
+            if (e.getMessage().split(" ")[0].equals("402")) throw new ApiException("API limit reached");
+            else throw new BadRequestException("API error");
+        }
+        
+        String summary = res.getSummary().replaceAll("<b>", "").replaceAll("</b>", "").substring(0, Math.min(res.getSummary().length(), 300)) + "...";
         List<MeasurementRes> measurements = new ArrayList<>();
-        for(RecipeIngredients ingredient : res.getExtendedIngredients())     {
+        for (RecipeIngredients ingredient : res.getExtendedIngredients()) {
             String unit = ingredient.getMeasures().getMetric().getUnitShort();
 
             MeasurementRes measurement = new MeasurementRes(
                     ingredientRepository.getIngredientByName(ingredient.getName()).orElseGet(() -> ingredientRepository.save(new com.example.recipe.ingredient.Ingredient(ingredient.getName()))),
                     ingredient.getMeasures().getMetric().getAmount(),
                     unitRepository.getUnitByName(unit).orElseGet(() -> unitRepository.save(new Unit(unit))));
-            if(!measurements.contains(measurement)){
+            if (!measurements.contains(measurement)) {
                 measurements.add(measurement);
             }
         }
@@ -313,9 +325,11 @@ public class RecipeService {
             countries.add(countryRepository.getCountryByName(cuisine).orElseGet(() -> countryRepository.save(new Country(cuisine))));
         }
 
-        for(String category : res.getDiets()) {
-            if (category.equals("pescatarian")) categories.add(categoryRepository.getCategoryByName("pescatarian").orElse(null));
-            if (category.equals("nutfree")) categories.add(categoryRepository.getCategoryByName("nutfree").orElse(null));
+        for (String category : res.getDiets()) {
+            if (category.equals("pescatarian"))
+                categories.add(categoryRepository.getCategoryByName("pescatarian").orElse(null));
+            if (category.equals("nutfree"))
+                categories.add(categoryRepository.getCategoryByName("nutfree").orElse(null));
         }
         if (res.isDairyFree()) {
             categories.add(categoryRepository.getCategoryByName("dairyfree").orElse(null));
@@ -352,7 +366,13 @@ public class RecipeService {
      * @return a ListRes of random recipes
      */
     public ListRes getRandom() {
-        List<ShortRecipe> recipes = recipeUtils.randomResults().getRecipes();
+        List<ShortRecipe> recipes;
+        try {
+            recipes = recipeUtils.randomResults().getRecipes();
+        } catch (Exception e) {
+            if (e.getMessage().split(" ")[0].equals("402")) throw new ApiException("API limit reached");
+            else throw new BadRequestException("API error");
+        }
         return new ListRes(recipes, false);
     }
 
