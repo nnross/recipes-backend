@@ -1,0 +1,17 @@
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/recipe/RecipeServiceTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/pages/PagesServiceTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/account/AccountIntegrationTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/type/TypeRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/category/CategoryRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/RecipeApplicationTests.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/account/AccountServiceTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/recipe/RecipeControllerTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/account/AccountControllerTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/country/CountryRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/ingredient/IngredientRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/account/AccountRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/pages/PagesControllerTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/pages/PagesIntegrationTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/recipe/RecipeRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/unit/UnitRepositoryTest.java
+/Users/nellirossi/Documents/recipes/recipes-backend/src/test/java/com/example/recipe/recipe/RecipeIntegrationTest.java
